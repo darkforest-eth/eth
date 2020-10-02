@@ -7,6 +7,7 @@ import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 
 contract Whitelist is Initializable {
     bool whitelistEnabled;
+    uint256 public drip = 0.05 ether;
     mapping(address => bool) allowedAccounts;
     mapping(bytes32 => bool) allowedKeyHashes;
     address[] allowedAccountsArray;
@@ -64,6 +65,8 @@ contract Whitelist is Initializable {
         allowedAccounts[owner] = true;
         allowedAccountsArray.push(owner);
         allowedKeyHashes[hashed] = false;
+        // xDAI ONLY
+        payable(owner).transfer(drip);
     }
 
     function removeFromWhitelist(address toRemove) public onlyAdmin {
@@ -80,4 +83,12 @@ contract Whitelist is Initializable {
             }
         }
     }
+    
+    function changeDrip(uint256 newDrip) public onlyAdmin {
+        drip = newDrip;
+    }
+
+    function receiveEther() external payable {}
+
+    receive() external payable {}
 }

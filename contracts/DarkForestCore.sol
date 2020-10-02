@@ -36,10 +36,13 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
     event PlayerInitialized(address player, uint256 loc);
     event ArrivalQueued(uint256 arrivalId);
     event PlanetUpgraded(uint256 loc);
+    event PlanetDelegated(uint256 loc, address player);
+    event PlanetUndelegated(uint256 loc, address player);
+    event BoughtHat(uint256 loc);
 
     function initialize(
         address _adminAddress,
-        address _whitelistAddress,
+        address payable _whitelistAddress,
         bool _disableZKCheck
     ) public initializer {
         adminAddress = _adminAddress;
@@ -47,14 +50,12 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
 
         paused = false;
 
-        VERSION = 1;
         DISABLE_ZK_CHECK = _disableZKCheck;
 
         gameEndTimestamp = 1697464000;
         target4RadiusConstant = 50;
         target5RadiusConstant = 12;
 
-        planetTypeThresholds = [65536, 0];
         planetLevelThresholds = [
             16777216,
             4194256,
@@ -141,6 +142,10 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         target5RadiusConstant = _newConstant;
     }
 
+    function withdraw() public onlyAdmin {
+        msg.sender.transfer(address(this).balance);
+    }
+
     //////////////
     /// Helper ///
     //////////////
@@ -204,10 +209,6 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
 
     function getPlanetLevelThresholds() public view returns (uint256[] memory) {
         return planetLevelThresholds;
-    }
-
-    function getPlanetTypeThresholds() public view returns (uint256[] memory) {
-        return planetTypeThresholds;
     }
 
     function getPlanetCumulativeRarities()
@@ -289,18 +290,20 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         return upgrades;
     }
 
-    // private utilities
-
-    function _getPlanetType()
+    function isDelegated(uint256 _location, address _player)
         public
-        pure
-        returns (
-            /* uint256 _location */
-            DarkForestTypes.PlanetType
-        )
+        view
+        returns (bool)
     {
-        return DarkForestTypes.PlanetType.PLANET;
+        return
+            DarkForestUtils.isDelegated(
+                planetsExtendedInfo,
+                _location,
+                _player
+            );
     }
+
+    // private utilities
 
     function _locationIdValid(uint256 _loc) public pure returns (bool) {
         return (_loc <
@@ -319,7 +322,11 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         );
     }
 
-    function _initializePlanet(uint256 _location, bool _isHomePlanet) private {
+    function _initializePlanet(
+        uint256 _location,
+        uint256 _perlin,
+        bool _isHomePlanet
+    ) private {
         require(_locationIdValid(_location), "Not a valid planet location");
 
         (
@@ -327,12 +334,15 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
             DarkForestTypes.PlanetResource _resource
         ) = DarkForestUtils._getPlanetLevelAndResource(
             _location,
-            SILVER_RARITY,
+            _perlin,
+            PERLIN_THRESHOLD_1,
+            PERLIN_THRESHOLD_2,
+            SILVER_RARITY_1,
+            SILVER_RARITY_2,
+            SILVER_RARITY_3,
             planetLevelThresholds,
             planetDefaultStats
         );
-
-        DarkForestTypes.PlanetType _type = _getPlanetType();
 
         if (_isHomePlanet) {
             require(_level == 0, "Can only initialize on planet level 0");
@@ -342,8 +352,10 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
             planets[_location],
             planetsExtendedInfo[_location],
             planetDefaultStats[_level],
-            VERSION,
-            _type,
+            _perlin,
+            TIME_FACTOR_HUNDREDTHS,
+            PERLIN_THRESHOLD_1,
+            PERLIN_THRESHOLD_2,
             _resource,
             _level,
             _location
@@ -362,26 +374,12 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         notPaused
         notEnded
     {
-        require(
-            planetsExtendedInfo[_location].isInitialized,
-            "Planet has not been initialized"
-        );
-
-        // apply all pending events until the current timestamp
-        DarkForestLazyUpdate._applyPendingEvents(
+        DarkForestPlanet.refreshPlanet(
             _location,
-            planetEvents,
             planets,
             planetsExtendedInfo,
+            planetEvents,
             planetArrivals
-        );
-
-        // we need to do another updatePlanet call to sync the planet's data
-        // to current time.
-        DarkForestLazyUpdate.updatePlanet(
-            planets[_location],
-            planetsExtendedInfo[_location],
-            block.timestamp
         );
     }
 
@@ -390,7 +388,7 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         uint256[2][2] memory _b,
         uint256[2] memory _c,
         uint256[3] memory _input
-    ) public onlyWhitelisted notPaused notEnded {
+    ) public onlyWhitelisted notPaused notEnded returns (uint256) {
         if (!DISABLE_ZK_CHECK) {
             require(
                 Verifier.verifyInitProof(_a, _b, _c, _input),
@@ -399,7 +397,7 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         }
 
         uint256 _location = _input[0];
-        // uint256 _perlin = _input[1];
+        uint256 _perlin = _input[1];
         uint256 _radius = _input[2];
 
         require(
@@ -414,21 +412,22 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
             _radius <= worldRadius,
             "Init radius is bigger than the current world radius"
         );
-        // require(
-        //     _perlin <= PERLIN_THRESHOLD,
-        //     "Init not allowed in perlin value above the threshold"
-        // );
+        require(
+            _perlin < PERLIN_THRESHOLD_1,
+            "Init not allowed in perlin value greater than or equal to the threshold"
+        );
 
         // Initialize player data
         isPlayerInitialized[msg.sender] = true;
         playerIds.push(msg.sender);
 
         // Initialize planet information
-        _initializePlanet(_location, true);
+        _initializePlanet(_location, _perlin, true);
         planets[_location].owner = msg.sender;
-        planets[_location].population = 75000;
+        planets[_location].population = 50000;
         _updateWorldRadius();
         emit PlayerInitialized(msg.sender, _location);
+        return _location;
     }
 
     function move(
@@ -436,7 +435,7 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         uint256[2][2] memory _b,
         uint256[2] memory _c,
         uint256[7] memory _input
-    ) public notPaused notEnded {
+    ) public notPaused notEnded returns (uint256) {
         uint256 _oldLoc = _input[0];
         uint256 _newLoc = _input[1];
         uint256 _newPerlin = _input[2];
@@ -464,11 +463,11 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
 
         // Only perform if the toPlanet have never initialized previously
         if (!planetsExtendedInfo[_newLoc].isInitialized) {
-            _initializePlanet(_newLoc, false);
+            _initializePlanet(_newLoc, _newPerlin, false);
         } else {
             // need to do this so people can't deny service to their own planets with gas limit
             refreshPlanet(_newLoc);
-            require(planetEvents[_newLoc].length < 8, "Planet is rate-limited");
+            require(planetEvents[_newLoc].length < 7, "Planet is rate-limited");
         }
 
         // Refresh fromPlanet first before doing any action on it
@@ -479,9 +478,9 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
             _maxDist,
             _popMoved,
             _silverMoved,
-            GLOBAL_SPEED_IN_HUNDRETHS,
             planetEventsCount,
             planets,
+            planetsExtendedInfo,
             planetEvents,
             planetArrivals
         );
@@ -490,12 +489,14 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
 
         _updateWorldRadius();
         emit ArrivalQueued(planetEventsCount - 1);
+        return (planetEventsCount - 1);
     }
 
     function upgradePlanet(uint256 _location, uint256 _branch)
         public
         notPaused
         notEnded
+        returns (uint256, uint256)
     {
         // _branch specifies which of the three upgrade branches player is leveling up
         // 0 improves silver production and capacity
@@ -503,12 +504,93 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         // 2 improves range
         refreshPlanet(_location);
         DarkForestPlanet.upgradePlanet(
-            planets[_location],
-            planetsExtendedInfo[_location],
+            _location,
             _branch,
+            planets,
+            planetsExtendedInfo,
             planetDefaultStats,
             upgrades
         );
         emit PlanetUpgraded(_location);
+        return (_location, _branch);
+    }
+
+    function delegatePlanet(uint256 _location, address _player)
+        public
+        notPaused
+        notEnded
+    {
+        require(
+            planetsExtendedInfo[_location].isInitialized == true,
+            "Planet is not initialized"
+        );
+        refreshPlanet(_location);
+        require(
+            planets[_location].owner == msg.sender,
+            "Only owner can delegate planet"
+        );
+        require(!isDelegated(_location, _player), "Planet already delegated");
+        planetsExtendedInfo[_location].delegatedPlayers.push(_player);
+
+        emit PlanetDelegated(_location, _player);
+    }
+
+    function undelegatePlanet(uint256 _location, address _player)
+        public
+        notPaused
+        notEnded
+    {
+        require(
+            planetsExtendedInfo[_location].isInitialized == true,
+            "Planet is not initialized"
+        );
+        refreshPlanet(_location);
+        require(
+            planets[_location].owner == msg.sender,
+            "Only owner can delegate planet"
+        );
+
+        require(isDelegated(_location, _player), "Planet is not delegated");
+
+        for (
+            uint256 i = 0;
+            i < planetsExtendedInfo[_location].delegatedPlayers.length;
+            i++
+        ) {
+            if (_player == planetsExtendedInfo[_location].delegatedPlayers[i]) {
+                planetsExtendedInfo[_location]
+                    .delegatedPlayers[i] = planetsExtendedInfo[_location]
+                    .delegatedPlayers[planetsExtendedInfo[_location]
+                    .delegatedPlayers
+                    .length - 1];
+
+                planetsExtendedInfo[_location].delegatedPlayers.pop();
+                emit PlanetUndelegated(_location, _player);
+            }
+        }
+    }
+
+    function buyHat(uint256 _location)
+        public
+        payable
+    {
+        require(
+            planetsExtendedInfo[_location].isInitialized == true,
+            "Planet is not initialized"
+        );
+
+        refreshPlanet(_location);
+
+        require(
+            planets[_location].owner == msg.sender,
+            "Only owner can buy hat for planet"
+        );
+
+        uint256 cost = (1 << planetsExtendedInfo[_location].hatLevel) * 1 ether;
+
+        require(msg.value >= cost, "Insufficient value sent");
+
+        planetsExtendedInfo[_location].hatLevel += 1;
+        emit BoughtHat(_location);
     }
 }

@@ -4,11 +4,13 @@ pragma solidity ^0.6.9;
 library DarkForestTypes {
     enum PlanetResource {NONE, SILVER}
     enum PlanetEventType {ARRIVAL}
-    enum PlanetType {PLANET, TRADING_POST}
+    enum SpaceType {NEBULA, SPACE, DEEP_SPACE}
 
     struct Planet {
         address owner;
         uint256 range;
+        uint256 speed;
+        uint256 defense;
         uint256 population;
         uint256 populationCap;
         uint256 populationGrowth;
@@ -16,18 +18,20 @@ library DarkForestTypes {
         uint256 silverCap;
         uint256 silverGrowth;
         uint256 silver;
-        uint256 silverMax;
         uint256 planetLevel;
-        PlanetType planetType;
     }
 
     struct PlanetExtendedInfo {
         bool isInitialized;
-        uint256 version;
+        uint256 createdAt;
         uint256 lastUpdated;
+        uint256 perlin;
+        SpaceType spaceType;
         uint256 upgradeState0;
         uint256 upgradeState1;
         uint256 upgradeState2;
+        uint256 hatLevel;
+        address[] delegatedPlayers;
     }
 
     struct PlanetEventMetadata {
@@ -53,20 +57,18 @@ library DarkForestTypes {
         uint256 populationCap;
         uint256 populationGrowth;
         uint256 range;
+        uint256 speed;
+        uint256 defense;
         uint256 silverGrowth;
         uint256 silverCap;
-        uint256 silverMax;
         uint256 barbarianPercentage;
-        uint256 energyCost;
     }
 
     struct Upgrade {
         uint256 popCapMultiplier;
         uint256 popGroMultiplier;
-        uint256 silverCapMultiplier;
-        uint256 silverGroMultiplier;
-        uint256 silverMaxMultiplier;
         uint256 rangeMultiplier;
-        uint256 silverCostMultiplier;
+        uint256 speedMultiplier;
+        uint256 defMultiplier;
     }
 }

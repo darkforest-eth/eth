@@ -1,6 +1,6 @@
-const {web3} = require("@openzeppelin/test-environment");
-const {time} = require("@openzeppelin/test-helpers");
-const {expect} = require("chai");
+const { web3 } = require("@openzeppelin/test-environment");
+const { time } = require("@openzeppelin/test-helpers");
+const { expect } = require("chai");
 
 const {
   zeroOwner,
@@ -35,15 +35,21 @@ describe("DarkForestRefresh", function () {
     this.timeout(5000);
 
     await Whitelist.detectNetwork();
-    this.whitelistContract = await Whitelist.new({from: deployer});
+    this.whitelistContract = await Whitelist.new({ from: deployer });
     await this.whitelistContract.initialize(deployer, false);
 
-    this.verifierLib = await Verifier.new({from: deployer});
-    this.dfPlanetLib = await DarkForestPlanet.new({from: deployer});
-    this.dfLazyUpdateLib = await DarkForestLazyUpdate.new({from: deployer});
-    this.dfTypesLib = await DarkForestTypes.new({from: deployer});
-    this.dfUtilsLib = await DarkForestUtils.new({from: deployer});
-    this.dfInitializeLib = await DarkForestInitialize.new({from: deployer});
+    this.verifierLib = await Verifier.new({ from: deployer });
+    this.dfUtilsLib = await DarkForestUtils.new({ from: deployer });
+    this.dfLazyUpdateLib = await DarkForestLazyUpdate.new({ from: deployer });
+    this.dfTypesLib = await DarkForestTypes.new({ from: deployer });
+    await DarkForestPlanet.detectNetwork();
+    await DarkForestPlanet.link(
+      "DarkForestLazyUpdate",
+      this.dfLazyUpdateLib.address
+    );
+    await DarkForestPlanet.link("DarkForestUtils", this.dfUtilsLib.address);
+    this.dfPlanetLib = await DarkForestPlanet.new({ from: deployer });
+    this.dfInitializeLib = await DarkForestInitialize.new({ from: deployer });
     await DarkForestCore.detectNetwork();
     await DarkForestCore.link("Verifier", this.verifierLib.address);
     await DarkForestCore.link("DarkForestPlanet", this.dfPlanetLib.address);
@@ -57,7 +63,7 @@ describe("DarkForestRefresh", function () {
       "DarkForestInitialize",
       this.dfInitializeLib.address
     );
-    this.contract = await DarkForestCore.new({from: deployer});
+    this.contract = await DarkForestCore.new({ from: deployer });
     await this.contract.initialize(
       deployer,
       this.whitelistContract.address,
@@ -69,7 +75,7 @@ describe("DarkForestRefresh", function () {
 
     let planetId = getPlanetIdFromHex(asteroid1Location.hex);
 
-    await this.contract.initializePlayer(...makeInitArgs(planetId, 17, 1999), {
+    await this.contract.initializePlayer(...makeInitArgs(planetId, 10, 1999), {
       from: user1,
     });
   });
@@ -126,7 +132,7 @@ describe("DarkForestRefresh", function () {
 
     await this.contract.move(
       ...makeMoveArgs(planetId1, planetId2, 16, 2000, 0, 50000, 0),
-      {from: user1}
+      { from: user1 }
     );
 
     time.increase(LARGE_INTERVAL);
@@ -134,7 +140,7 @@ describe("DarkForestRefresh", function () {
 
     await this.contract.move(
       ...makeMoveArgs(planetId2, planetId1, 17, 2000, 0, 100000, 0),
-      {from: user1}
+      { from: user1 }
     );
 
     await this.contract.refreshPlanet(planetId1);
@@ -170,14 +176,14 @@ describe("DarkForestRefresh", function () {
 
   it("should increase silver of 50%pop silver-producing planet", async function () {
     let planetId = getPlanetIdFromHex(asteroid1Location.hex);
-    let silverStarId = getPlanetIdFromHex(silverStar1Location.hex);
+    let silverStarId = getPlanetIdFromHex(silverStar2Location.hex);
 
     time.increase(LARGE_INTERVAL);
     time.advanceBlock();
 
     await this.contract.move(
       ...makeMoveArgs(planetId, silverStarId, 16, 2000, 0, 90001, 0),
-      {from: user1}
+      { from: user1 }
     );
 
     // after a long time, silver star is full of silver and pop
@@ -197,18 +203,11 @@ describe("DarkForestRefresh", function () {
         silverStarPopCap.toNumber() / 2,
         silverStarResCap
       ),
-      {from: user1}
+      { from: user1 }
     );
 
     // test that over SMALL_INTERVAL seconds it produces the correct amt of silver
-    expect(
-      (await this.contract.planets(silverStarId)).silver
-    ).to.be.bignumber.equal(web3.utils.toBN(0));
-
-    expect(
-      (await this.contract.planets(silverStarId)).population
-    ).to.be.bignumber.equal(silverStarPopCap.divn(2));
-
+    // i.e. after SMALL_INTERVAL seconds it has ~silverGrowth * SMALL_INTERVAL silver
     time.increase(SMALL_INTERVAL);
     time.advanceBlock();
     await this.contract.refreshPlanet(silverStarId);
@@ -220,32 +219,6 @@ describe("DarkForestRefresh", function () {
     // to account for the fact that blockchain time passes somewhat unevenly
     expect(silverStarPlanet.silver).to.not.be.bignumber.above(
       silverStarPlanet.silverGrowth.muln(SMALL_INTERVAL + TOLERANCE)
-    );
-  });
-
-  it("should not increase silver of <50%pop silver-producing planet", async function () {
-    let planetId = getPlanetIdFromHex(asteroid1Location.hex);
-    let silverStarId = getPlanetIdFromHex(silverStar1Location.hex);
-
-    time.increase(LARGE_INTERVAL);
-    time.advanceBlock();
-
-    await this.contract.move(
-      ...makeMoveArgs(planetId, silverStarId, 16, 2000, 0, 100000, 0),
-      {from: user1}
-    );
-
-    // the silver should be 0 after SMALL_INTERVAL bc population < 50%
-
-    time.increase(SMALL_INTERVAL);
-    time.advanceBlock();
-    await this.contract.refreshPlanet(silverStarId);
-
-    const silverStarPlanet = await this.contract.planets(silverStarId);
-    expect(silverStarPlanet.owner).to.equal(user1);
-    expect(silverStarPlanet.silver).to.be.bignumber.equal(web3.utils.toBN(0));
-    expect(silverStarPlanet.population).to.be.bignumber.below(
-      silverStarPlanet.populationCap.divn(2)
     );
   });
 
@@ -267,21 +240,21 @@ describe("DarkForestRefresh", function () {
     time.increase(LARGE_INTERVAL);
     time.advanceBlock();
     await this.contract.move(
-      ...makeMoveArgs(planetId, silverStarId1, 16, 2000, 0, 100000, 0),
-      {from: user1}
+      ...makeMoveArgs(planetId, silverStarId1, 20, 2000, 0, 90000, 0),
+      { from: user1 }
     );
     time.increase(LARGE_INTERVAL);
     time.advanceBlock();
     await this.contract.move(
-      ...makeMoveArgs(planetId, silverStarId2, 16, 2000, 0, 100000, 0),
-      {from: user1}
+      ...makeMoveArgs(planetId, silverStarId2, 20, 2000, 0, 90000, 0),
+      { from: user1 }
     );
     time.increase(LARGE_INTERVAL);
     time.advanceBlock();
     // make planet 2's silver > cap
     await this.contract.move(
-      ...makeMoveArgs(silverStarId1, silverStarId2, 16, 2000, 0, 100000, 1000),
-      {from: user1}
+      ...makeMoveArgs(silverStarId1, silverStarId2, 10, 2000, 0, 90000, 1000),
+      { from: user1 }
     );
     await this.contract.refreshPlanet(silverStarId2);
     let silverStarPlanet2 = await this.contract.planets(silverStarId2);
@@ -302,8 +275,8 @@ describe("DarkForestRefresh", function () {
     let homePlanetId = getPlanetIdFromHex(asteroid1Location.hex);
     let star2Id = getPlanetIdFromHex(star2Location.hex);
     await this.contract.move(
-      ...makeMoveArgs(homePlanetId, star2Id, 16, 2000, 0, 20000, 0),
-      {from: user1}
+      ...makeMoveArgs(homePlanetId, star2Id, 10, 2000, 0, 20000, 0),
+      { from: user1 }
     );
     time.increase(LARGE_INTERVAL);
     time.advanceBlock();
@@ -328,7 +301,7 @@ describe("DarkForestRefresh", function () {
     let uninitializedPlanet = getPlanetIdFromHex(asteroid2Location.hex);
 
     await expectRevert(
-      this.contract.refreshPlanet(uninitializedPlanet, {from: user1}),
+      this.contract.refreshPlanet(uninitializedPlanet, { from: user1 }),
       "Planet has not been initialized"
     );
   });

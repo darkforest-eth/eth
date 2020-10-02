@@ -12,8 +12,10 @@ require("dotenv").config({
 });
 
 enum Network {
+  xDAI = "xdai",
   Ropsten = "ropsten",
   Development = "development",
+  PersonalGanache = "personalGanache",
 }
 
 const NETWORK: Network = process.env.network as Network;
@@ -51,10 +53,15 @@ if (DISABLE_ZK_CHECKS) {
   console.log("WARNING: ZK checks disabled.");
 }
 
-const network_url =
-  NETWORK === Network.Ropsten
-    ? `https://ropsten.infura.io/v3/${PROJECT_ID}`
-    : "http://localhost:8545";
+let network_url = "http://localhost:8545";
+
+if (NETWORK === Network.Ropsten) {
+  network_url = `https://ropsten.infura.io/v3/${PROJECT_ID}`;
+} else if (NETWORK === Network.xDAI) {
+  network_url = "https://rpc.xdaichain.com/";
+} else if (NETWORK === Network.PersonalGanache) {
+  network_url = "https://dark-forest.online:8545";
+}
 
 const exec = async (command: string) => {
   const { error, stdout, stderr } = await rawExec(command);
@@ -69,6 +76,7 @@ const exec = async (command: string) => {
 };
 
 const run = async () => {
+  await exec(`oz compile --optimizer on --no-interactive`);
   console.log("Deploy mnemonics: ", DEPLOYER_MNEMONIC);
   const deployerWallet = new HDWalletProvider(DEPLOYER_MNEMONIC, network_url);
   const whitelistControllerWallet = new HDWalletProvider(
@@ -80,8 +88,6 @@ const run = async () => {
     network_url
   );
   const ozAdminWallet = new HDWalletProvider(OZ_ADMIN_MNEMONIC, network_url);
-  //await exec(`wget https://faucet.ropsten.be/donate/${wallet.getAddress()}`) // need to add a wallet and get the address.
-  //console.log("Got ETH from faucet.")
   if (isProd) {
     console.log(`Give some eth to ${deployerWallet.getAddress()}`);
     readlineSync.question("Press enter when you're done.");
@@ -125,14 +131,16 @@ const run = async () => {
 const deployWhitelist = async (
   whitelistControllerAddress: string
 ): Promise<string> => {
-  await exec(`oz compile --no-interactive`);
   await exec(`oz add Whitelist`);
-  await exec(`oz push -n ${NETWORK} --no-interactive --force`);
+  await exec(`oz push -n ${NETWORK} --no-interactive --reset --force`);
   const whitelistAddress = await exec(
     `oz deploy Whitelist -k regular -n ${NETWORK} --no-interactive`
   );
   await exec(
-    `oz send-tx -n ${NETWORK} --to ${whitelistAddress} --method initialize --args ${whitelistControllerAddress},true --no-interactive`
+    `oz send-tx -n ${NETWORK} --to ${whitelistAddress} --method initialize --args ${whitelistControllerAddress},${isProd} --no-interactive`
+  );
+  await exec(
+    `oz send-tx -n ${NETWORK} --to ${whitelistAddress} --method receiveEther --value 2000000000000000000 --no-interactive`
   );
   console.log(`Whitelist deployed to ${whitelistAddress}`);
   return whitelistAddress;
@@ -142,8 +150,8 @@ const deployCore = async (
   coreControllerAddress: string,
   whitelistAddress: string
 ): Promise<string> => {
-  await exec(`oz add DarkForestCore --no-interactive`);
-  await exec(`oz push -n ${NETWORK} --no-interactive --force`);
+  await exec(`oz add DarkForestCore`);
+  await exec(`oz push -n ${NETWORK} --no-interactive --reset --force`);
   const dfCoreAddress = await exec(
     `oz deploy DarkForestCore -k upgradeable -n ${NETWORK} --no-interactive`
   );

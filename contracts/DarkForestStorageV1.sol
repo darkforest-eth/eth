@@ -12,20 +12,17 @@ contract DarkForestStorageV1 {
     bool public paused;
 
     // Game config
-    uint256 public VERSION;
     bool public DISABLE_ZK_CHECK;
-    uint256 public constant PERLIN_THRESHOLD = 18;
-    uint256 public constant GLOBAL_SPEED_IN_HUNDRETHS = 75;
+    uint256 public constant TIME_FACTOR_HUNDREDTHS = 100; // dev use only - speedup/slowdown game
+    uint256 public constant PERLIN_THRESHOLD_1 = 15;
+    uint256 public constant PERLIN_THRESHOLD_2 = 17;
     uint256 public constant PLANET_RARITY = 16384;
-    uint256 public constant ENERGY_PER_SECOND = 17;
-    uint256 public constant ENERGY_CAP = 200000;
-    uint256 public constant TRADING_POST_RARITY = 16;
-    uint256 public constant SILVER_RARITY = 4;
-    uint256 public constant TRADING_POST_BARBARIANS = 50;
+    uint256 public constant SILVER_RARITY_1 = 8;
+    uint256 public constant SILVER_RARITY_2 = 8;
+    uint256 public constant SILVER_RARITY_3 = 4;
 
     // Default planet type stats
     uint256[] public planetLevelThresholds;
-    uint256[] public planetTypeThresholds;
     uint256[] public cumulativeRarities;
     uint256[] public initializedPlanetCountByLevel;
     DarkForestTypes.PlanetDefaultStats[] public planetDefaultStats;
@@ -50,7 +47,4 @@ contract DarkForestStorageV1 {
 
     // maps event id to arrival data
     mapping(uint256 => DarkForestTypes.ArrivalData) public planetArrivals;
-
-    // no-op for now since no player energy
-    // mapping(address => DarkForestTypes.PlayerInfo) public playerInfos;
 }

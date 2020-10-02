@@ -18,7 +18,12 @@ library DarkForestUtils {
 
     function _getPlanetLevelAndResource(
         uint256 _location,
-        uint256 SILVER_RARITY,
+        uint256 _perlin,
+        uint256 PERLIN_THRESHOLD_1,
+        uint256 PERLIN_THRESHOLD_2,
+        uint256 SILVER_RARITY_1,
+        uint256 SILVER_RARITY_2,
+        uint256 SILVER_RARITY_3,
         uint256[] storage planetLevelThresholds,
         DarkForestTypes.PlanetDefaultStats[] storage planetDefaultStats
     ) public view returns (uint256, DarkForestTypes.PlanetResource) {
@@ -36,15 +41,44 @@ library DarkForestUtils {
             }
         }
 
-        DarkForestTypes.PlanetResource resource;
+        DarkForestTypes.PlanetResource resource = DarkForestTypes
+            .PlanetResource
+            .NONE;
 
+        if (planetDefaultStats[level].silverGrowth > 0) {
+            if (
+                _perlin < PERLIN_THRESHOLD_1 &&
+                uint256(uint8(_b[8])) * SILVER_RARITY_1 < 256
+            ) {
+                // nebula
+                resource = DarkForestTypes.PlanetResource.SILVER;
+            } else if (
+                _perlin >= PERLIN_THRESHOLD_1 &&
+                _perlin < PERLIN_THRESHOLD_2 &&
+                uint256(uint8(_b[8])) * SILVER_RARITY_2 < 256
+            ) {
+                // space
+                resource = DarkForestTypes.PlanetResource.SILVER;
+            } else if (
+                _perlin >= PERLIN_THRESHOLD_2 &&
+                uint256(uint8(_b[8])) * SILVER_RARITY_3 < 256
+            ) {
+                // deep space
+                resource = DarkForestTypes.PlanetResource.SILVER;
+            }
+        }
+
+        if (_perlin < PERLIN_THRESHOLD_1 && level > 3) {
+            // nebula clip
+            level = 3;
+        }
         if (
-            planetDefaultStats[level].silverGrowth > 0 &&
-            uint256(uint8(_b[10])) * SILVER_RARITY < 256
+            _perlin >= PERLIN_THRESHOLD_1 &&
+            _perlin < PERLIN_THRESHOLD_2 &&
+            level > 4
         ) {
-            resource = DarkForestTypes.PlanetResource.SILVER;
-        } else {
-            resource = DarkForestTypes.PlanetResource.NONE;
+            // space clip
+            level = 4;
         }
 
         return (level, resource);
@@ -82,5 +116,24 @@ library DarkForestUtils {
         } else {
             return r5;
         }
+    }
+
+    function isDelegated(
+        mapping(uint256 => DarkForestTypes.PlanetExtendedInfo)
+            storage planetsExtendedInfo,
+        uint256 _location,
+        address _player
+    ) public view returns (bool) {
+        for (
+            uint256 i = 0;
+            i < planetsExtendedInfo[_location].delegatedPlayers.length;
+            i++
+        ) {
+            if (_player == planetsExtendedInfo[_location].delegatedPlayers[i]) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

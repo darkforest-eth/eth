@@ -12,70 +12,70 @@ library DarkForestInitialize {
         planetDefaultStats.push(
             DarkForestTypes.PlanetDefaultStats({
                 label: "Asteroid",
-                populationCap: 150000,
-                populationGrowth: 750,
+                populationCap: 100000,
+                populationGrowth: 417,
                 range: 99,
+                speed: 75,
+                defense: 800,
                 silverGrowth: 0,
                 silverCap: 0,
-                silverMax: 0,
-                barbarianPercentage: 0,
-                energyCost: 0
+                barbarianPercentage: 0                
             })
         );
 
         planetDefaultStats.push(
             DarkForestTypes.PlanetDefaultStats({
                 label: "Brown Dwarf",
-                populationCap: 500000,
-                populationGrowth: 1000,
+                populationCap: 400000,
+                populationGrowth: 833,
                 range: 177,
-                silverGrowth: 28,
-                silverCap: 20000,
-                silverMax: 40000,
-                barbarianPercentage: 0,
-                energyCost: 5
+                speed: 75,
+                defense: 800,
+                silverGrowth: 14,
+                silverCap: 50000,
+                barbarianPercentage: 0                
             })
         );
 
         planetDefaultStats.push(
             DarkForestTypes.PlanetDefaultStats({
                 label: "Red Dwarf",
-                populationCap: 1500000,
+                populationCap: 1600000,
                 populationGrowth: 1250,
                 range: 315,
-                silverGrowth: 139,
+                speed: 75,
+                defense: 600,
+                silverGrowth: 69,
                 silverCap: 250000,
-                silverMax: 500000,
-                barbarianPercentage: 2,
-                energyCost: 10
+                barbarianPercentage: 1               
             })
         );
 
         planetDefaultStats.push(
             DarkForestTypes.PlanetDefaultStats({
                 label: "White Dwarf",
-                populationCap: 5000000,
-                populationGrowth: 1500,
+                populationCap: 6000000,
+                populationGrowth: 1667,
                 range: 591,
-                silverGrowth: 889,
-                silverCap: 3200000,
-                silverMax: 6400000,
-                barbarianPercentage: 3,
-                energyCost: 15
+                speed: 75,
+                defense: 400,
+                silverGrowth: 417,
+                silverCap: 2500000,
+                barbarianPercentage: 1                
             })
         );
 
         planetDefaultStats.push(
             DarkForestTypes.PlanetDefaultStats({
                 label: "Yellow Star",
-                populationCap: 15000000,
-                populationGrowth: 1750,
+                populationCap: 20000000,
+                populationGrowth: 2167,
                 range: 1025,
-                silverGrowth: 3556,
-                silverCap: 32000000,
-                silverMax: 64000000,
-                barbarianPercentage: 4,
-                energyCost: 20
+                speed: 75,
+                defense: 200,
+                silverGrowth: 1667,
+                silverCap: 20000000,
+                barbarianPercentage: 2                
             })
         );
 
@@ -83,41 +83,41 @@ library DarkForestInitialize {
             DarkForestTypes.PlanetDefaultStats({
                 label: "Blue Star",
                 populationCap: 40000000,
-                populationGrowth: 2000,
+                populationGrowth: 2667,
                 range: 1261,
-                silverGrowth: 5333,
-                silverCap: 134400000,
-                silverMax: 268800000,
-                barbarianPercentage: 5,
-                energyCost: 25
+                speed: 75,
+                defense: 200,
+                silverGrowth: 2222,
+                silverCap: 40000000,
+                barbarianPercentage: 5                
             })
         );
 
         planetDefaultStats.push(
             DarkForestTypes.PlanetDefaultStats({
                 label: "Giant",
-                populationCap: 60000000,
-                populationGrowth: 2250,
+                populationCap: 55000000,
+                populationGrowth: 2917,
                 range: 1577,
-                silverGrowth: 6667,
-                silverCap: 240000000,
-                silverMax: 480000000,
-                barbarianPercentage: 9,
-                energyCost: 30
+                speed: 75,
+                defense: 200,
+                silverGrowth: 2778,
+                silverCap: 50000000,
+                barbarianPercentage: 9                
             })
         );
 
         planetDefaultStats.push(
             DarkForestTypes.PlanetDefaultStats({
                 label: "Supergiant",
-                populationCap: 75000000,
-                populationGrowth: 2500,
+                populationCap: 65000000,
+                populationGrowth: 3000,
                 range: 1892,
-                silverGrowth: 6667,
-                silverCap: 288000000,
-                silverMax: 576000000,
-                barbarianPercentage: 10,
-                energyCost: 35
+                speed: 75,
+                defense: 200,
+                silverGrowth: 3333,
+                silverCap: 60000000,
+                barbarianPercentage: 10                
             })
         );
     }
@@ -125,115 +125,94 @@ library DarkForestInitialize {
     function initializeUpgrades(DarkForestTypes.Upgrade[4][3] storage upgrades)
         public
     {
+        // defense
         upgrades[0][0] = DarkForestTypes.Upgrade({
-            popCapMultiplier: 100,
-            popGroMultiplier: 100,
-            silverCapMultiplier: 110,
-            silverGroMultiplier: 110,
-            silverMaxMultiplier: 110,
+            popCapMultiplier: 120,
+            popGroMultiplier: 120,
             rangeMultiplier: 100,
-            silverCostMultiplier: 25
+            speedMultiplier: 100,
+            defMultiplier: 150
         });
         upgrades[0][1] = DarkForestTypes.Upgrade({
-            popCapMultiplier: 100,
-            popGroMultiplier: 100,
-            silverCapMultiplier: 115,
-            silverGroMultiplier: 115,
-            silverMaxMultiplier: 115,
+            popCapMultiplier: 120,
+            popGroMultiplier: 120,
             rangeMultiplier: 100,
-            silverCostMultiplier: 60
+            speedMultiplier: 100,
+            defMultiplier: 150
         });
         upgrades[0][2] = DarkForestTypes.Upgrade({
-            popCapMultiplier: 100,
-            popGroMultiplier: 100,
-            silverCapMultiplier: 135,
-            silverGroMultiplier: 135,
-            silverMaxMultiplier: 135,
-            rangeMultiplier: 85,
-            silverCostMultiplier: 120
+            popCapMultiplier: 120,
+            popGroMultiplier: 120,
+            rangeMultiplier: 100,
+            speedMultiplier: 100,
+            defMultiplier: 150
         });
         upgrades[0][3] = DarkForestTypes.Upgrade({
-            popCapMultiplier: 100,
-            popGroMultiplier: 100,
-            silverCapMultiplier: 160,
-            silverGroMultiplier: 160,
-            silverMaxMultiplier: 160,
-            rangeMultiplier: 80,
-            silverCostMultiplier: 240
+            popCapMultiplier: 120,
+            popGroMultiplier: 120,
+            rangeMultiplier: 100,
+            speedMultiplier: 100,
+            defMultiplier: 150
         });
 
+        // range
         upgrades[1][0] = DarkForestTypes.Upgrade({
-            popCapMultiplier: 110,
-            popGroMultiplier: 110,
-            silverCapMultiplier: 100,
-            silverGroMultiplier: 100,
-            silverMaxMultiplier: 100,
-            rangeMultiplier: 100,
-            silverCostMultiplier: 25
+            popCapMultiplier: 120,
+            popGroMultiplier: 120,
+            rangeMultiplier: 125,
+            speedMultiplier: 100,
+            defMultiplier: 100
         });
         upgrades[1][1] = DarkForestTypes.Upgrade({
-            popCapMultiplier: 115,
-            popGroMultiplier: 115,
-            silverCapMultiplier: 100,
-            silverGroMultiplier: 100,
-            silverMaxMultiplier: 100,
-            rangeMultiplier: 100,
-            silverCostMultiplier: 50
+            popCapMultiplier: 120,
+            popGroMultiplier: 120,
+            rangeMultiplier: 125,
+            speedMultiplier: 100,
+            defMultiplier: 100
         });
         upgrades[1][2] = DarkForestTypes.Upgrade({
-            popCapMultiplier: 135,
-            popGroMultiplier: 135,
-            silverCapMultiplier: 100,
-            silverGroMultiplier: 100,
-            silverMaxMultiplier: 100,
-            rangeMultiplier: 85,
-            silverCostMultiplier: 90
+            popCapMultiplier: 120,
+            popGroMultiplier: 120,
+            rangeMultiplier: 125,
+            speedMultiplier: 100,
+            defMultiplier: 100
         });
         upgrades[1][3] = DarkForestTypes.Upgrade({
-            popCapMultiplier: 160,
-            popGroMultiplier: 160,
-            silverCapMultiplier: 100,
-            silverGroMultiplier: 100,
-            silverMaxMultiplier: 100,
-            rangeMultiplier: 80,
-            silverCostMultiplier: 170
+            popCapMultiplier: 120,
+            popGroMultiplier: 120,
+            rangeMultiplier: 125,
+            speedMultiplier: 100,
+            defMultiplier: 100
         });
 
+        // speed
         upgrades[2][0] = DarkForestTypes.Upgrade({
-            popCapMultiplier: 100,
-            popGroMultiplier: 100,
-            silverCapMultiplier: 100,
-            silverGroMultiplier: 100,
-            silverMaxMultiplier: 100,
-            rangeMultiplier: 110,
-            silverCostMultiplier: 25
+            popCapMultiplier: 120,
+            popGroMultiplier: 120,
+            rangeMultiplier: 100,
+            speedMultiplier: 150,
+            defMultiplier: 100
         });
         upgrades[2][1] = DarkForestTypes.Upgrade({
-            popCapMultiplier: 100,
-            popGroMultiplier: 100,
-            silverCapMultiplier: 100,
-            silverGroMultiplier: 100,
-            silverMaxMultiplier: 100,
-            rangeMultiplier: 115,
-            silverCostMultiplier: 50
+            popCapMultiplier: 120,
+            popGroMultiplier: 120,
+            rangeMultiplier: 100,
+            speedMultiplier: 150,
+            defMultiplier: 100
         });
         upgrades[2][2] = DarkForestTypes.Upgrade({
-            popCapMultiplier: 80,
-            popGroMultiplier: 80,
-            silverCapMultiplier: 100,
-            silverGroMultiplier: 100,
-            silverMaxMultiplier: 100,
-            rangeMultiplier: 125,
-            silverCostMultiplier: 90
+            popCapMultiplier: 120,
+            popGroMultiplier: 120,
+            rangeMultiplier: 100,
+            speedMultiplier: 150,
+            defMultiplier: 100
         });
         upgrades[2][3] = DarkForestTypes.Upgrade({
-            popCapMultiplier: 75,
-            popGroMultiplier: 75,
-            silverCapMultiplier: 100,
-            silverGroMultiplier: 100,
-            silverMaxMultiplier: 100,
-            rangeMultiplier: 135,
-            silverCostMultiplier: 170
+            popCapMultiplier: 120,
+            popGroMultiplier: 120,
+            rangeMultiplier: 100,
+            speedMultiplier: 150,
+            defMultiplier: 100
         });
     }
 }

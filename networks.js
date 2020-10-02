@@ -20,5 +20,24 @@ module.exports = {
       networkId: 3,
       gasPrice: 10e9,
     },
+    xdai: {
+      provider: () =>
+        new HDWalletProvider(
+          process.env.deployer_mnemonic,
+          `https://rpc.xdaichain.com/`
+        ),
+      networkId: 100,
+      gas: 8000000,
+      gasPrice: 1e9,
+    },
+    personalGanache: {
+      provider: () =>
+        new HDWalletProvider(
+          process.env.deployer_mnemonic,
+          "https://dark-forest.online:8545"
+        ),
+      gas: 8000000,
+      gasPrice: 1e8,
+    },
   },
 };

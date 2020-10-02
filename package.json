@@ -4,11 +4,13 @@
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
+    "@nomiclabs/buidler": "^1.4.7",
     "@openzeppelin/cli": "^2.8.2",
     "@openzeppelin/test-environment": "^0.1.4",
     "@openzeppelin/test-helpers": "^0.5.6",
     "@truffle/hdwallet-provider": "^1.0.40",
     "@types/node": "^14.0.27",
+    "buidler-contract-sizer": "^1.0.2",
     "ganache-cli": "^6.9.1",
     "mocha": "^8.0.1",
     "prettier": "^2.0.5",
@@ -29,6 +31,6 @@
   "scripts": {
     "deploy:dev": "NODE_ENV=development ts-node src/deploy.ts",
     "deploy:prod": "NODE_ENV=production ts-node src/deploy.ts",
-    "test": "oz compile && mocha --exit --recursive test --timeout 25000"
+    "test": "oz compile --optimizer on && mocha --exit --recursive test --timeout 25000"
   }
 }

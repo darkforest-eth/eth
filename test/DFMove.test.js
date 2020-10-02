@@ -21,7 +21,7 @@ const {
   star2Location,
   silverStar1Location,
   silverStar2Location,
-  highLevel3Location,
+  lvl4Location1,
   makeInitArgs,
   makeMoveArgs,
   deployer,
@@ -36,15 +36,23 @@ describe("DarkForestMove", function () {
 
   describe("move to new planet", function () {
     before(async function () {
+      this.timeout(5000);
+
       await Whitelist.detectNetwork();
       this.whitelistContract = await Whitelist.new({ from: deployer });
       await this.whitelistContract.initialize(deployer, false);
 
       this.verifierLib = await Verifier.new({ from: deployer });
-      this.dfPlanetLib = await DarkForestPlanet.new({ from: deployer });
+      this.dfUtilsLib = await DarkForestUtils.new({ from: deployer });
       this.dfLazyUpdateLib = await DarkForestLazyUpdate.new({ from: deployer });
       this.dfTypesLib = await DarkForestTypes.new({ from: deployer });
-      this.dfUtilsLib = await DarkForestUtils.new({ from: deployer });
+      await DarkForestPlanet.detectNetwork();
+      await DarkForestPlanet.link(
+        "DarkForestLazyUpdate",
+        this.dfLazyUpdateLib.address
+      );
+      await DarkForestPlanet.link("DarkForestUtils", this.dfUtilsLib.address);
+      this.dfPlanetLib = await DarkForestPlanet.new({ from: deployer });
       this.dfInitializeLib = await DarkForestInitialize.new({ from: deployer });
       await DarkForestCore.detectNetwork();
       await DarkForestCore.link("Verifier", this.verifierLib.address);
@@ -69,12 +77,14 @@ describe("DarkForestMove", function () {
 
       const fromId = getPlanetIdFromHex(asteroid1Location.hex);
 
-      await this.contract.initializePlayer(...makeInitArgs(fromId, 17, 1999), {
+      await this.contract.initializePlayer(...makeInitArgs(fromId, 10, 1999), {
         from: user1,
       });
       await this.contract.changeGameEndTime(99999999999999, {
         from: deployer,
       });
+      time.increase(LARGE_INTERVAL);
+      time.advanceBlock();
     });
 
     it("should emit event", async function () {
@@ -84,7 +94,7 @@ describe("DarkForestMove", function () {
       const shipsSent = 50000;
       const silverSent = 0;
       const receipt = await this.contract.move(
-        ...makeMoveArgs(fromId, toId, 16, 2000, dist, shipsSent, silverSent),
+        ...makeMoveArgs(fromId, toId, 10, 2000, dist, shipsSent, silverSent),
         { from: user1 }
       );
 
@@ -103,20 +113,16 @@ describe("DarkForestMove", function () {
       expect(toPlanetExtended.isInitialized).to.equal(true);
     });
 
-    // it("should decrease energy of player who sent move", async function () {});
-
-    it("should create new event and arrival", async function () {
+    it("should create new event and arrival with correct delay", async function () {
       const fromId = getPlanetIdFromHex(asteroid1Location.hex);
       const toId = getPlanetIdFromHex(asteroid2Location.hex);
       const planetEventsCount = await this.contract.planetEventsCount();
-      const planetEvents = await this.contract.planetEvents(toId, 0);
+      const planetEvent0 = await this.contract.planetEvents(toId, 0);
       const planetArrivals = await this.contract.getPlanetArrivals(toId);
 
-      // check planet events
-      expect(planetEvents.id).to.be.bignumber.equal(
-        (planetEventsCount - 1).toString()
-      );
-      expect(planetEvents.eventType).to.be.bignumber.equal("0");
+      // check planet events: arrival and departure
+      expect(planetEvent0.id).to.be.bignumber.equal("0");
+      expect(planetEvent0.eventType).to.be.bignumber.equal("0");
 
       // check planet arrival
       expect(
@@ -125,12 +131,39 @@ describe("DarkForestMove", function () {
       expect(
         planetArrivals[planetEventsCount - 1].fromPlanet
       ).to.be.bignumber.equal(fromId);
+
+      // check that time delay is correct
+      const fromPlanet = await this.contract.planets(fromId);
+
+      const dist = 100;
+      const expectedTime = Math.floor(
+        (dist * 100) / fromPlanet.speed.toNumber()
+      );
+      const planetArrival = (await this.contract.getPlanetArrivals(toId))[0];
+      expect(
+        planetArrival.arrivalTime - planetArrival.departureTime
+      ).to.be.equal(expectedTime);
     });
 
     it("should decay ships", async function () {
+      const fromId = getPlanetIdFromHex(asteroid1Location.hex);
       const toId = getPlanetIdFromHex(asteroid2Location.hex);
+
+      const fromPlanet = await this.contract.planets(fromId);
+      const range = fromPlanet.range.toNumber();
+      const popCap = fromPlanet.populationCap.toNumber();
+      const shipsSent = 50000;
+      const dist = 100;
+      const decayFactor = Math.pow(2, dist / range);
+      const approxArriving = shipsSent / decayFactor - 0.05 * popCap;
+
       const planetArrivals = await this.contract.getPlanetArrivals(toId);
-      expect(planetArrivals[0].popArriving).to.be.bignumber.equal("9825");
+      expect(parseInt(planetArrivals[0].popArriving)).to.be.above(
+        approxArriving - 1000
+      );
+      expect(parseInt(planetArrivals[0].popArriving)).to.be.below(
+        approxArriving + 1000
+      );
     });
 
     it("should not apply event before arrival time", async function () {
@@ -171,11 +204,11 @@ describe("DarkForestMove", function () {
       const fromId = getPlanetIdFromHex(asteroid2Location.hex);
       const toId = getPlanetIdFromHex(asteroid1Location.hex);
       const dist = 100;
-      const shipsSent = 49999;
+      const shipsSent = 30000;
       const silverSent = 0;
       // drain the population first
       await this.contract.move(
-        ...makeMoveArgs(toId, fromId, 16, 2000, dist, 299999, silverSent),
+        ...makeMoveArgs(toId, fromId, 16, 2000, dist, 99999, silverSent),
         { from: user1 }
       );
 
@@ -235,13 +268,13 @@ describe("DarkForestMove", function () {
       const initialRadius = await this.contract.worldRadius();
       const fromId = getPlanetIdFromHex(asteroid2Location.hex);
 
-      const toId = getPlanetIdFromHex(highLevel3Location.hex);
+      const toId = getPlanetIdFromHex(lvl4Location1.hex);
       const dist = 100;
-      const shipsSent = 50000;
+      const shipsSent = 40000;
       const silverSent = 0;
 
       await this.contract.move(
-        ...makeMoveArgs(fromId, toId, 16, 2000, dist, shipsSent, silverSent),
+        ...makeMoveArgs(fromId, toId, 20, 2000, dist, shipsSent, silverSent),
         { from: user1 }
       );
 
@@ -287,15 +320,15 @@ describe("DarkForestMove", function () {
       const fromId = getPlanetIdFromHex(asteroid1Location.hex);
       const toId = getPlanetIdFromHex(asteroid2Location.hex);
       const dist = 100;
-      const shipsSent = 50000;
+      const shipsSent = 40000;
       const silverSent = 0;
 
-      await this.contract.initializePlayer(...makeInitArgs(fromId, 17, 1999), {
+      await this.contract.initializePlayer(...makeInitArgs(fromId, 10, 1999), {
         from: user1,
       });
 
       await this.contract.move(
-        ...makeMoveArgs(fromId, toId, 16, 2000, dist, shipsSent, silverSent),
+        ...makeMoveArgs(fromId, toId, 10, 2000, dist, shipsSent, silverSent),
         { from: user1 }
       );
     });
@@ -348,7 +381,7 @@ describe("DarkForestMove", function () {
       const toId2 = getPlanetIdFromHex(silverStar1Location.hex);
 
       const dist = 100;
-      const shipsSent = 150000;
+      const shipsSent = 90000;
       const silverSent = 0;
 
       await this.contract.move(
@@ -417,11 +450,11 @@ describe("DarkForestMove", function () {
       const planet1 = getPlanetIdFromHex(asteroid1Location.hex);
       const planet2 = getPlanetIdFromHex(asteroid2Location.hex);
 
-      await this.contract.initializePlayer(...makeInitArgs(planet1, 17, 1999), {
+      await this.contract.initializePlayer(...makeInitArgs(planet1, 10, 1999), {
         from: user1,
       });
 
-      await this.contract.initializePlayer(...makeInitArgs(planet2, 17, 1999), {
+      await this.contract.initializePlayer(...makeInitArgs(planet2, 10, 1999), {
         from: user2,
       });
     });
@@ -429,8 +462,8 @@ describe("DarkForestMove", function () {
     it("should decrease population if insufficient to conquer", async function () {
       const planet1Id = getPlanetIdFromHex(asteroid1Location.hex);
       const planet2Id = getPlanetIdFromHex(asteroid2Location.hex);
-      const dist = 100;
-      const shipsSent = 50000;
+      const dist = 0; // instant move - just for testing correct decay application
+      const shipsSent = 40000;
       const silverSent = 0;
 
       time.increase(LARGE_INTERVAL);
@@ -439,7 +472,7 @@ describe("DarkForestMove", function () {
         ...makeMoveArgs(
           planet1Id,
           planet2Id,
-          16,
+          10,
           2000,
           dist,
           shipsSent,
@@ -448,14 +481,27 @@ describe("DarkForestMove", function () {
         { from: user1 }
       );
 
-      time.increase(200);
-      time.advanceBlock();
+      const toPlanetDef = (
+        await this.contract.planets(planet2Id)
+      ).defense.toNumber();
+      const planetArrival = (
+        await this.contract.getPlanetArrivals(planet2Id)
+      )[0];
+      const shipsMoved = parseInt(planetArrival.popArriving);
+      const attackForce = Math.floor((shipsMoved * 100) / toPlanetDef);
 
       await this.contract.refreshPlanet(planet2Id);
 
       const planet2 = await this.contract.planets(planet2Id);
       expect(planet2.owner).to.equal(user2);
-      expect(planet2.population).to.be.bignumber.below(planet2.populationCap);
+
+      // range of tolerances
+      expect(planet2.population.toNumber()).to.be.above(
+        planet2.populationCap.toNumber() - attackForce - 1000
+      );
+      expect(planet2.population.toNumber()).to.be.below(
+        planet2.populationCap.toNumber() - attackForce + 1000
+      );
     });
 
     it("should conquer planet if sufficient forces", async function () {
@@ -463,7 +509,7 @@ describe("DarkForestMove", function () {
       const planet1Id = getPlanetIdFromHex(asteroid1Location.hex);
       const planet2Id = getPlanetIdFromHex(asteroid2Location.hex);
       const planet3Id = getPlanetIdFromHex(silverStar1Location.hex);
-      const dist = 100;
+      const dist = 0; // instant move - just for testing correct decay application
       const silverSent = 0;
 
       // drain planet first
@@ -471,35 +517,51 @@ describe("DarkForestMove", function () {
         ...makeMoveArgs(
           planet2Id,
           planet3Id,
-          16,
+          10,
           2000,
           dist,
-          149999,
+          95000,
           silverSent
         ),
         { from: user2 }
       );
 
+      await this.contract.refreshPlanet(planet2Id);
+      let planet2 = await this.contract.planets(planet2Id);
+      const planet2Pop = planet2.population.toNumber();
+      const planet2Def = planet2.defense.toNumber();
+      const defenseForce = Math.floor((planet2Pop * planet2Def) / 100);
+
       await this.contract.move(
         ...makeMoveArgs(
           planet1Id,
           planet2Id,
-          16,
+          10,
           2000,
           dist,
-          149999,
+          50000,
           silverSent
         ),
         { from: user1 }
       );
 
-      time.increase(200);
-      time.advanceBlock();
+      const planetArrival = (
+        await this.contract.getPlanetArrivals(planet2Id)
+      )[0];
+      const shipsMoved = parseInt(planetArrival.popArriving);
 
       await this.contract.refreshPlanet(planet2Id);
+      planet2 = await this.contract.planets(planet2Id);
 
-      const planet2 = await this.contract.planets(planet2Id);
       expect(planet2.owner).to.equal(user1);
+
+      // range of tolerances
+      expect(planet2.population.toNumber()).to.be.above(
+        shipsMoved - defenseForce - 1000
+      );
+      expect(planet2.population.toNumber()).to.be.below(
+        shipsMoved - defenseForce + 1000
+      );
     });
 
     it("should send silver", async function () {
@@ -511,7 +573,7 @@ describe("DarkForestMove", function () {
       const silverSent = 100;
 
       await this.contract.move(
-        ...makeMoveArgs(planet1Id, planet2Id, 16, 2000, dist, 149999, 0),
+        ...makeMoveArgs(planet1Id, planet2Id, 20, 2000, dist, 99999, 0),
         { from: user1 }
       );
 
@@ -522,10 +584,10 @@ describe("DarkForestMove", function () {
         ...makeMoveArgs(
           planet3Id,
           planet2Id,
-          16,
+          20,
           2000,
           dist,
-          149999,
+          99999,
           silverSent
         ),
         { from: user2 }
@@ -576,7 +638,7 @@ describe("DarkForestMove", function () {
 
       const planet1 = getPlanetIdFromHex(asteroid1Location.hex);
 
-      await this.contract.initializePlayer(...makeInitArgs(planet1, 17, 1999), {
+      await this.contract.initializePlayer(...makeInitArgs(planet1, 10, 1999), {
         from: user1,
       });
     });
@@ -586,7 +648,7 @@ describe("DarkForestMove", function () {
       const planet1Id = getPlanetIdFromHex(asteroid1Location.hex);
       const planet2Id = getPlanetIdFromHex(asteroid2Location.hex);
       const dist = 100;
-      const shipsSent = 50000;
+      const shipsSent = 40000;
       const silverSent = 100;
 
       await expectRevert(
@@ -664,7 +726,7 @@ describe("DarkForestMove", function () {
       const silverSent = 0;
 
       await this.contract.initializePlayer(
-        ...makeInitArgs(planet1Id, 17, 1999),
+        ...makeInitArgs(planet1Id, 10, 1999),
         {
           from: user2,
         }
@@ -683,7 +745,7 @@ describe("DarkForestMove", function () {
           ),
           { from: user1 }
         ),
-        "Only owner can perform operation on planets"
+        "Only owner or delegated account can perform operation on planets"
       );
     });
 

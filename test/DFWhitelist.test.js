@@ -1,6 +1,6 @@
-const {expectRevert} = require("@openzeppelin/test-helpers");
-const {web3} = require("@openzeppelin/test-environment");
-const {expect} = require("chai");
+const { expectRevert } = require("@openzeppelin/test-helpers");
+const { web3 } = require("@openzeppelin/test-environment");
+const { expect } = require("chai");
 
 const {
   DarkForestCore,
@@ -22,16 +22,22 @@ const {
 describe("DarkForestWhitelist", function () {
   beforeEach(async function () {
     await Whitelist.detectNetwork();
-    this.whitelistContract = await Whitelist.new({from: deployer});
+    this.whitelistContract = await Whitelist.new({ from: deployer });
     await this.whitelistContract.initialize(deployer, true);
+    await this.whitelistContract.send(1000000000000000000, { from: deployer });
 
-    this.verifierLib = await Verifier.new({from: deployer});
-    this.dfPlanetLib = await DarkForestPlanet.new({from: deployer});
-    this.dfLazyUpdateLib = await DarkForestLazyUpdate.new({from: deployer});
-    this.dfTypesLib = await DarkForestTypes.new({from: deployer});
-    this.dfUtilsLib = await DarkForestUtils.new({from: deployer});
-    this.dfInitializeLib = await DarkForestInitialize.new({from: deployer});
-
+    this.verifierLib = await Verifier.new({ from: deployer });
+    this.dfUtilsLib = await DarkForestUtils.new({ from: deployer });
+    this.dfLazyUpdateLib = await DarkForestLazyUpdate.new({ from: deployer });
+    this.dfTypesLib = await DarkForestTypes.new({ from: deployer });
+    await DarkForestPlanet.detectNetwork();
+    await DarkForestPlanet.link(
+      "DarkForestLazyUpdate",
+      this.dfLazyUpdateLib.address
+    );
+    await DarkForestPlanet.link("DarkForestUtils", this.dfUtilsLib.address);
+    this.dfPlanetLib = await DarkForestPlanet.new({ from: deployer });
+    this.dfInitializeLib = await DarkForestInitialize.new({ from: deployer });
     await DarkForestCore.detectNetwork();
     await DarkForestCore.link("Verifier", this.verifierLib.address);
     await DarkForestCore.link("DarkForestPlanet", this.dfPlanetLib.address);
@@ -45,7 +51,7 @@ describe("DarkForestWhitelist", function () {
       "DarkForestInitialize",
       this.dfInitializeLib.address
     );
-    this.contract = await DarkForestCore.new({from: deployer});
+    this.contract = await DarkForestCore.new({ from: deployer });
     await this.contract.initialize(
       deployer,
       this.whitelistContract.address,
@@ -58,7 +64,7 @@ describe("DarkForestWhitelist", function () {
 
   it("should reject change admin if not admin", async function () {
     await expectRevert(
-      this.whitelistContract.changeAdmin(user1, {from: user2}),
+      this.whitelistContract.changeAdmin(user1, { from: user2 }),
       "Only administrator can perform this action"
     );
   });
@@ -208,7 +214,7 @@ describe("DarkForestWhitelist", function () {
       }
     );
 
-    await this.contract.initializePlayer(...makeInitArgs(planetId, 17, 1999), {
+    await this.contract.initializePlayer(...makeInitArgs(planetId, 10, 1999), {
       from: user1,
     });
 
@@ -219,7 +225,7 @@ describe("DarkForestWhitelist", function () {
     let planetId = getPlanetIdFromHex(asteroid1Location.hex);
 
     await expectRevert(
-      this.contract.initializePlayer(...makeInitArgs(planetId, 17, 1999), {
+      this.contract.initializePlayer(...makeInitArgs(planetId, 10, 1999), {
         from: user1,
       }),
       "Player is not whitelisted"
@@ -243,13 +249,50 @@ describe("DarkForestWhitelist", function () {
       }
     );
 
-    await this.whitelistContract.removeFromWhitelist(user1, {from: deployer});
+    await this.whitelistContract.removeFromWhitelist(user1, { from: deployer });
 
     await expectRevert(
-      this.contract.initializePlayer(...makeInitArgs(planetId, 17, 1999), {
+      this.contract.initializePlayer(...makeInitArgs(planetId, 10, 1999), {
         from: user1,
       }),
       "Player is not whitelisted"
     );
+  });
+
+  it("should allow admin to set drip, and drip player eth after whitelisted", async function () {
+    await this.whitelistContract.addKeys(
+      [web3.utils.keccak256("XXXXX-XXXXX-XXXXX-XXXXX-XXXXX")],
+      {
+        from: deployer,
+      }
+    );
+
+    await this.whitelistContract.changeDrip("20000000000000000", {
+      from: deployer,
+    });
+
+    const drip = parseFloat(
+      web3.utils.fromWei(await this.whitelistContract.drip())
+    );
+
+    expect(drip).to.equal(0.02);
+
+    const oldBalance = parseFloat(
+      web3.utils.fromWei(await web3.eth.getBalance(user1), "ether")
+    );
+
+    await this.whitelistContract.useKey(
+      "XXXXX-XXXXX-XXXXX-XXXXX-XXXXX",
+      user1,
+      {
+        from: deployer,
+      }
+    );
+
+    const newBalance = parseFloat(
+      web3.utils.fromWei(await web3.eth.getBalance(user1), "ether")
+    );
+
+    expect(newBalance).to.equal(oldBalance + drip);
   });
 });

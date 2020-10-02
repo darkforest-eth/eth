@@ -23,58 +23,21 @@ library DarkForestLazyUpdate {
             return;
         }
 
-        // WE NEED TO MAKE SURE WE NEVER TAKE LOG(0)
-        uint256 _startSilverProd;
+        if (_planet.silver < _planet.silverCap) {
 
-        if (_planet.population > _planet.populationCap / 2) {
-            // midpoint was before lastUpdated, so start prod from lastUpdated
-            _startSilverProd = _planetExtendedInfo.lastUpdated;
-        } else {
-            // midpoint was after lastUpdated, so calculate & start prod from lastUpdated
-            int128 _popCap = ABDKMath64x64.fromUInt(_planet.populationCap);
-            int128 _pop = ABDKMath64x64.fromUInt(_planet.population);
-            int128 _logVal = ABDKMath64x64.ln(
-                ABDKMath64x64.div(ABDKMath64x64.sub(_popCap, _pop), _pop)
+            uint256 _timeDiff = SafeMath.sub(
+                _updateToTime,
+                _planetExtendedInfo.lastUpdated
+            );
+            uint256 _silverMined = SafeMath.mul(
+                _planet.silverGrowth,
+                _timeDiff
             );
 
-            int128 _diffNumerator = ABDKMath64x64.mul(_logVal, _popCap);
-            int128 _diffDenominator = ABDKMath64x64.mul(
-                ABDKMath64x64.fromUInt(4),
-                ABDKMath64x64.fromUInt(_planet.populationGrowth)
+            _planet.silver = Math.min(
+                _planet.silverCap,
+                SafeMath.add(_planet.silver, _silverMined)
             );
-
-            int128 _popCurveMidpoint = ABDKMath64x64.add(
-                ABDKMath64x64.div(_diffNumerator, _diffDenominator),
-                ABDKMath64x64.fromUInt(_planetExtendedInfo.lastUpdated)
-            );
-
-            _startSilverProd = ABDKMath64x64.toUInt(_popCurveMidpoint);
-        }
-
-        // Check if the pop curve midpoint happens in the past
-        if (_startSilverProd < _updateToTime) {
-            uint256 _timeDiff;
-
-            if (_startSilverProd > _planetExtendedInfo.lastUpdated) {
-                _timeDiff = SafeMath.sub(_updateToTime, _startSilverProd);
-            } else {
-                _timeDiff = SafeMath.sub(
-                    _updateToTime,
-                    _planetExtendedInfo.lastUpdated
-                );
-            }
-
-            if (_planet.silver < _planet.silverCap) {
-                uint256 _silverMined = SafeMath.mul(
-                    _planet.silverGrowth,
-                    _timeDiff
-                );
-
-                _planet.silver = Math.min(
-                    _planet.silverCap,
-                    SafeMath.add(_planet.silver, _silverMined)
-                );
-            }
         }
     }
 
@@ -158,12 +121,12 @@ library DarkForestLazyUpdate {
                 _planetArrival.popArriving
             );
         } else {
-            if (_planet.population > _planetArrival.popArriving) {
+            if (_planet.population > _planetArrival.popArriving * 100 / _planet.defense) {
                 // handles if the planet population is bigger than the arriving ships
                 // simply reduce the amount of planet population by the arriving ships
                 _planet.population = SafeMath.sub(
                     _planet.population,
-                    _planetArrival.popArriving
+                    _planetArrival.popArriving * 100 / _planet.defense
                 );
             } else {
                 // handles if the planet population is equal or less the arriving ships
@@ -173,7 +136,7 @@ library DarkForestLazyUpdate {
                 _planet.owner = _planetArrival.player;
                 _planet.population = SafeMath.sub(
                     _planetArrival.popArriving,
-                    _planet.population
+                    _planet.population * _planet.defense / 100
                 );
                 if (_planet.population == 0) {
                     // make sure pop is never 0
@@ -183,7 +146,7 @@ library DarkForestLazyUpdate {
         }
 
         _planet.silver = Math.min(
-            _planet.silverMax,
+            _planet.silverCap,
             SafeMath.add(_planet.silver, _planetArrival.silverMoved)
         );
     }
@@ -211,8 +174,7 @@ library DarkForestLazyUpdate {
                 }
             }
 
-            // TODO: the invalid opcode error is somewhere in this block
-            // only process the event if it occurs before the current time and the timeTrigger is not 0
+            // only process the event if it occurs not after the current time and the timeTrigger is not 0
             // which comes from uninitialized PlanetEventMetadata
             if (
                 planetEvents[_location].length != 0 &&
