@@ -24,7 +24,7 @@ module.exports = {
       provider: () =>
         new HDWalletProvider(
           process.env.deployer_mnemonic,
-          `https://rpc.xdaichain.com/`
+          `https://dai.poa.network/`
         ),
       networkId: 100,
       gas: 8000000,

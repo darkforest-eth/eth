@@ -58,7 +58,7 @@ let network_url = "http://localhost:8545";
 if (NETWORK === Network.Ropsten) {
   network_url = `https://ropsten.infura.io/v3/${PROJECT_ID}`;
 } else if (NETWORK === Network.xDAI) {
-  network_url = "https://rpc.xdaichain.com/";
+  network_url = "https://dai.poa.network/";
 } else if (NETWORK === Network.PersonalGanache) {
   network_url = "https://dark-forest.online:8545";
 }
