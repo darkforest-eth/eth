@@ -167,6 +167,45 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         }
     }
 
+    function bulkGetPlanetsByIds(uint256[] calldata ids) 
+        public
+        view
+        returns (DarkForestTypes.Planet[] memory ret) 
+    {
+        ret = new DarkForestTypes.Planet[](ids.length);
+
+        for (uint256 i = 0; i < ids.length; i++) {
+            ret[i] = planets[ids[i]];
+        }
+    }
+
+    function bulkGetPlanetArrivalsByIds(uint256[] calldata ids)
+        public
+        view
+        returns (DarkForestTypes.ArrivalData[][] memory)
+    {
+        DarkForestTypes.ArrivalData[][] memory ret
+            = new DarkForestTypes.ArrivalData[][](ids.length);
+
+        for (uint256 i = 0; i < ids.length; i++) {
+            ret[i] = getPlanetArrivals(ids[i]);
+        }
+
+        return ret;
+    }
+
+    function bulkGetPlanetsExtendedInfoByIds(uint256[] calldata ids)
+        public
+        view
+        returns (DarkForestTypes.PlanetExtendedInfo[] memory ret)
+    {
+        ret = new DarkForestTypes.PlanetExtendedInfo[](ids.length);
+
+        for (uint256 i = 0; i < ids.length; i++) {
+            ret[i] = planetsExtendedInfo[ids[i]];
+        }
+    }
+
     function bulkGetPlanets(uint256 startIdx, uint256 endIdx)
         public
         view
@@ -252,10 +291,8 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         returns (DarkForestTypes.ArrivalData[][] memory)
     {
         // return array of planets corresponding to planetIds[startIdx] through planetIds[endIdx - 1]
-
-
-            DarkForestTypes.ArrivalData[][] memory ret
-         = new DarkForestTypes.ArrivalData[][](endIdx - startIdx);
+        DarkForestTypes.ArrivalData[][] memory ret
+            = new DarkForestTypes.ArrivalData[][](endIdx - startIdx);
         for (uint256 i = startIdx; i < endIdx; i++) {
             ret[i - startIdx] = getPlanetArrivals(planetIds[i]);
         }
@@ -570,10 +607,7 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         }
     }
 
-    function buyHat(uint256 _location)
-        public
-        payable
-    {
+    function buyHat(uint256 _location) public payable {
         require(
             planetsExtendedInfo[_location].isInitialized == true,
             "Planet is not initialized"

@@ -29,8 +29,9 @@
     "ts-node": "^8.10.2"
   },
   "scripts": {
-    "deploy:dev": "NODE_ENV=development ts-node src/deploy.ts",
-    "deploy:prod": "NODE_ENV=production ts-node src/deploy.ts",
-    "test": "oz compile --optimizer on && mocha --exit --recursive test --timeout 25000"
+    "deploy:dev": "yarn run compile && NODE_ENV=development ts-node src/deploy.ts",
+    "deploy:prod": "yarn run compile && NODE_ENV=production ts-node src/deploy.ts",
+    "compile": "oz compile --optimizer on",
+    "test": "yarn run compile && mocha --exit --recursive test --timeout 25000"
   }
 }

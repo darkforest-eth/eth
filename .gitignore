@@ -5,5 +5,5 @@ yarn-error.log
 *.env
 .env.prod
 
-.openzeppelin
+.openzeppelin/dev-*.json
 .openzeppelin/.session
