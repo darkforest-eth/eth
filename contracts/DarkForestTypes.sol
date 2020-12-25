@@ -5,6 +5,7 @@ library DarkForestTypes {
     enum PlanetResource {NONE, SILVER}
     enum PlanetEventType {ARRIVAL}
     enum SpaceType {NEBULA, SPACE, DEEP_SPACE}
+    enum UpgradeBranch {DEFENSE, RANGE, SPEED}
 
     struct Planet {
         address owner;
@@ -31,7 +32,9 @@ library DarkForestTypes {
         uint256 upgradeState1;
         uint256 upgradeState2;
         uint256 hatLevel;
-        address[] delegatedPlayers;
+        bool hasTriedFindingArtifact;
+        uint256 heldArtifactId;
+        uint256 artifactLockedTimestamp;
     }
 
     struct PlanetEventMetadata {
@@ -52,6 +55,22 @@ library DarkForestTypes {
         uint256 arrivalTime;
     }
 
+    // for a utility getter - not used for any mutations
+    struct CompactArrival {
+        uint256 popArriving;
+        uint256 silverMoved;
+        uint256 departureTime;
+        uint256 arrivalTime;
+        uint256 fromPlanet;
+        address fromPlanetOwner;
+        uint256 fromPlanetPopulation;
+        uint256 fromPlanetSilver;
+        uint256 toPlanet;
+        address toPlanetOwner;
+        uint256 toPlanetPopulation;
+        uint256 toPlanetSilver;
+    }
+
     struct PlanetDefaultStats {
         string label;
         uint256 populationCap;
@@ -70,5 +89,41 @@ library DarkForestTypes {
         uint256 rangeMultiplier;
         uint256 speedMultiplier;
         uint256 defMultiplier;
+    }
+
+    // for NFTs
+    enum ArtifactType {Unknown, Monolith, Colossus, Spaceship, Pyramid}
+
+    // for NFTs
+    struct Artifact {
+        uint256 id;
+        uint256 planetDiscoveredOn;
+        uint256 planetLevel;
+        Biome planetBiome;
+        uint256 mintedAtTimestamp;
+        address discoverer;
+        ArtifactType artifactType;
+    }
+
+    // for artifact getters
+
+    struct ArtifactWithMetadata {
+        Artifact artifact;
+        Upgrade upgrade;
+        address owner;
+        uint256 locationId; // 0 if planet is not deposited into contract
+    }
+
+    enum Biome {
+        Unknown,
+        Ocean,
+        Forest,
+        Grassland,
+        Tundra,
+        Swamp,
+        Desert,
+        Ice,
+        Wasteland,
+        Lava
     }
 }

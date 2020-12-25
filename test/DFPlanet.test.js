@@ -2,19 +2,12 @@ const { expect } = require("chai");
 const { time } = require("@openzeppelin/test-helpers");
 
 const {
-  DarkForestCore,
-  Whitelist,
-  Verifier,
-  DarkForestPlanet,
-  DarkForestLazyUpdate,
-  DarkForestUtils,
-  DarkForestTypes,
-  DarkForestInitialize,
+  initializeTest,
   getPlanetIdFromHex,
   asteroid1Location,
   asteroid2Location,
   asteroid3Location,
-  star2Location,
+  star1Location,
   silverStar2Location,
   silverStar3Location,
   silverStar4Location,
@@ -34,38 +27,9 @@ describe("DarkForestPlanet", function () {
   // test that initialization works as expected
 
   beforeEach(async function () {
-    this.timeout(10000);
+    await initializeTest(this);
 
-    await Whitelist.detectNetwork();
-    this.whitelistContract = await Whitelist.new({ from: deployer });
-    await this.whitelistContract.initialize(deployer, false);
-
-    this.verifierLib = await Verifier.new({ from: deployer });
-    this.dfPlanetLib = await DarkForestPlanet.new({ from: deployer });
-    this.dfLazyUpdateLib = await DarkForestLazyUpdate.new({ from: deployer });
-    this.dfTypesLib = await DarkForestTypes.new({ from: deployer });
-    this.dfUtilsLib = await DarkForestUtils.new({ from: deployer });
-    this.dfInitializeLib = await DarkForestInitialize.new({ from: deployer });
-    await DarkForestCore.detectNetwork();
-    await DarkForestCore.link("Verifier", this.verifierLib.address);
-    await DarkForestCore.link("DarkForestPlanet", this.dfPlanetLib.address);
-    await DarkForestCore.link(
-      "DarkForestLazyUpdate",
-      this.dfLazyUpdateLib.address
-    );
-    await DarkForestCore.link("DarkForestTypes", this.dfTypesLib.address);
-    await DarkForestCore.link("DarkForestUtils", this.dfUtilsLib.address);
-    await DarkForestCore.link(
-      "DarkForestInitialize",
-      this.dfInitializeLib.address
-    );
-    this.contract = await DarkForestCore.new({ from: deployer });
-    await this.contract.initialize(
-      deployer,
-      this.whitelistContract.address,
-      true
-    );
-    await this.contract.changeGameEndTime(99999999999999, {
+    await this.contract.changeTokenMintEndTime(99999999999999, {
       from: deployer,
     });
     let planetId = getPlanetIdFromHex(asteroid1Location.hex);
@@ -159,7 +123,7 @@ describe("DarkForestPlanet", function () {
     );
     // barbarians
     expectEqualWithTolerance(
-      lvlFourPlanet1.population.toNumber() * 2 * 1.25,
+      lvlFourPlanet1.population.toNumber() * 2.5 * 1.25,
       lvlFourPlanet2.population.toNumber()
     );
   });
@@ -247,7 +211,7 @@ describe("DarkForestPlanet", function () {
 
   it("initializes silver mines with debuffs and silver cache", async function () {
     const homeId = getPlanetIdFromHex(asteroid1Location.hex);
-    const regularPlanetId = getPlanetIdFromHex(star2Location.hex);
+    const regularPlanetId = getPlanetIdFromHex(star1Location.hex);
     const silverPlanetId = getPlanetIdFromHex(silverStar2Location.hex);
     await this.contract.move(
       ...makeMoveArgs(homeId, regularPlanetId, 10, 2000, 0, 30000, 0),

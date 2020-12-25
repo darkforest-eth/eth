@@ -3,61 +3,24 @@ const { web3 } = require("@openzeppelin/test-environment");
 const { expect } = require("chai");
 
 const {
-  DarkForestCore,
-  Whitelist,
-  Verifier,
-  DarkForestPlanet,
-  DarkForestLazyUpdate,
-  DarkForestUtils,
-  DarkForestTypes,
-  DarkForestInitialize,
+  initializeTest,
   deployer,
   user1,
   user2,
   asteroid1Location,
   makeInitArgs,
   getPlanetIdFromHex,
+  expectEqualWithTolerance,
 } = require("./DFTestUtils");
 
 describe("DarkForestWhitelist", function () {
   beforeEach(async function () {
-    await Whitelist.detectNetwork();
-    this.whitelistContract = await Whitelist.new({ from: deployer });
-    await this.whitelistContract.initialize(deployer, true);
-    await this.whitelistContract.send(1000000000000000000, { from: deployer });
+    await initializeTest(this, true);
+    await this.whitelistContract.send(1000000000000000000, {
+      from: deployer,
+    });
 
-    this.verifierLib = await Verifier.new({ from: deployer });
-    this.dfUtilsLib = await DarkForestUtils.new({ from: deployer });
-    this.dfLazyUpdateLib = await DarkForestLazyUpdate.new({ from: deployer });
-    this.dfTypesLib = await DarkForestTypes.new({ from: deployer });
-    await DarkForestPlanet.detectNetwork();
-    await DarkForestPlanet.link(
-      "DarkForestLazyUpdate",
-      this.dfLazyUpdateLib.address
-    );
-    await DarkForestPlanet.link("DarkForestUtils", this.dfUtilsLib.address);
-    this.dfPlanetLib = await DarkForestPlanet.new({ from: deployer });
-    this.dfInitializeLib = await DarkForestInitialize.new({ from: deployer });
-    await DarkForestCore.detectNetwork();
-    await DarkForestCore.link("Verifier", this.verifierLib.address);
-    await DarkForestCore.link("DarkForestPlanet", this.dfPlanetLib.address);
-    await DarkForestCore.link(
-      "DarkForestLazyUpdate",
-      this.dfLazyUpdateLib.address
-    );
-    await DarkForestCore.link("DarkForestTypes", this.dfTypesLib.address);
-    await DarkForestCore.link("DarkForestUtils", this.dfUtilsLib.address);
-    await DarkForestCore.link(
-      "DarkForestInitialize",
-      this.dfInitializeLib.address
-    );
-    this.contract = await DarkForestCore.new({ from: deployer });
-    await this.contract.initialize(
-      deployer,
-      this.whitelistContract.address,
-      true
-    );
-    await this.contract.changeGameEndTime(99999999999999, {
+    await this.contract.changeTokenMintEndTime(99999999999999, {
       from: deployer,
     });
   });
@@ -232,7 +195,7 @@ describe("DarkForestWhitelist", function () {
     );
   });
 
-  it("should reject player to initialize if removed fromw hitelist", async function () {
+  it("should reject player to initialize if removed from whitelist", async function () {
     let planetId = getPlanetIdFromHex(asteroid1Location.hex);
     await this.whitelistContract.addKeys(
       [web3.utils.keccak256("XXXXX-XXXXX-XXXXX-XXXXX-XXXXX")],
@@ -275,7 +238,7 @@ describe("DarkForestWhitelist", function () {
       web3.utils.fromWei(await this.whitelistContract.drip())
     );
 
-    expect(drip).to.equal(0.02);
+    expectEqualWithTolerance(drip, 0.02, 0.00000000000001);
 
     const oldBalance = parseFloat(
       web3.utils.fromWei(await web3.eth.getBalance(user1), "ether")
@@ -293,6 +256,6 @@ describe("DarkForestWhitelist", function () {
       web3.utils.fromWei(await web3.eth.getBalance(user1), "ether")
     );
 
-    expect(newBalance).to.equal(oldBalance + drip);
+    expectEqualWithTolerance(newBalance, oldBalance + drip, 0.00000000000001);
   });
 });

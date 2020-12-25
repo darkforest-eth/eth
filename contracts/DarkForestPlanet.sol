@@ -2,8 +2,9 @@
 pragma solidity ^0.6.9;
 pragma experimental ABIEncoderV2;
 
-import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
 import "./DarkForestTypes.sol";
+import "./DarkForestTokens.sol";
 import "./DarkForestLazyUpdate.sol";
 import "./DarkForestUtils.sol";
 
@@ -171,17 +172,18 @@ library DarkForestPlanet {
         }
 
         // initial population (barbarians) and silver
-        _planet.population = SafeMath.div(
-            SafeMath.mul(
+        _planet.population = SafeMathUpgradeable.div(
+            SafeMathUpgradeable.mul(
                 _planet.populationCap,
                 _planetDefaultStats.barbarianPercentage
             ),
             100
         );
+        // barbarians adjusted for def debuffs, and buffed in space/deepspace
         if (deepSpace) {
-            _planet.population *= 4;
+            _planet.population *= 6;
         } else if (mediumSpace) {
-            _planet.population *= 2;
+            _planet.population = (_planet.population * 5) / 2;
         }
 
         _planet.silver = 0;
@@ -212,6 +214,36 @@ library DarkForestPlanet {
         _planetExtendedInfo.upgradeState2 = 0;
     }
 
+    function _buffPlanet(
+        DarkForestTypes.Planet storage planet,
+        DarkForestTypes.Upgrade memory upgrade
+    ) public {
+        planet.populationCap =
+            (planet.populationCap * upgrade.popCapMultiplier) /
+            100;
+        planet.populationGrowth =
+            (planet.populationGrowth * upgrade.popGroMultiplier) /
+            100;
+        planet.range = (planet.range * upgrade.rangeMultiplier) / 100;
+        planet.speed = (planet.speed * upgrade.speedMultiplier) / 100;
+        planet.defense = (planet.defense * upgrade.defMultiplier) / 100;
+    }
+
+    function _debuffPlanet(
+        DarkForestTypes.Planet storage planet,
+        DarkForestTypes.Upgrade memory upgrade
+    ) public {
+        planet.populationCap =
+            (planet.populationCap * 100) /
+            upgrade.popCapMultiplier;
+        planet.populationGrowth =
+            (planet.populationGrowth * 100) /
+            upgrade.popGroMultiplier;
+        planet.range = (planet.range * 100) / upgrade.rangeMultiplier;
+        planet.speed = (planet.speed * 100) / upgrade.speedMultiplier;
+        planet.defense = (planet.defense * 100) / upgrade.defMultiplier;
+    }
+
     function upgradePlanet(
         uint256 _location,
         uint256 _branch,
@@ -224,13 +256,8 @@ library DarkForestPlanet {
         // do checks
 
         require(
-            planets[_location].owner == msg.sender ||
-                DarkForestUtils.isDelegated(
-                    planetsExtendedInfo,
-                    _location,
-                    msg.sender
-                ),
-            "Only owner or delegated account can perform operation on planets"
+            planets[_location].owner == msg.sender,
+            "Only owner account can perform operation on planets"
         );
         uint256 planetLevel = planets[_location].planetLevel;
         require(
@@ -260,17 +287,28 @@ library DarkForestPlanet {
         );
 
         uint256 upgradeBranchCurrentLevel;
-        if (_branch == 0) {
+        if (_branch == uint256(DarkForestTypes.UpgradeBranch.DEFENSE)) {
             upgradeBranchCurrentLevel = planetsExtendedInfo[_location]
                 .upgradeState0;
-        } else if (_branch == 1) {
+        } else if (_branch == uint256(DarkForestTypes.UpgradeBranch.RANGE)) {
             upgradeBranchCurrentLevel = planetsExtendedInfo[_location]
                 .upgradeState1;
-        } else if (_branch == 2) {
+        } else if (_branch == uint256(DarkForestTypes.UpgradeBranch.SPEED)) {
             upgradeBranchCurrentLevel = planetsExtendedInfo[_location]
                 .upgradeState2;
         }
         require(upgradeBranchCurrentLevel < 4, "Upgrade branch already maxed");
+
+        if (
+            planetsExtendedInfo[_location].spaceType ==
+            DarkForestTypes.SpaceType.DEEP_SPACE &&
+            _branch == uint256(DarkForestTypes.UpgradeBranch.DEFENSE)
+        ) {
+            require(
+                upgradeBranchCurrentLevel < 2,
+                "Can't upgrade DEF past level 2 in deep space"
+            );
+        }
 
 
             DarkForestTypes.Upgrade memory upgrade
@@ -284,29 +322,44 @@ library DarkForestPlanet {
         );
 
         // do upgrade
-        planets[_location].populationCap =
-            (planets[_location].populationCap * upgrade.popCapMultiplier) /
-            100;
-        planets[_location].populationGrowth =
-            (planets[_location].populationGrowth * upgrade.popGroMultiplier) /
-            100;
-        planets[_location].range =
-            (planets[_location].range * upgrade.rangeMultiplier) /
-            100;
-        planets[_location].speed =
-            (planets[_location].speed * upgrade.speedMultiplier) /
-            100;
-        planets[_location].defense =
-            (planets[_location].defense * upgrade.defMultiplier) /
-            100;
+        _buffPlanet(planets[_location], upgrade);
         planets[_location].silver -= upgradeCost;
-        if (_branch == 0) {
+        if (_branch == uint256(DarkForestTypes.UpgradeBranch.DEFENSE)) {
             planetsExtendedInfo[_location].upgradeState0 += 1;
-        } else if (_branch == 1) {
+        } else if (_branch == uint256(DarkForestTypes.UpgradeBranch.RANGE)) {
             planetsExtendedInfo[_location].upgradeState1 += 1;
-        } else if (_branch == 2) {
+        } else if (_branch == uint256(DarkForestTypes.UpgradeBranch.SPEED)) {
             planetsExtendedInfo[_location].upgradeState2 += 1;
         }
+    }
+
+    function checkInit(
+        uint256 _location,
+        uint256 _perlin,
+        uint256 _radius,
+        mapping(address => bool) storage isPlayerInitialized,
+        mapping(uint256 => DarkForestTypes.PlanetExtendedInfo)
+            storage planetsExtendedInfo,
+        uint256 worldRadius,
+        uint256 PERLIN_THRESHOLD_1
+    ) public view returns (bool) {
+        require(
+            !isPlayerInitialized[msg.sender],
+            "Player is already initialized"
+        );
+        require(
+            !planetsExtendedInfo[_location].isInitialized,
+            "Planet is already initialized"
+        );
+        require(
+            _radius <= worldRadius,
+            "Init radius is bigger than the current world radius"
+        );
+        require(
+            _perlin < PERLIN_THRESHOLD_1,
+            "Init not allowed in perlin value greater than or equal to the threshold"
+        );
+        return true;
     }
 
     function move(
@@ -324,13 +377,8 @@ library DarkForestPlanet {
         mapping(uint256 => DarkForestTypes.ArrivalData) storage planetArrivals
     ) public {
         require(
-            planets[_oldLoc].owner == msg.sender ||
-                DarkForestUtils.isDelegated(
-                    planetsExtendedInfo,
-                    _oldLoc,
-                    msg.sender
-                ),
-            "Only owner or delegated account can perform operation on planets"
+            planets[_oldLoc].owner == msg.sender,
+            "Only owner account can perform operation on planets"
         );
         // we want strict > so that the population can't go to 0
         require(
@@ -400,5 +448,40 @@ library DarkForestPlanet {
             planetsExtendedInfo[_location],
             block.timestamp
         );
+    }
+
+    // transfers ownership of artifact to core contract and assigns it to a planet
+    function _putArtifactOnPlanet(
+        DarkForestTokens tokens,
+        uint256 artifactId,
+        uint256 locationId,
+        DarkForestTypes.Planet storage planet,
+        DarkForestTypes.PlanetExtendedInfo storage planetInfo,
+        mapping(uint256 => uint256) storage contractOwnedArtifactLocations
+    ) public {
+        tokens.transferToCoreContract(artifactId);
+        contractOwnedArtifactLocations[artifactId] = locationId;
+        planetInfo.heldArtifactId = artifactId;
+        planetInfo.artifactLockedTimestamp = block.timestamp;
+        DarkForestTypes.Upgrade memory upgrade = DarkForestUtils
+            ._getUpgradeForArtifact(tokens.getArtifact(artifactId));
+        _buffPlanet(planet, upgrade);
+    }
+
+    function _takeArtifactOffPlanet(
+        DarkForestTokens tokens,
+        address coreContractAddr,
+        DarkForestTypes.Planet storage planet,
+        DarkForestTypes.PlanetExtendedInfo storage planetInfo,
+        mapping(uint256 => uint256) storage contractOwnedArtifactLocations
+    ) public {
+        uint256 artifactId = planetInfo.heldArtifactId;
+        tokens.safeTransferFrom(coreContractAddr, msg.sender, artifactId);
+        contractOwnedArtifactLocations[artifactId] = 0;
+        planetInfo.heldArtifactId = 0;
+        planetInfo.artifactLockedTimestamp = 0;
+        DarkForestTypes.Upgrade memory upgrade = DarkForestUtils
+            ._getUpgradeForArtifact(tokens.getArtifact(artifactId));
+        _debuffPlanet(planet, upgrade);
     }
 }

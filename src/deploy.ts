@@ -1,10 +1,9 @@
-const util = require("util");
-const rawExec = util.promisify(require("child_process").exec);
-const fs = require("fs");
-const readlineSync = require("readline-sync");
-//@ts-ignore
+import * as util from "util";
+import * as fs from "fs";
+import * as readlineSync from "readline-sync";
 import HDWalletProvider from "@truffle/hdwallet-provider";
 
+const rawExec = util.promisify(require("child_process").exec);
 const isProd = process.env.NODE_ENV === "production";
 
 require("dotenv").config({
@@ -75,57 +74,106 @@ const exec = async (command: string) => {
   }
 };
 
-const run = async () => {
+const deploy = async () => {
+  if (!isProd) {
+    // delete old contract data
+    // -f in case path doesn't exist
+    await exec(`rm -f .openzeppelin/dev-31337.json`);
+  }
+
+  // compile the contracts
   await exec(`oz compile --optimizer on --no-interactive`);
-  console.log("Deploy mnemonics: ", DEPLOYER_MNEMONIC);
-  const deployerWallet = new HDWalletProvider(DEPLOYER_MNEMONIC, network_url);
-  const whitelistControllerWallet = new HDWalletProvider(
-    WHITELIST_CONTROLLER_MNEMONIC,
-    network_url
-  );
-  const coreControllerWallet = new HDWalletProvider(
-    CORE_CONTROLLER_MNEMONIC,
-    network_url
-  );
-  const ozAdminWallet = new HDWalletProvider(OZ_ADMIN_MNEMONIC, network_url);
+
+  const [
+    deployerWallet,
+    whitelistControllerWallet,
+    coreControllerWallet,
+    ozAdminWallet,
+  ] = [
+    new HDWalletProvider(DEPLOYER_MNEMONIC, network_url),
+    new HDWalletProvider(WHITELIST_CONTROLLER_MNEMONIC, network_url),
+    new HDWalletProvider(CORE_CONTROLLER_MNEMONIC, network_url),
+    new HDWalletProvider(OZ_ADMIN_MNEMONIC, network_url),
+  ];
+
+  const [whitelistControllerAddress, coreControllerAddress, ozAdminAddress] = [
+    whitelistControllerWallet.getAddress(),
+    coreControllerWallet.getAddress(),
+    ozAdminWallet.getAddress(),
+  ];
+
+  // Only when deploying to production, give the deployer wallet money,
+  // in order for it to be able to deploy the contracts
   if (isProd) {
     console.log(`Give some eth to ${deployerWallet.getAddress()}`);
     readlineSync.question("Press enter when you're done.");
   }
-  const whitelistControllerAddress = whitelistControllerWallet.getAddress();
+
+  // deploy the whitelist contract
   const whitelistContractAddress = await deployWhitelist(
     whitelistControllerAddress
   );
 
+  // Save the deployment environment variables relevant for whitelist
   writeEnv(`../whitelist/${isProd ? "prod" : "dev"}.autogen.env`, {
     mnemonic: WHITELIST_CONTROLLER_MNEMONIC,
     project_id: PROJECT_ID,
     contract_address: whitelistContractAddress,
   });
-  const coreControllerAddress = coreControllerWallet.getAddress();
+
+  // deploy the tokens contract
+  const tokensContractAddress = await deployTokens();
+
+  // deploy the core contract
   const coreContractAddress = await deployCore(
     coreControllerAddress,
-    whitelistContractAddress
+    whitelistContractAddress,
+    tokensContractAddress
   );
+
+  await exec(
+    `oz send-tx -n ${NETWORK} --to ${tokensContractAddress} --method initialize --args ${coreContractAddress} --no-interactive`
+  );
+
+  // save the addresses of the deployed contracts to files that
+  // are accessible by typesript, so that the client connects to the correct
+  // contracts
   fs.writeFileSync(
     isProd
       ? "../client/src/utils/prod_contract_addr.ts"
       : "../client/src/utils/local_contract_addr.ts",
-    `export const contractAddress = '${coreContractAddress}'`
+    `export const contractAddress = '${coreContractAddress}';\nexport const tokensContract = '${tokensContractAddress}';`
   );
+
+  // save the core contract json
   await exec("mkdir -p ../client/public/contracts");
   await exec(
     "cp build/contracts/DarkForestCore.json ../client/public/contracts/"
   );
-
-  const ozAdminAddress = ozAdminWallet.getAddress();
+  await exec(
+    "cp build/contracts/DarkForestTokens.json ../client/public/contracts/"
+  );
 
   await exec(
     `oz set-admin ${coreControllerAddress} ${ozAdminAddress} --network ${NETWORK} --no-interactive --force`
   );
 
+  // save environment variables (i.e. contract addresses) and contract ABI to cache-server
+  // save the addresses of the deployed contracts to files that
+  // are accessible by typesript, so that the client connects to the correct
+  // contracts
+  fs.writeFileSync(
+    isProd
+      ? "../cache-server/src/prod_contract_addrs.ts"
+      : "../cache-server/src/local_contract_addrs.ts",
+    `export const coreContractAddress = '${coreContractAddress}';\nexport const tokensContract = '${tokensContractAddress}';`
+  );
+  await exec("cp build/contracts/DarkForestCore.json ../cache-server/src/abi/");
+  await exec(
+    "cp build/contracts/DarkForestTokens.json ../cache-server/src/abi/"
+  );
+
   console.log("Deploy over. You can quit this process.");
-  //process.exit()
 };
 
 const deployWhitelist = async (
@@ -146,9 +194,21 @@ const deployWhitelist = async (
   return whitelistAddress;
 };
 
+const deployTokens = async (): Promise<string> => {
+  await exec(`oz add DarkForestTokens`);
+  await exec(`oz push -n ${NETWORK} --no-interactive --reset --force`);
+  const dfTokensAddress = await exec(
+    `oz deploy DarkForestTokens -k upgradeable -n ${NETWORK} --no-interactive`
+  );
+
+  console.log(`DarkForestTokens deployed to ${dfTokensAddress}.`);
+  return dfTokensAddress;
+};
+
 const deployCore = async (
   coreControllerAddress: string,
-  whitelistAddress: string
+  whitelistAddress: string,
+  tokensAddress: string
 ): Promise<string> => {
   await exec(`oz add DarkForestCore`);
   await exec(`oz push -n ${NETWORK} --no-interactive --reset --force`);
@@ -156,7 +216,7 @@ const deployCore = async (
     `oz deploy DarkForestCore -k upgradeable -n ${NETWORK} --no-interactive`
   );
   await exec(
-    `oz send-tx -n ${NETWORK} --to ${dfCoreAddress} --method initialize --args ${coreControllerAddress},${whitelistAddress},${DISABLE_ZK_CHECKS} --no-interactive`
+    `oz send-tx -n ${NETWORK} --to ${dfCoreAddress} --method initialize --args ${coreControllerAddress},${whitelistAddress},${tokensAddress},${DISABLE_ZK_CHECKS} --no-interactive`
   );
   console.log(`DFCore deployed to ${dfCoreAddress}.`);
   return dfCoreAddress;
@@ -169,4 +229,4 @@ const writeEnv = (filename: string, dict: Record<string, string>): void => {
   fs.writeFileSync(filename, str);
 };
 
-run();
+deploy();

@@ -6,18 +6,10 @@ const {
 const { expect } = require("chai");
 
 const {
-  DarkForestCore,
-  Whitelist,
-  Verifier,
-  DarkForestPlanet,
-  DarkForestLazyUpdate,
-  DarkForestUtils,
-  DarkForestTypes,
-  DarkForestInitialize,
+  initializeTest,
   getPlanetIdFromHex,
   asteroid1Location,
   star1Location,
-  star2Location,
   silverStar2Location,
   makeInitArgs,
   makeMoveArgs,
@@ -29,42 +21,9 @@ const {
 
 describe("DarkForestUpgrade", function () {
   beforeEach(async function () {
-    await Whitelist.detectNetwork();
-    this.whitelistContract = await Whitelist.new({ from: deployer });
-    await this.whitelistContract.initialize(deployer, false);
+    await initializeTest(this);
 
-    this.verifierLib = await Verifier.new({ from: deployer });
-    this.dfUtilsLib = await DarkForestUtils.new({ from: deployer });
-    this.dfLazyUpdateLib = await DarkForestLazyUpdate.new({ from: deployer });
-    this.dfTypesLib = await DarkForestTypes.new({ from: deployer });
-    await DarkForestPlanet.detectNetwork();
-    await DarkForestPlanet.link(
-      "DarkForestLazyUpdate",
-      this.dfLazyUpdateLib.address
-    );
-    await DarkForestPlanet.link("DarkForestUtils", this.dfUtilsLib.address);
-    this.dfPlanetLib = await DarkForestPlanet.new({ from: deployer });
-    this.dfInitializeLib = await DarkForestInitialize.new({ from: deployer });
-    await DarkForestCore.detectNetwork();
-    await DarkForestCore.link("Verifier", this.verifierLib.address);
-    await DarkForestCore.link("DarkForestPlanet", this.dfPlanetLib.address);
-    await DarkForestCore.link(
-      "DarkForestLazyUpdate",
-      this.dfLazyUpdateLib.address
-    );
-    await DarkForestCore.link("DarkForestTypes", this.dfTypesLib.address);
-    await DarkForestCore.link("DarkForestUtils", this.dfUtilsLib.address);
-    await DarkForestCore.link(
-      "DarkForestInitialize",
-      this.dfInitializeLib.address
-    );
-    this.contract = await DarkForestCore.new({ from: deployer });
-    await this.contract.initialize(
-      deployer,
-      this.whitelistContract.address,
-      true
-    );
-    await this.contract.changeGameEndTime(99999999999999, {
+    await this.contract.changeTokenMintEndTime(99999999999999, {
       from: deployer,
     });
   });
@@ -90,7 +49,7 @@ describe("DarkForestUpgrade", function () {
 
     await expectRevert(
       this.contract.upgradePlanet(player1Planet, 0, { from: user2 }),
-      "Only owner or delegated account can perform operation on planets"
+      "Only owner account can perform operation on planets"
     );
   });
 
@@ -150,7 +109,7 @@ describe("DarkForestUpgrade", function () {
 
   it("should upgrade planet stats and emit event", async function () {
     const homePlanetId = getPlanetIdFromHex(asteroid1Location.hex);
-    const upgradeablePlanetId = getPlanetIdFromHex(star2Location.hex);
+    const upgradeablePlanetId = getPlanetIdFromHex(star1Location.hex);
     const silverMinePlanetId = getPlanetIdFromHex(silverStar2Location.hex);
     const dist = 0;
     const shipsSent = 90000;
@@ -288,7 +247,7 @@ describe("DarkForestUpgrade", function () {
 
   it("should reject upgrade if there's not enough resources", async function () {
     const homePlanetId = getPlanetIdFromHex(asteroid1Location.hex);
-    const upgradeablePlanetId = getPlanetIdFromHex(star2Location.hex);
+    const upgradeablePlanetId = getPlanetIdFromHex(star1Location.hex);
     const dist = 0;
     const shipsSent = 90000;
     const silverSent = 0;
@@ -329,8 +288,10 @@ describe("DarkForestUpgrade", function () {
   });
 
   it("should reject upgrade if branch is maxed", async function () {
+    this.timeout(5000);
+
     const homePlanetId = getPlanetIdFromHex(asteroid1Location.hex);
-    const upgradeablePlanetId = getPlanetIdFromHex(star2Location.hex);
+    const upgradeablePlanetId = getPlanetIdFromHex(star1Location.hex);
     const silverMinePlanetId = getPlanetIdFromHex(silverStar2Location.hex);
     const dist = 0;
     const shipsSent = 90000;
@@ -416,8 +377,10 @@ describe("DarkForestUpgrade", function () {
   });
 
   it("should reject upgrade if total level already maxed (safe space)", async function () {
+    this.timeout(10000);
+
     const homePlanetId = getPlanetIdFromHex(asteroid1Location.hex);
-    const upgradeablePlanetId = getPlanetIdFromHex(star2Location.hex);
+    const upgradeablePlanetId = getPlanetIdFromHex(star1Location.hex);
     const silverMinePlanetId = getPlanetIdFromHex(silverStar2Location.hex);
     const dist = 0;
     const shipsSent = 90000;
@@ -504,8 +467,10 @@ describe("DarkForestUpgrade", function () {
   });
 
   it("should reject upgrade if total level already maxed (deep space)", async function () {
+    this.timeout(10000);
+
     const homePlanetId = getPlanetIdFromHex(asteroid1Location.hex);
-    const upgradeablePlanetId = getPlanetIdFromHex(star2Location.hex);
+    const upgradeablePlanetId = getPlanetIdFromHex(star1Location.hex);
     const silverMinePlanetId = getPlanetIdFromHex(silverStar2Location.hex);
     const dist = 0;
     const shipsSent = 90000;
@@ -556,7 +521,7 @@ describe("DarkForestUpgrade", function () {
     time.increase(LARGE_INTERVAL);
     time.advanceBlock();
 
-    const branchOrder = [0, 0, 0, 1, 1];
+    const branchOrder = [2, 2, 2, 1, 1];
     for (let i = 0; i < 5; i++) {
       const silverMinePlanet = await this.contract.planets(silverMinePlanetId);
       // fill up planet with silver
@@ -589,5 +554,96 @@ describe("DarkForestUpgrade", function () {
       this.contract.upgradePlanet(upgradeablePlanetId, 1, { from: user1 }),
       "Planet at max total level"
     );
+  });
+
+  it("should reject lvl3 def upgrade in deep space", async function () {
+    this.timeout(10000);
+
+    const homePlanetId = getPlanetIdFromHex(asteroid1Location.hex);
+    const upgradeablePlanetId = getPlanetIdFromHex(star1Location.hex);
+    const silverMinePlanetId = getPlanetIdFromHex(silverStar2Location.hex);
+    const dist = 0;
+    const shipsSent = 90000;
+    const silverSent = 0;
+
+    await this.contract.initializePlayer(
+      ...makeInitArgs(homePlanetId, 10, 2000),
+      {
+        from: user1,
+      }
+    );
+
+    // conquer upgradeable planet and silver planet
+    for (let i = 0; i < 4; i++) {
+      time.increase(LARGE_INTERVAL);
+      time.advanceBlock();
+
+      await this.contract.move(
+        ...makeMoveArgs(
+          homePlanetId,
+          upgradeablePlanetId,
+          20,
+          2000,
+          dist,
+          shipsSent,
+          silverSent
+        ),
+        { from: user1 }
+      );
+
+      time.increase(LARGE_INTERVAL);
+      time.advanceBlock();
+
+      await this.contract.move(
+        ...makeMoveArgs(
+          homePlanetId,
+          silverMinePlanetId,
+          20,
+          2000,
+          dist,
+          shipsSent,
+          silverSent
+        ),
+        { from: user1 }
+      );
+    }
+
+    time.increase(LARGE_INTERVAL);
+    time.advanceBlock();
+
+    for (let i = 0; i < 3; i++) {
+      const silverMinePlanet = await this.contract.planets(silverMinePlanetId);
+      // fill up planet with silver
+      for (let j = 0; j < 2; j++) {
+        await this.contract.move(
+          ...makeMoveArgs(
+            silverMinePlanetId,
+            upgradeablePlanetId,
+            20,
+            2000,
+            1,
+            shipsSent,
+            silverMinePlanet.silverCap
+          ),
+          { from: user1 }
+        );
+        time.increase(LARGE_INTERVAL);
+        time.advanceBlock();
+      }
+
+      if (i === 2) {
+        await expectRevert(
+          this.contract.upgradePlanet(upgradeablePlanetId, 0, { from: user1 }),
+          "Can't upgrade DEF past level 2 in deep space"
+        );
+      } else {
+        await this.contract.upgradePlanet(upgradeablePlanetId, 0, {
+          from: user1,
+        });
+      }
+
+      time.increase(LARGE_INTERVAL);
+      time.advanceBlock();
+    }
   });
 });

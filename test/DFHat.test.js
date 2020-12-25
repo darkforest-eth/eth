@@ -2,14 +2,7 @@ const { web3 } = require("@openzeppelin/test-environment");
 const { expect } = require("chai");
 
 const {
-  DarkForestCore,
-  Whitelist,
-  Verifier,
-  DarkForestPlanet,
-  DarkForestLazyUpdate,
-  DarkForestUtils,
-  DarkForestTypes,
-  DarkForestInitialize,
+  initializeTest,
   getPlanetIdFromHex,
   asteroid1Location,
   makeInitArgs,
@@ -23,44 +16,9 @@ describe("DarkForestHat", function () {
   // test that silver and population lazy updating work
 
   beforeEach(async function () {
-    this.timeout(5000);
+    await initializeTest(this);
 
-    await Whitelist.detectNetwork();
-    this.whitelistContract = await Whitelist.new({ from: deployer });
-    await this.whitelistContract.initialize(deployer, false);
-
-    this.verifierLib = await Verifier.new({ from: deployer });
-    this.dfUtilsLib = await DarkForestUtils.new({ from: deployer });
-    this.dfLazyUpdateLib = await DarkForestLazyUpdate.new({ from: deployer });
-    this.dfTypesLib = await DarkForestTypes.new({ from: deployer });
-    await DarkForestPlanet.detectNetwork();
-    await DarkForestPlanet.link(
-      "DarkForestLazyUpdate",
-      this.dfLazyUpdateLib.address
-    );
-    await DarkForestPlanet.link("DarkForestUtils", this.dfUtilsLib.address);
-    this.dfPlanetLib = await DarkForestPlanet.new({ from: deployer });
-    this.dfInitializeLib = await DarkForestInitialize.new({ from: deployer });
-    await DarkForestCore.detectNetwork();
-    await DarkForestCore.link("Verifier", this.verifierLib.address);
-    await DarkForestCore.link("DarkForestPlanet", this.dfPlanetLib.address);
-    await DarkForestCore.link(
-      "DarkForestLazyUpdate",
-      this.dfLazyUpdateLib.address
-    );
-    await DarkForestCore.link("DarkForestTypes", this.dfTypesLib.address);
-    await DarkForestCore.link("DarkForestUtils", this.dfUtilsLib.address);
-    await DarkForestCore.link(
-      "DarkForestInitialize",
-      this.dfInitializeLib.address
-    );
-    this.contract = await DarkForestCore.new({ from: deployer });
-    await this.contract.initialize(
-      deployer,
-      this.whitelistContract.address,
-      true
-    );
-    await this.contract.changeGameEndTime(999999999999999, {
+    await this.contract.changeTokenMintEndTime(999999999999999, {
       from: deployer,
     });
     await web3.eth.sendTransaction({

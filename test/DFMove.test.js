@@ -7,14 +7,7 @@ const {
 const { expect } = require("chai");
 
 const {
-  DarkForestCore,
-  Whitelist,
-  Verifier,
-  DarkForestPlanet,
-  DarkForestLazyUpdate,
-  DarkForestUtils,
-  DarkForestTypes,
-  DarkForestInitialize,
+  initializeTest,
   getPlanetIdFromHex,
   asteroid1Location,
   asteroid2Location,
@@ -29,6 +22,7 @@ const {
   user2,
   SMALL_INTERVAL,
   LARGE_INTERVAL,
+  star1Location,
 } = require("./DFTestUtils");
 
 describe("DarkForestMove", function () {
@@ -36,51 +30,18 @@ describe("DarkForestMove", function () {
 
   describe("move to new planet", function () {
     before(async function () {
-      this.timeout(5000);
+      await initializeTest(this);
 
-      await Whitelist.detectNetwork();
-      this.whitelistContract = await Whitelist.new({ from: deployer });
-      await this.whitelistContract.initialize(deployer, false);
-
-      this.verifierLib = await Verifier.new({ from: deployer });
-      this.dfUtilsLib = await DarkForestUtils.new({ from: deployer });
-      this.dfLazyUpdateLib = await DarkForestLazyUpdate.new({ from: deployer });
-      this.dfTypesLib = await DarkForestTypes.new({ from: deployer });
-      await DarkForestPlanet.detectNetwork();
-      await DarkForestPlanet.link(
-        "DarkForestLazyUpdate",
-        this.dfLazyUpdateLib.address
-      );
-      await DarkForestPlanet.link("DarkForestUtils", this.dfUtilsLib.address);
-      this.dfPlanetLib = await DarkForestPlanet.new({ from: deployer });
-      this.dfInitializeLib = await DarkForestInitialize.new({ from: deployer });
-      await DarkForestCore.detectNetwork();
-      await DarkForestCore.link("Verifier", this.verifierLib.address);
-      await DarkForestCore.link("DarkForestPlanet", this.dfPlanetLib.address);
-      await DarkForestCore.link(
-        "DarkForestLazyUpdate",
-        this.dfLazyUpdateLib.address
-      );
-      await DarkForestCore.link("DarkForestTypes", this.dfTypesLib.address);
-      await DarkForestCore.link("DarkForestUtils", this.dfUtilsLib.address);
-      await DarkForestCore.link(
-        "DarkForestInitialize",
-        this.dfInitializeLib.address
-      );
-      this.contract = await DarkForestCore.new({ from: deployer });
-      await this.contract.initialize(
-        deployer,
-        this.whitelistContract.address,
-        true
-      );
-      await this.contract.changeGameEndTime(9997464000, { from: deployer });
+      await this.contract.changeTokenMintEndTime(9997464000, {
+        from: deployer,
+      });
 
       const fromId = getPlanetIdFromHex(asteroid1Location.hex);
 
       await this.contract.initializePlayer(...makeInitArgs(fromId, 10, 1999), {
         from: user1,
       });
-      await this.contract.changeGameEndTime(99999999999999, {
+      await this.contract.changeTokenMintEndTime(99999999999999, {
         from: deployer,
       });
       time.increase(LARGE_INTERVAL);
@@ -178,9 +139,11 @@ describe("DarkForestMove", function () {
 
       await this.contract.refreshPlanet(toId);
 
+      const lvl0PlanetStartingPop = 0.0 * 100000;
+
       expect(
         (await this.contract.planets(toId)).population
-      ).to.be.bignumber.equal("0");
+      ).to.be.bignumber.equal(lvl0PlanetStartingPop.toString());
     });
 
     it("should apply event after arrival time", async function () {
@@ -265,6 +228,7 @@ describe("DarkForestMove", function () {
     });
 
     it("should expand world radius when init high level planet", async function () {
+      await this.contract.changeTarget4RadiusConstant(1, { from: deployer }); // basically no min radius
       const initialRadius = await this.contract.worldRadius();
       const fromId = getPlanetIdFromHex(asteroid2Location.hex);
 
@@ -274,7 +238,7 @@ describe("DarkForestMove", function () {
       const silverSent = 0;
 
       await this.contract.move(
-        ...makeMoveArgs(fromId, toId, 20, 2000, dist, shipsSent, silverSent),
+        ...makeMoveArgs(fromId, toId, 20, 1, dist, shipsSent, silverSent),
         { from: user1 }
       );
 
@@ -286,40 +250,15 @@ describe("DarkForestMove", function () {
 
   describe("move to friendly planet", function () {
     before(async function () {
-      await Whitelist.detectNetwork();
-      this.whitelistContract = await Whitelist.new({ from: deployer });
-      await this.whitelistContract.initialize(deployer, false);
+      await initializeTest(this);
 
-      this.verifierLib = await Verifier.new({ from: deployer });
-      this.dfPlanetLib = await DarkForestPlanet.new({ from: deployer });
-      this.dfLazyUpdateLib = await DarkForestLazyUpdate.new({ from: deployer });
-      this.dfTypesLib = await DarkForestTypes.new({ from: deployer });
-      this.dfUtilsLib = await DarkForestUtils.new({ from: deployer });
-      this.dfInitializeLib = await DarkForestInitialize.new({ from: deployer });
-      await DarkForestCore.detectNetwork();
-      await DarkForestCore.link("Verifier", this.verifierLib.address);
-      await DarkForestCore.link("DarkForestPlanet", this.dfPlanetLib.address);
-      await DarkForestCore.link(
-        "DarkForestLazyUpdate",
-        this.dfLazyUpdateLib.address
-      );
-      await DarkForestCore.link("DarkForestTypes", this.dfTypesLib.address);
-      await DarkForestCore.link("DarkForestUtils", this.dfUtilsLib.address);
-      await DarkForestCore.link(
-        "DarkForestInitialize",
-        this.dfInitializeLib.address
-      );
-      this.contract = await DarkForestCore.new({ from: deployer });
-      await this.contract.initialize(
-        deployer,
-        this.whitelistContract.address,
-        true
-      );
-      await this.contract.changeGameEndTime(9997464000, { from: deployer });
+      await this.contract.changeTokenMintEndTime(9997464000, {
+        from: deployer,
+      });
 
       const fromId = getPlanetIdFromHex(asteroid1Location.hex);
       const toId = getPlanetIdFromHex(asteroid2Location.hex);
-      const dist = 100;
+      const dist = 10;
       const shipsSent = 40000;
       const silverSent = 0;
 
@@ -398,10 +337,15 @@ describe("DarkForestMove", function () {
         "0"
       );
 
+      // send silver to toId2 but don't conquer it. 30000 conquers but 10000 move fails
       await this.contract.move(
-        ...makeMoveArgs(toId, toId2, 16, 2000, dist, shipsSent, 100),
+        ...makeMoveArgs(toId, toId2, 16, 2000, 10, 20000, 100),
         { from: user1 }
       );
+
+      const oldTo2 = await this.contract.planets(toId2);
+      const oldSilverValue = oldTo2.silver;
+      const silverCap = oldTo2.silverCap;
 
       time.increase(LARGE_INTERVAL);
       time.advanceBlock();
@@ -409,43 +353,21 @@ describe("DarkForestMove", function () {
       await this.contract.refreshPlanet(toId2);
 
       expect((await this.contract.planets(toId2)).silver).to.be.bignumber.above(
-        "0"
+        oldSilverValue
+      );
+      expect((await this.contract.planets(toId2)).silver).to.be.bignumber.below(
+        silverCap
       );
     });
   });
 
   describe("move to enemy planet", function () {
     before(async function () {
-      await Whitelist.detectNetwork();
-      this.whitelistContract = await Whitelist.new({ from: deployer });
-      await this.whitelistContract.initialize(deployer, false);
+      await initializeTest(this);
 
-      this.verifierLib = await Verifier.new({ from: deployer });
-      this.dfPlanetLib = await DarkForestPlanet.new({ from: deployer });
-      this.dfLazyUpdateLib = await DarkForestLazyUpdate.new({ from: deployer });
-      this.dfTypesLib = await DarkForestTypes.new({ from: deployer });
-      this.dfUtilsLib = await DarkForestUtils.new({ from: deployer });
-      this.dfInitializeLib = await DarkForestInitialize.new({ from: deployer });
-      await DarkForestCore.detectNetwork();
-      await DarkForestCore.link("Verifier", this.verifierLib.address);
-      await DarkForestCore.link("DarkForestPlanet", this.dfPlanetLib.address);
-      await DarkForestCore.link(
-        "DarkForestLazyUpdate",
-        this.dfLazyUpdateLib.address
-      );
-      await DarkForestCore.link("DarkForestTypes", this.dfTypesLib.address);
-      await DarkForestCore.link("DarkForestUtils", this.dfUtilsLib.address);
-      await DarkForestCore.link(
-        "DarkForestInitialize",
-        this.dfInitializeLib.address
-      );
-      this.contract = await DarkForestCore.new({ from: deployer });
-      await this.contract.initialize(
-        deployer,
-        this.whitelistContract.address,
-        true
-      );
-      await this.contract.changeGameEndTime(9997464000, { from: deployer });
+      await this.contract.changeTokenMintEndTime(9997464000, {
+        from: deployer,
+      });
 
       const planet1 = getPlanetIdFromHex(asteroid1Location.hex);
       const planet2 = getPlanetIdFromHex(asteroid2Location.hex);
@@ -605,36 +527,7 @@ describe("DarkForestMove", function () {
 
   describe("reject move with insufficient resources", function () {
     before(async function () {
-      await Whitelist.detectNetwork();
-      this.whitelistContract = await Whitelist.new({ from: deployer });
-      await this.whitelistContract.initialize(deployer, false);
-
-      this.verifierLib = await Verifier.new({ from: deployer });
-      this.dfPlanetLib = await DarkForestPlanet.new({ from: deployer });
-      this.dfLazyUpdateLib = await DarkForestLazyUpdate.new({ from: deployer });
-      this.dfTypesLib = await DarkForestTypes.new({ from: deployer });
-      this.dfUtilsLib = await DarkForestUtils.new({ from: deployer });
-      this.dfInitializeLib = await DarkForestInitialize.new({ from: deployer });
-      await DarkForestCore.detectNetwork();
-      await DarkForestCore.link("Verifier", this.verifierLib.address);
-      await DarkForestCore.link("DarkForestPlanet", this.dfPlanetLib.address);
-      await DarkForestCore.link(
-        "DarkForestLazyUpdate",
-        this.dfLazyUpdateLib.address
-      );
-      await DarkForestCore.link("DarkForestTypes", this.dfTypesLib.address);
-      await DarkForestCore.link("DarkForestUtils", this.dfUtilsLib.address);
-      await DarkForestCore.link(
-        "DarkForestInitialize",
-        this.dfInitializeLib.address
-      );
-      this.contract = await DarkForestCore.new({ from: deployer });
-      await this.contract.initialize(
-        deployer,
-        this.whitelistContract.address,
-        true
-      );
-      await this.contract.changeGameEndTime(9997464000, { from: deployer });
+      await initializeTest(this);
 
       const planet1 = getPlanetIdFromHex(asteroid1Location.hex);
 
@@ -745,7 +638,7 @@ describe("DarkForestMove", function () {
           ),
           { from: user1 }
         ),
-        "Only owner or delegated account can perform operation on planets"
+        "Only owner account can perform operation on planets"
       );
     });
 
@@ -771,6 +664,178 @@ describe("DarkForestMove", function () {
         ),
         "Attempting to move out of bounds"
       );
+    });
+  });
+
+  describe("move rate limits", function () {
+    beforeEach(async function () {
+      await initializeTest(this);
+
+      await this.contract.changeTokenMintEndTime(9997464000, {
+        from: deployer,
+      });
+
+      const planet1 = getPlanetIdFromHex(asteroid1Location.hex);
+      const planet2 = getPlanetIdFromHex(asteroid2Location.hex);
+      const planet3 = getPlanetIdFromHex(star1Location.hex);
+
+      await this.contract.initializePlayer(...makeInitArgs(planet1, 10, 1999), {
+        from: user1,
+      });
+      await this.contract.initializePlayer(...makeInitArgs(planet2, 10, 1999), {
+        from: user2,
+      });
+
+      // conquer the star
+      for (let i = 0; i < 2; i++) {
+        time.increase(LARGE_INTERVAL);
+        time.advanceBlock();
+        await this.contract.move(
+          ...makeMoveArgs(planet1, planet3, 10, 1999, 0, 90000, 0),
+          {
+            from: user1,
+          }
+        );
+      }
+      time.increase(LARGE_INTERVAL);
+      time.advanceBlock();
+    });
+
+    it("don't allow 7th incoming arrival until at least one has finished", async function () {
+      const planet3 = getPlanetIdFromHex(star1Location.hex);
+      const planet1 = getPlanetIdFromHex(asteroid1Location.hex);
+      const from = await this.contract.planets(planet3);
+
+      // do 1 move
+      await this.contract.move(
+        ...makeMoveArgs(
+          planet3,
+          planet1,
+          10,
+          1999,
+          from.range.toNumber(),
+          from.populationCap.toNumber() / 8,
+          0
+        ),
+        { from: user1 }
+      );
+      time.increase(from.range.toNumber() / (from.speed.toNumber() / 100) - 5);
+      // do 5 moves after some time
+      for (let i = 0; i < 5; i++) {
+        await this.contract.move(
+          ...makeMoveArgs(
+            planet3,
+            planet1,
+            10,
+            1999,
+            from.range.toNumber(),
+            from.populationCap.toNumber() / 8,
+            0
+          ),
+          { from: user1 }
+        );
+      }
+      // queue should be full
+      await expectRevert(
+        this.contract.move(
+          ...makeMoveArgs(
+            planet3,
+            planet1,
+            10,
+            1999,
+            from.range.toNumber(),
+            from.populationCap.toNumber() / 8,
+            0
+          ),
+          { from: user1 }
+        ),
+        "Planet is rate-limited."
+      );
+      time.increase(10);
+      // first move should be done
+      this.contract.move(
+        ...makeMoveArgs(
+          planet3,
+          planet1,
+          10,
+          1999,
+          from.range.toNumber(),
+          from.populationCap.toNumber() / 8,
+          0
+        ),
+        { from: user1 }
+      );
+    });
+
+    it("should not allow 7 incoming enemy arrivals", async function () {
+      const planet3 = getPlanetIdFromHex(star1Location.hex);
+      const planet2 = getPlanetIdFromHex(asteroid2Location.hex);
+      const from = await this.contract.planets(planet3);
+      for (let i = 0; i < 6; i++) {
+        await this.contract.move(
+          ...makeMoveArgs(
+            planet3,
+            planet2,
+            10,
+            1999,
+            from.range.toNumber(),
+            from.populationCap.toNumber() / 8,
+            0
+          ),
+          { from: user1 }
+        );
+      }
+      await expectRevert(
+        this.contract.move(
+          ...makeMoveArgs(
+            planet3,
+            planet2,
+            10,
+            1999,
+            from.range.toNumber(),
+            from.populationCap.toNumber() / 8,
+            0
+          ),
+          { from: user1 }
+        ),
+        "Planet is rate-limited."
+      );
+    });
+
+    it("should allow owner to move to planet even if there are 7 enemy arrivals", async function () {
+      const planet3 = getPlanetIdFromHex(star1Location.hex);
+      const planet2 = getPlanetIdFromHex(asteroid2Location.hex);
+      const planet1 = getPlanetIdFromHex(asteroid1Location.hex);
+      const enemyFrom = await this.contract.planets(planet2);
+      const myFrom = await this.contract.planets(planet3);
+      for (let i = 0; i < 6; i++) {
+        await this.contract.move(
+          ...makeMoveArgs(
+            planet2,
+            planet1,
+            10,
+            1999,
+            enemyFrom.range.toNumber(),
+            enemyFrom.populationCap.toNumber() / 8,
+            0
+          ),
+          { from: user2 }
+        );
+      }
+      for (let i = 0; i < 6; i++) {
+        await this.contract.move(
+          ...makeMoveArgs(
+            planet3,
+            planet1,
+            10,
+            1999,
+            myFrom.range.toNumber(),
+            myFrom.populationCap.toNumber() / 8,
+            0
+          ),
+          { from: user1 }
+        );
+      }
     });
   });
 });

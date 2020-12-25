@@ -19,7 +19,7 @@ library DarkForestInitialize {
                 defense: 800,
                 silverGrowth: 0,
                 silverCap: 0,
-                barbarianPercentage: 0                
+                barbarianPercentage: 0
             })
         );
 
@@ -33,7 +33,7 @@ library DarkForestInitialize {
                 defense: 800,
                 silverGrowth: 14,
                 silverCap: 50000,
-                barbarianPercentage: 0                
+                barbarianPercentage: 1
             })
         );
 
@@ -47,7 +47,7 @@ library DarkForestInitialize {
                 defense: 600,
                 silverGrowth: 69,
                 silverCap: 250000,
-                barbarianPercentage: 1               
+                barbarianPercentage: 2
             })
         );
 
@@ -61,7 +61,7 @@ library DarkForestInitialize {
                 defense: 400,
                 silverGrowth: 417,
                 silverCap: 2500000,
-                barbarianPercentage: 1                
+                barbarianPercentage: 3
             })
         );
 
@@ -75,7 +75,7 @@ library DarkForestInitialize {
                 defense: 200,
                 silverGrowth: 1667,
                 silverCap: 20000000,
-                barbarianPercentage: 2                
+                barbarianPercentage: 4
             })
         );
 
@@ -89,7 +89,7 @@ library DarkForestInitialize {
                 defense: 200,
                 silverGrowth: 2222,
                 silverCap: 40000000,
-                barbarianPercentage: 5                
+                barbarianPercentage: 5
             })
         );
 
@@ -103,7 +103,7 @@ library DarkForestInitialize {
                 defense: 200,
                 silverGrowth: 2778,
                 silverCap: 50000000,
-                barbarianPercentage: 9                
+                barbarianPercentage: 7
             })
         );
 
@@ -117,7 +117,7 @@ library DarkForestInitialize {
                 defense: 200,
                 silverGrowth: 3333,
                 silverCap: 60000000,
-                barbarianPercentage: 10                
+                barbarianPercentage: 10
             })
         );
     }
@@ -126,28 +126,36 @@ library DarkForestInitialize {
         public
     {
         // defense
-        upgrades[0][0] = DarkForestTypes.Upgrade({
+        upgrades[uint256(
+            DarkForestTypes.UpgradeBranch.DEFENSE
+        )][0] = DarkForestTypes.Upgrade({
             popCapMultiplier: 120,
             popGroMultiplier: 120,
             rangeMultiplier: 100,
             speedMultiplier: 100,
             defMultiplier: 150
         });
-        upgrades[0][1] = DarkForestTypes.Upgrade({
+        upgrades[uint256(
+            DarkForestTypes.UpgradeBranch.DEFENSE
+        )][1] = DarkForestTypes.Upgrade({
             popCapMultiplier: 120,
             popGroMultiplier: 120,
             rangeMultiplier: 100,
             speedMultiplier: 100,
             defMultiplier: 150
         });
-        upgrades[0][2] = DarkForestTypes.Upgrade({
+        upgrades[uint256(
+            DarkForestTypes.UpgradeBranch.DEFENSE
+        )][2] = DarkForestTypes.Upgrade({
             popCapMultiplier: 120,
             popGroMultiplier: 120,
             rangeMultiplier: 100,
             speedMultiplier: 100,
             defMultiplier: 150
         });
-        upgrades[0][3] = DarkForestTypes.Upgrade({
+        upgrades[uint256(
+            DarkForestTypes.UpgradeBranch.DEFENSE
+        )][3] = DarkForestTypes.Upgrade({
             popCapMultiplier: 120,
             popGroMultiplier: 120,
             rangeMultiplier: 100,
@@ -156,28 +164,36 @@ library DarkForestInitialize {
         });
 
         // range
-        upgrades[1][0] = DarkForestTypes.Upgrade({
+        upgrades[uint256(
+            DarkForestTypes.UpgradeBranch.RANGE
+        )][0] = DarkForestTypes.Upgrade({
             popCapMultiplier: 120,
             popGroMultiplier: 120,
             rangeMultiplier: 125,
             speedMultiplier: 100,
             defMultiplier: 100
         });
-        upgrades[1][1] = DarkForestTypes.Upgrade({
+        upgrades[uint256(
+            DarkForestTypes.UpgradeBranch.RANGE
+        )][1] = DarkForestTypes.Upgrade({
             popCapMultiplier: 120,
             popGroMultiplier: 120,
             rangeMultiplier: 125,
             speedMultiplier: 100,
             defMultiplier: 100
         });
-        upgrades[1][2] = DarkForestTypes.Upgrade({
+        upgrades[uint256(
+            DarkForestTypes.UpgradeBranch.RANGE
+        )][2] = DarkForestTypes.Upgrade({
             popCapMultiplier: 120,
             popGroMultiplier: 120,
             rangeMultiplier: 125,
             speedMultiplier: 100,
             defMultiplier: 100
         });
-        upgrades[1][3] = DarkForestTypes.Upgrade({
+        upgrades[uint256(
+            DarkForestTypes.UpgradeBranch.RANGE
+        )][3] = DarkForestTypes.Upgrade({
             popCapMultiplier: 120,
             popGroMultiplier: 120,
             rangeMultiplier: 125,
@@ -186,28 +202,36 @@ library DarkForestInitialize {
         });
 
         // speed
-        upgrades[2][0] = DarkForestTypes.Upgrade({
+        upgrades[uint256(
+            DarkForestTypes.UpgradeBranch.SPEED
+        )][0] = DarkForestTypes.Upgrade({
             popCapMultiplier: 120,
             popGroMultiplier: 120,
             rangeMultiplier: 100,
             speedMultiplier: 150,
             defMultiplier: 100
         });
-        upgrades[2][1] = DarkForestTypes.Upgrade({
+        upgrades[uint256(
+            DarkForestTypes.UpgradeBranch.SPEED
+        )][1] = DarkForestTypes.Upgrade({
             popCapMultiplier: 120,
             popGroMultiplier: 120,
             rangeMultiplier: 100,
             speedMultiplier: 150,
             defMultiplier: 100
         });
-        upgrades[2][2] = DarkForestTypes.Upgrade({
+        upgrades[uint256(
+            DarkForestTypes.UpgradeBranch.SPEED
+        )][2] = DarkForestTypes.Upgrade({
             popCapMultiplier: 120,
             popGroMultiplier: 120,
             rangeMultiplier: 100,
             speedMultiplier: 150,
             defMultiplier: 100
         });
-        upgrades[2][3] = DarkForestTypes.Upgrade({
+        upgrades[uint256(
+            DarkForestTypes.UpgradeBranch.SPEED
+        )][3] = DarkForestTypes.Upgrade({
             popCapMultiplier: 120,
             popGroMultiplier: 120,
             rangeMultiplier: 100,
