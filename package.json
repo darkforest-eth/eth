@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
-    "@nomiclabs/buidler": "^1.4.7",
+    "hardhat": "^2.0.7",
     "@openzeppelin/cli": "^2.8.2",
     "@openzeppelin/contracts-upgradeable": "^3.3.0",
     "@openzeppelin/test-environment": "^0.1.4",
@@ -12,7 +12,7 @@
     "@truffle/hdwallet-provider": "^1.0.40",
     "@types/node": "^14.0.27",
     "@types/readline-sync": "^1.4.3",
-    "buidler-contract-sizer": "^1.0.2",
+    "hardhat-contract-sizer": "^2.0.2",
     "ganache-cli": "^6.9.1",
     "mocha": "^8.0.1",
     "prettier": "^2.0.5",
@@ -21,12 +21,14 @@
     "typescript": "^3.9.7",
     "why-is-node-running": "^2.2.0"
   },
+  "engines": {
+    "node": "14.15.*"
+  },
   "dependencies": {
     "@openzeppelin/upgrades": "^2.8.0",
     "bn.js": "^4.11.0",
     "dotenv": "^8.2.0",
     "readline-sync": "^1.4.10",
-    "scrypt": "^6.0.3",
     "ts-node": "^8.10.2"
   },
   "scripts": {

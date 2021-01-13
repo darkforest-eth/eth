@@ -1,10 +1,9 @@
-usePlugin("buidler-contract-sizer");
 
 module.exports = {
   // This is a sample solc configuration that specifies which version of solc to use
-  defaultNetwork: "buidlerevm",
+  defaultNetwork: "hardhat",
   networks: {
-    buidlerevm: {
+    hardhat: {
       accounts: [
         {
           privateKey:
@@ -26,7 +25,7 @@ module.exports = {
       blockTime: 3,
     },
   },
-  solc: {
+  solidity: {
     version: "0.6.9",
   },
   contractSizer: {
