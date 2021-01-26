@@ -736,7 +736,7 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         uint256 artifactSeed = DarkForestUtils._artifactSeed(
             planetId,
             planetEventsCount,
-            planetId
+            block.timestamp
         );
         (
             DarkForestTypes.ArtifactType artifactType,

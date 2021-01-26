@@ -1,9 +1,17 @@
 const HDWalletProvider = require("@truffle/hdwallet-provider");
-require("dotenv").config({ path: `./.env.prod` });
+const isProd = process.env.NODE_ENV === "production";
+require("dotenv").config({
+  path: isProd ? ".env.prod" : ".env.example",
+});
 
 module.exports = {
   networks: {
     development: {
+      provider: () =>
+        new HDWalletProvider(
+          process.env.deployer_mnemonic,
+          "http://localhost:8545"
+        ),
       protocol: "http",
       host: "localhost",
       port: 8545,

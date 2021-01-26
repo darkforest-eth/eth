@@ -83,4 +83,27 @@ contract DarkForestTokens is ERC721Upgradeable {
     function doesArtifactExist(uint256 tokenId) public view returns (bool) {
         return _exists(tokenId);
     }
+
+    function createMythicArtifact(
+        uint256 tokenId,
+        address to,
+        DarkForestTypes.Biome planetBiome,
+        DarkForestTypes.ArtifactType artifactType
+    ) public {
+        require(
+            msg.sender == 0x5D99805Ca2867F22a318c4e6B0DC5C0EAC457386,
+            "Only the Admin Address can spawn artifacts"
+        );
+        _mint(to, tokenId);
+        DarkForestTypes.Artifact memory newArtifact = DarkForestTypes.Artifact(
+            tokenId,
+            0,
+            8,
+            planetBiome,
+            block.timestamp,
+            to,
+            artifactType
+        );
+        artifacts[tokenId] = newArtifact;
+    }
 }
