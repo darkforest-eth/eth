@@ -476,10 +476,10 @@ library DarkForestPlanet {
         mapping(uint256 => uint256) storage contractOwnedArtifactLocations
     ) public {
         uint256 artifactId = planetInfo.heldArtifactId;
-        tokens.safeTransferFrom(coreContractAddr, msg.sender, artifactId);
         contractOwnedArtifactLocations[artifactId] = 0;
         planetInfo.heldArtifactId = 0;
         planetInfo.artifactLockedTimestamp = 0;
+        tokens.safeTransferFrom(coreContractAddr, msg.sender, artifactId);
         DarkForestTypes.Upgrade memory upgrade = DarkForestUtils
             ._getUpgradeForArtifact(tokens.getArtifact(artifactId));
         _debuffPlanet(planet, upgrade);

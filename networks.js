@@ -1,4 +1,6 @@
 const HDWalletProvider = require("@truffle/hdwallet-provider");
+// NOTE: when running oz send-tx or oz upgrade for production contracts,
+// isProd will be false. you'll have to manually set it to true
 const isProd = process.env.NODE_ENV === "production";
 require("dotenv").config({
   path: isProd ? ".env.prod" : ".env.example",

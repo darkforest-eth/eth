@@ -1,11 +1,11 @@
 {
   "contracts": {
     "DarkForestCore": {
-      "address": "0xeaab996CcbCB843AeBd5c3F32d3F76953764BCF7",
+      "address": "0xDc24C21bc5C7008e3ED9abb5c44d6D21bfc02595",
       "constructorCode": "608060405234801561001057600080fd5b50615fda80620000216000396000f3fe",
-      "bodyBytecodeHash": "763e57a81b035dd221f7c6d821655e6ef4ed9e2cc220bd58271c559b25d78e5a",
+      "bodyBytecodeHash": "3827b2a1d0cab62c9876ee9f80dff32c2cea9a95036876cedc3b43a5c7d69691",
       "localBytecodeHash": "2c7c8006c85b3c80c93c8dead7898b1a7b764079b8aef27cd256e77e18ecba5e",
-      "deployedBytecodeHash": "128080454d9f226573dc8867feed037995c57ca7787de3d3975c265ee312753b",
+      "deployedBytecodeHash": "ffc5424d982f415f0ee5ce020a0525d4bce66c6135959c42fce0f89843eb2f40",
       "types": {
         "t_bool": {
           "id": "t_bool",
@@ -1294,11 +1294,11 @@
       "deployedBytecodeHash": "dea403157e367f87c1daed56eb2c89107afcfba0d757a96b47d6552f26ba0cfd"
     },
     "DarkForestPlanet": {
-      "address": "0x7Cf8366536e02c3EDBB075FF5EfaC8a09B621Dc0",
-      "constructorCode": "612d15610026600b82828239805160001a60731461001957fe5b30600052607381538281f3fe",
-      "bodyBytecodeHash": "ac62133fb958a7355cd6853c75baf1091d35bd3e569fb0081d80d76b7d67743a",
-      "localBytecodeHash": "a9d59107d3eda36fef145baf005db6bc2be0ada52549e6842a31d084a38269be",
-      "deployedBytecodeHash": "63da5b467fcec56d43abe92959177e934180230e8fcdabb3e88dbbe1631c7bd2"
+      "address": "0xDc9b0E1F64a8f2eD91f2A8394cB07a3d3103624a",
+      "constructorCode": "612d13610026600b82828239805160001a60731461001957fe5b30600052607381538281f3fe",
+      "bodyBytecodeHash": "649f379907eb8d31f2ccbda812fe4eb45c2e263e9a04c2f580cbcfb3d633de53",
+      "localBytecodeHash": "6b7ba2f7be4968a1b4b5984e76b217c123e0f77dbeb9c4eb3d0beb97964a0dea",
+      "deployedBytecodeHash": "08c0a5e655aed65c3d283c7b10207f9243fd9b2b7efce12052fa4d2d19bda6ce"
     },
     "Verifier": {
       "address": "0xaaBA8E30a03629747117f38D3F783CACE9B406B0",
@@ -1448,7 +1448,7 @@
       {
         "address": "0x678ACb78948Be7F354B28DaAb79B1ABD81574c1B",
         "version": "1.0.0",
-        "implementation": "0xc6A4C542cAeF572F42F637Dec7093ffCFc972ACD",
+        "implementation": "0xDc24C21bc5C7008e3ED9abb5c44d6D21bfc02595",
         "admin": "0xa17950c9910E28CAe535F43D0C87A6C6cb2F5216",
         "kind": "Upgradeable"
       }
@@ -1471,7 +1471,7 @@
       {
         "address": "0x5cFbC3e179C48ccB3B3d35bAD6361972F2C5603B",
         "version": "1.0.0",
-        "implementation": "0xd515d54545a17EE262f4f40Ee70984f3F6936c92",
+        "implementation": "0x9DfB17901eC39BB50a5B653e28817D34aF103676",
         "admin": "0xa17950c9910E28CAe535F43D0C87A6C6cb2F5216",
         "kind": "Upgradeable"
       }
