@@ -142,7 +142,7 @@ const deploy = async () => {
     isProd
       ? "../client/src/utils/prod_contract_addr.ts"
       : "../client/src/utils/local_contract_addr.ts",
-    `export const contractAddress = '${coreContractAddress}';\nexport const tokensContract = '${tokensContractAddress}';`
+    `export const contractAddress = '${coreContractAddress}';\nexport const tokensContract = '${tokensContractAddress}';\nexport const whitelistContract = '${whitelistContractAddress}';\n`
   );
 
   // save the core contract json
@@ -153,6 +153,7 @@ const deploy = async () => {
   await exec(
     "cp build/contracts/DarkForestTokens.json ../client/public/contracts/"
   );
+  await exec("cp build/contracts/Whitelist.json ../client/public/contracts/");
 
   await exec(
     `oz set-admin ${coreControllerAddress} ${ozAdminAddress} --network ${NETWORK} --no-interactive --force`
@@ -166,12 +167,13 @@ const deploy = async () => {
     isProd
       ? "../cache-server/src/prod_contract_addrs.ts"
       : "../cache-server/src/local_contract_addrs.ts",
-    `export const coreContractAddress = '${coreContractAddress}';\nexport const tokensContract = '${tokensContractAddress}';`
+    `export const coreContractAddress = '${coreContractAddress}';\nexport const tokensContract = '${tokensContractAddress}';\nexport const whitelistContract = '${whitelistContractAddress}';\n`
   );
   await exec("cp build/contracts/DarkForestCore.json ../cache-server/src/abi/");
   await exec(
     "cp build/contracts/DarkForestTokens.json ../cache-server/src/abi/"
   );
+  await exec("cp build/contracts/Whitelist.json ../cache-server/src/abi/");
 
   console.log("Deploy over. You can quit this process.");
 };
