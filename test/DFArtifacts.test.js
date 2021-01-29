@@ -147,6 +147,42 @@ describe("DarkForestArtifacts", function () {
     expect(statSumMiddle).to.be.not.equal(statSumAfter);
   });
 
+  it("should return a correct token uri for a minted artifact", async function () {
+    this.timeout(10000);
+
+    const planetWithArtifact1Id = getPlanetIdFromHex(planetWithArtifact1.hex);
+
+    await conquerArtifactPlanet(this);
+
+    time.increase(LARGE_INTERVAL);
+    time.advanceBlock();
+
+    await this.contract.findArtifact(
+      [1, 2],
+      [
+        [1, 2],
+        [3, 4],
+      ],
+      [5, 6],
+      [planetWithArtifact1Id, 1],
+      {
+        from: user1,
+      }
+    );
+
+    let planetInfo = await this.contract.planetsExtendedInfo(
+      planetWithArtifact1Id
+    );
+
+    const tokenUri = await this.tokensContract.tokenURI(
+      planetInfo.heldArtifactId
+    );
+
+    expect(tokenUri).to.eq(
+      "https://zkga.me/token-uri/artifact/" + planetInfo.heldArtifactId
+    );
+  });
+
   it("should not be able to withdraw artifact before lockup period", async function () {
     this.timeout(10000);
 

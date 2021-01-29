@@ -132,7 +132,7 @@ const deploy = async () => {
   );
 
   await exec(
-    `oz send-tx -n ${NETWORK} --to ${tokensContractAddress} --method initialize --args ${coreContractAddress} --no-interactive`
+    `oz send-tx -n ${NETWORK} --to ${tokensContractAddress} --method initialize --args ${coreContractAddress},${coreControllerAddress} --no-interactive`
   );
 
   // save the addresses of the deployed contracts to files that

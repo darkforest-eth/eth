@@ -1,11 +1,11 @@
 {
   "contracts": {
     "DarkForestCore": {
-      "address": "0xDc24C21bc5C7008e3ED9abb5c44d6D21bfc02595",
-      "constructorCode": "608060405234801561001057600080fd5b50615fda80620000216000396000f3fe",
-      "bodyBytecodeHash": "3827b2a1d0cab62c9876ee9f80dff32c2cea9a95036876cedc3b43a5c7d69691",
-      "localBytecodeHash": "2c7c8006c85b3c80c93c8dead7898b1a7b764079b8aef27cd256e77e18ecba5e",
-      "deployedBytecodeHash": "ffc5424d982f415f0ee5ce020a0525d4bce66c6135959c42fce0f89843eb2f40",
+      "address": "0x6A3d45c8FC8239ff19Ee38B15343f5A7b116b9a1",
+      "constructorCode": "608060405234801561001057600080fd5b50615fd680620000216000396000f3fe",
+      "bodyBytecodeHash": "605d94668ec063f3bbc30b37f172cf57eb8ccb7be24acce010773ac98fe59fc8",
+      "localBytecodeHash": "6c6c64de042789504bf8fe0b753d95f9c6f9d3da42cb900ce40ac5a18d560f48",
+      "deployedBytecodeHash": "df652799691ef6ca0d2af44a1136abbbf65cf1b12125aa37d936ad22eb705666",
       "types": {
         "t_bool": {
           "id": "t_bool",
@@ -36,55 +36,55 @@
           "members": [
             {
               "label": "label",
-              "astId": 10663,
+              "astId": 10752,
               "type": "t_string",
               "src": "1935:12:22"
             },
             {
               "label": "populationCap",
-              "astId": 10665,
+              "astId": 10754,
               "type": "t_uint256",
               "src": "1957:21:22"
             },
             {
               "label": "populationGrowth",
-              "astId": 10667,
+              "astId": 10756,
               "type": "t_uint256",
               "src": "1988:24:22"
             },
             {
               "label": "range",
-              "astId": 10669,
+              "astId": 10758,
               "type": "t_uint256",
               "src": "2022:13:22"
             },
             {
               "label": "speed",
-              "astId": 10671,
+              "astId": 10760,
               "type": "t_uint256",
               "src": "2045:13:22"
             },
             {
               "label": "defense",
-              "astId": 10673,
+              "astId": 10762,
               "type": "t_uint256",
               "src": "2068:15:22"
             },
             {
               "label": "silverGrowth",
-              "astId": 10675,
+              "astId": 10764,
               "type": "t_uint256",
               "src": "2093:20:22"
             },
             {
               "label": "silverCap",
-              "astId": 10677,
+              "astId": 10766,
               "type": "t_uint256",
               "src": "2123:17:22"
             },
             {
               "label": "barbarianPercentage",
-              "astId": 10679,
+              "astId": 10768,
               "type": "t_uint256",
               "src": "2150:27:22"
             }
@@ -109,31 +109,31 @@
           "members": [
             {
               "label": "popCapMultiplier",
-              "astId": 10682,
+              "astId": 10771,
               "type": "t_uint256",
               "src": "2215:24:22"
             },
             {
               "label": "popGroMultiplier",
-              "astId": 10684,
+              "astId": 10773,
               "type": "t_uint256",
               "src": "2249:24:22"
             },
             {
               "label": "rangeMultiplier",
-              "astId": 10686,
+              "astId": 10775,
               "type": "t_uint256",
               "src": "2283:23:22"
             },
             {
               "label": "speedMultiplier",
-              "astId": 10688,
+              "astId": 10777,
               "type": "t_uint256",
               "src": "2316:23:22"
             },
             {
               "label": "defMultiplier",
-              "astId": 10690,
+              "astId": 10779,
               "type": "t_uint256",
               "src": "2349:21:22"
             }
@@ -167,73 +167,73 @@
           "members": [
             {
               "label": "owner",
-              "astId": 10562,
+              "astId": 10651,
               "type": "t_address",
               "src": "287:13:22"
             },
             {
               "label": "range",
-              "astId": 10564,
+              "astId": 10653,
               "type": "t_uint256",
               "src": "310:13:22"
             },
             {
               "label": "speed",
-              "astId": 10566,
+              "astId": 10655,
               "type": "t_uint256",
               "src": "333:13:22"
             },
             {
               "label": "defense",
-              "astId": 10568,
+              "astId": 10657,
               "type": "t_uint256",
               "src": "356:15:22"
             },
             {
               "label": "population",
-              "astId": 10570,
+              "astId": 10659,
               "type": "t_uint256",
               "src": "381:18:22"
             },
             {
               "label": "populationCap",
-              "astId": 10572,
+              "astId": 10661,
               "type": "t_uint256",
               "src": "409:21:22"
             },
             {
               "label": "populationGrowth",
-              "astId": 10574,
+              "astId": 10663,
               "type": "t_uint256",
               "src": "440:24:22"
             },
             {
               "label": "planetResource",
-              "astId": 10576,
+              "astId": 10665,
               "type": "t_enum<DarkForestTypes.PlanetResource>",
               "src": "474:29:22"
             },
             {
               "label": "silverCap",
-              "astId": 10578,
+              "astId": 10667,
               "type": "t_uint256",
               "src": "513:17:22"
             },
             {
               "label": "silverGrowth",
-              "astId": 10580,
+              "astId": 10669,
               "type": "t_uint256",
               "src": "540:20:22"
             },
             {
               "label": "silver",
-              "astId": 10582,
+              "astId": 10671,
               "type": "t_uint256",
               "src": "570:14:22"
             },
             {
               "label": "planetLevel",
-              "astId": 10584,
+              "astId": 10673,
               "type": "t_uint256",
               "src": "594:19:22"
             }
@@ -261,73 +261,73 @@
           "members": [
             {
               "label": "isInitialized",
-              "astId": 10587,
+              "astId": 10676,
               "type": "t_bool",
               "src": "662:18:22"
             },
             {
               "label": "createdAt",
-              "astId": 10589,
+              "astId": 10678,
               "type": "t_uint256",
               "src": "690:17:22"
             },
             {
               "label": "lastUpdated",
-              "astId": 10591,
+              "astId": 10680,
               "type": "t_uint256",
               "src": "717:19:22"
             },
             {
               "label": "perlin",
-              "astId": 10593,
+              "astId": 10682,
               "type": "t_uint256",
               "src": "746:14:22"
             },
             {
               "label": "spaceType",
-              "astId": 10595,
+              "astId": 10684,
               "type": "t_enum<DarkForestTypes.SpaceType>",
               "src": "770:19:22"
             },
             {
               "label": "upgradeState0",
-              "astId": 10597,
+              "astId": 10686,
               "type": "t_uint256",
               "src": "799:21:22"
             },
             {
               "label": "upgradeState1",
-              "astId": 10599,
+              "astId": 10688,
               "type": "t_uint256",
               "src": "830:21:22"
             },
             {
               "label": "upgradeState2",
-              "astId": 10601,
+              "astId": 10690,
               "type": "t_uint256",
               "src": "861:21:22"
             },
             {
               "label": "hatLevel",
-              "astId": 10603,
+              "astId": 10692,
               "type": "t_uint256",
               "src": "892:16:22"
             },
             {
               "label": "hasTriedFindingArtifact",
-              "astId": 10605,
+              "astId": 10694,
               "type": "t_bool",
               "src": "918:28:22"
             },
             {
               "label": "heldArtifactId",
-              "astId": 10607,
+              "astId": 10696,
               "type": "t_uint256",
               "src": "956:22:22"
             },
             {
               "label": "artifactLockedTimestamp",
-              "astId": 10609,
+              "astId": 10698,
               "type": "t_uint256",
               "src": "988:31:22"
             }
@@ -368,25 +368,25 @@
           "members": [
             {
               "label": "id",
-              "astId": 10612,
+              "astId": 10701,
               "type": "t_uint256",
               "src": "1069:10:22"
             },
             {
               "label": "eventType",
-              "astId": 10614,
+              "astId": 10703,
               "type": "t_enum<DarkForestTypes.PlanetEventType>",
               "src": "1089:25:22"
             },
             {
               "label": "timeTrigger",
-              "astId": 10616,
+              "astId": 10705,
               "type": "t_uint256",
               "src": "1124:19:22"
             },
             {
               "label": "timeAdded",
-              "astId": 10618,
+              "astId": 10707,
               "type": "t_uint256",
               "src": "1153:17:22"
             }
@@ -420,49 +420,49 @@
           "members": [
             {
               "label": "id",
-              "astId": 10621,
+              "astId": 10710,
               "type": "t_uint256",
               "src": "1212:10:22"
             },
             {
               "label": "player",
-              "astId": 10623,
+              "astId": 10712,
               "type": "t_address",
               "src": "1232:14:22"
             },
             {
               "label": "fromPlanet",
-              "astId": 10625,
+              "astId": 10714,
               "type": "t_uint256",
               "src": "1256:18:22"
             },
             {
               "label": "toPlanet",
-              "astId": 10627,
+              "astId": 10716,
               "type": "t_uint256",
               "src": "1284:16:22"
             },
             {
               "label": "popArriving",
-              "astId": 10629,
+              "astId": 10718,
               "type": "t_uint256",
               "src": "1310:19:22"
             },
             {
               "label": "silverMoved",
-              "astId": 10631,
+              "astId": 10720,
               "type": "t_uint256",
               "src": "1339:19:22"
             },
             {
               "label": "departureTime",
-              "astId": 10633,
+              "astId": 10722,
               "type": "t_uint256",
               "src": "1368:21:22"
             },
             {
               "label": "arrivalTime",
-              "astId": 10635,
+              "astId": 10724,
               "type": "t_uint256",
               "src": "1399:19:22"
             }
@@ -841,11 +841,11 @@
       }
     },
     "DarkForestTokens": {
-      "address": "0x9DfB17901eC39BB50a5B653e28817D34aF103676",
-      "constructorCode": "6080604052609780546001600160a01b031916905534801561002057600080fd5b506122fd806100306000396000f3fe",
-      "bodyBytecodeHash": "514bcc73818f33a6b99561eacf508907a3ccd7b3b0a8466394cdc2c88b08d63e",
-      "localBytecodeHash": "741e6bea76c6633360f5fc9a201c815c5a9be24399f9317d73fb47b87315ee1d",
-      "deployedBytecodeHash": "741e6bea76c6633360f5fc9a201c815c5a9be24399f9317d73fb47b87315ee1d",
+      "address": "0x2Bbf9a1D7256271330495d8632B97368FaE89268",
+      "constructorCode": "6080604052609780546001600160a01b031990811690915560998054909116905534801561002c57600080fd5b506126708061003c6000396000f3fe",
+      "bodyBytecodeHash": "c44462c6eaddbcb369a0d1e173ba1fbe969240cd96fbd1abf76b935c967a915e",
+      "localBytecodeHash": "79e277808aaf0b3166277ca38aae292ff46c945423c537100160127082636b1f",
+      "deployedBytecodeHash": "79e277808aaf0b3166277ca38aae292ff46c945423c537100160127082636b1f",
       "types": {
         "t_bool": {
           "id": "t_bool",
@@ -1027,43 +1027,43 @@
           "members": [
             {
               "label": "id",
-              "astId": 10699,
+              "astId": 10788,
               "type": "t_uint256",
               "src": "2514:10:22"
             },
             {
               "label": "planetDiscoveredOn",
-              "astId": 10701,
+              "astId": 10790,
               "type": "t_uint256",
               "src": "2534:26:22"
             },
             {
               "label": "planetLevel",
-              "astId": 10703,
+              "astId": 10792,
               "type": "t_uint256",
               "src": "2570:19:22"
             },
             {
               "label": "planetBiome",
-              "astId": 10705,
+              "astId": 10794,
               "type": "t_enum<DarkForestTypes.Biome>",
               "src": "2599:17:22"
             },
             {
               "label": "mintedAtTimestamp",
-              "astId": 10707,
+              "astId": 10796,
               "type": "t_uint256",
               "src": "2626:25:22"
             },
             {
               "label": "discoverer",
-              "astId": 10709,
+              "astId": 10798,
               "type": "t_address",
               "src": "2661:18:22"
             },
             {
               "label": "artifactType",
-              "astId": 10711,
+              "astId": 10800,
               "type": "t_enum<DarkForestTypes.ArtifactType>",
               "src": "2689:25:22"
             }
@@ -1233,6 +1233,14 @@
           "astId": 10318,
           "type": "t_mapping<t_struct<DarkForestTypes.Artifact>>",
           "src": "264:54:21"
+        },
+        {
+          "contract": "DarkForestTokens",
+          "path": "contracts/DarkForestTokens.sol",
+          "label": "adminAddress",
+          "astId": 10324,
+          "type": "t_address",
+          "src": "324:33:21"
         }
       ],
       "warnings": {
@@ -1267,7 +1275,20 @@
             "src": "264:54:21"
           }
         ],
-        "storageDiff": []
+        "storageDiff": [
+          {
+            "action": "append",
+            "updated": {
+              "index": 16,
+              "contract": "DarkForestTokens",
+              "path": "contracts/DarkForestTokens.sol",
+              "label": "adminAddress",
+              "astId": 10324,
+              "type": "t_address",
+              "src": "324:33:21"
+            }
+          }
+        ]
       }
     }
   },
@@ -1294,11 +1315,11 @@
       "deployedBytecodeHash": "dea403157e367f87c1daed56eb2c89107afcfba0d757a96b47d6552f26ba0cfd"
     },
     "DarkForestPlanet": {
-      "address": "0xDc9b0E1F64a8f2eD91f2A8394cB07a3d3103624a",
-      "constructorCode": "612d13610026600b82828239805160001a60731461001957fe5b30600052607381538281f3fe",
-      "bodyBytecodeHash": "649f379907eb8d31f2ccbda812fe4eb45c2e263e9a04c2f580cbcfb3d633de53",
-      "localBytecodeHash": "6b7ba2f7be4968a1b4b5984e76b217c123e0f77dbeb9c4eb3d0beb97964a0dea",
-      "deployedBytecodeHash": "08c0a5e655aed65c3d283c7b10207f9243fd9b2b7efce12052fa4d2d19bda6ce"
+      "address": "0xFbE6d6459ddE5575edFa2caF2A0EeED30DC3C918",
+      "constructorCode": "612d1d610026600b82828239805160001a60731461001957fe5b30600052607381538281f3fe",
+      "bodyBytecodeHash": "6f7dcca11ee84be573a3ef93217c497323e669aa6f2adb7c59f2374437fc5d65",
+      "localBytecodeHash": "ec57a0f4c3be52fb0798bf870ff9bdf7a7ce5ec4aee5dbead04a707abb67572a",
+      "deployedBytecodeHash": "c050edc82bd9bfe9801dab61fff7d9ce6bcf073032c43e0ddfbaa21a7e93d1cd"
     },
     "Verifier": {
       "address": "0xaaBA8E30a03629747117f38D3F783CACE9B406B0",
@@ -1448,7 +1469,7 @@
       {
         "address": "0x678ACb78948Be7F354B28DaAb79B1ABD81574c1B",
         "version": "1.0.0",
-        "implementation": "0xDc24C21bc5C7008e3ED9abb5c44d6D21bfc02595",
+        "implementation": "0x6A3d45c8FC8239ff19Ee38B15343f5A7b116b9a1",
         "admin": "0xa17950c9910E28CAe535F43D0C87A6C6cb2F5216",
         "kind": "Upgradeable"
       }
@@ -1471,7 +1492,7 @@
       {
         "address": "0x5cFbC3e179C48ccB3B3d35bAD6361972F2C5603B",
         "version": "1.0.0",
-        "implementation": "0x9DfB17901eC39BB50a5B653e28817D34aF103676",
+        "implementation": "0x2Bbf9a1D7256271330495d8632B97368FaE89268",
         "admin": "0xa17950c9910E28CAe535F43D0C87A6C6cb2F5216",
         "kind": "Upgradeable"
       }

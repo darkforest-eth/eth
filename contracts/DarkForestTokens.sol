@@ -7,9 +7,12 @@ import "./DarkForestTypes.sol";
 contract DarkForestTokens is ERC721Upgradeable {
     address coreAddress = address(0);
     mapping(uint256 => DarkForestTypes.Artifact) artifacts;
+    address adminAddress = address(0);
 
-    function initialize(address _coreAddress) public initializer {
+    function initialize(address _coreAddress, address _adminAddress) public initializer {
         coreAddress = _coreAddress;
+        adminAddress = _adminAddress;
+        _setBaseURI("https://zkga.me/token-uri/artifact/");
     }
 
     function createArtifact(
@@ -22,8 +25,8 @@ contract DarkForestTokens is ERC721Upgradeable {
         DarkForestTypes.ArtifactType artifactType
     ) public returns (DarkForestTypes.Artifact memory) {
         require(
-            msg.sender == coreAddress,
-            "Only the Core Address can spawn artifacts"
+            msg.sender == coreAddress || msg.sender == adminAddress,
+            "Only the Core or Admin addresses can spawn artifacts"
         );
 
         _mint(coreAddress, tokenId);
@@ -37,6 +40,36 @@ contract DarkForestTokens is ERC721Upgradeable {
             tokenId,
             planetId,
             level,
+            planetBiome,
+            block.timestamp,
+            discoverer,
+            artifactType
+        );
+
+        artifacts[tokenId] = newArtifact;
+
+        return newArtifact;
+    }
+
+    function giveArtifactToPlayer(
+        uint256 tokenId,
+        address discoverer,
+        uint256 planetId,
+        uint256 artifactLevel,
+        DarkForestTypes.Biome planetBiome,
+        DarkForestTypes.ArtifactType artifactType
+    ) public returns (DarkForestTypes.Artifact memory) {
+         require(
+            msg.sender == coreAddress || msg.sender == adminAddress,
+            "Only the Core or Admin addresses can spawn artifacts"
+        );
+
+        _mint(discoverer, tokenId);
+
+        DarkForestTypes.Artifact memory newArtifact = DarkForestTypes.Artifact(
+            tokenId,
+            planetId,
+            artifactLevel,
             planetBiome,
             block.timestamp,
             discoverer,
@@ -105,5 +138,9 @@ contract DarkForestTokens is ERC721Upgradeable {
             artifactType
         );
         artifacts[tokenId] = newArtifact;
+    }
+    
+    function setBaseUri() public {
+        _setBaseURI("https://zkga.me/token-uri/artifact/");
     }
 }
