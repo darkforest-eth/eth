@@ -1,13 +1,22 @@
-pragma solidity ^0.6.9;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.7.6;
 pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "./DarkForestTypes.sol";
 
 contract DarkForestTokens is ERC721Upgradeable {
-    address coreAddress = address(0);
+    address coreAddress;
     mapping(uint256 => DarkForestTypes.Artifact) artifacts;
-    address adminAddress = address(0);
+    address adminAddress;
+
+    modifier onlyAdminOrCore() {
+        require(
+            msg.sender == coreAddress || msg.sender == adminAddress,
+            "Only the Core or Admin addresses can fiddle with artifacts."
+        );
+        _;
+    }
 
     function initialize(address _coreAddress, address _adminAddress) public initializer {
         coreAddress = _coreAddress;
@@ -15,87 +24,41 @@ contract DarkForestTokens is ERC721Upgradeable {
         _setBaseURI("https://zkga.me/token-uri/artifact/");
     }
 
-    function createArtifact(
-        uint256 tokenId,
-        address discoverer,
-        uint256 planetId,
-        uint256 planetLevel,
-        uint256 levelBonus,
-        DarkForestTypes.Biome planetBiome,
-        DarkForestTypes.ArtifactType artifactType
-    ) public returns (DarkForestTypes.Artifact memory) {
-        require(
-            msg.sender == coreAddress || msg.sender == adminAddress,
-            "Only the Core or Admin addresses can spawn artifacts"
-        );
-
-        _mint(coreAddress, tokenId);
-
-        uint256 level = planetLevel + levelBonus;
-        if (level > 7) {
-            level = 7;
-        }
-
-        DarkForestTypes.Artifact memory newArtifact = DarkForestTypes.Artifact(
-            tokenId,
-            planetId,
-            level,
-            planetBiome,
-            block.timestamp,
-            discoverer,
-            artifactType
-        );
-
-        artifacts[tokenId] = newArtifact;
-
-        return newArtifact;
-    }
-
-    function giveArtifactToPlayer(
-        uint256 tokenId,
-        address discoverer,
-        uint256 planetId,
-        uint256 artifactLevel,
-        DarkForestTypes.Biome planetBiome,
-        DarkForestTypes.ArtifactType artifactType
-    ) public returns (DarkForestTypes.Artifact memory) {
-         require(
-            msg.sender == coreAddress || msg.sender == adminAddress,
-            "Only the Core or Admin addresses can spawn artifacts"
-        );
-
-        _mint(discoverer, tokenId);
-
-        DarkForestTypes.Artifact memory newArtifact = DarkForestTypes.Artifact(
-            tokenId,
-            planetId,
-            artifactLevel,
-            planetBiome,
-            block.timestamp,
-            discoverer,
-            artifactType
-        );
-
-        artifacts[tokenId] = newArtifact;
-
-        return newArtifact;
-    }
-
-    function getArtifact(uint256 tokenId)
+    function createArtifact(DarkForestTypes.DFTCreateArtifactArgs memory args)
         public
-        view
+        onlyAdminOrCore
         returns (DarkForestTypes.Artifact memory)
     {
+        require(args.tokenId >= 1, "artifact id must be positive");
+
+        _mint(args.owner, args.tokenId);
+
+        DarkForestTypes.Artifact memory newArtifact =
+            DarkForestTypes.Artifact(
+                true,
+                args.tokenId,
+                args.planetId,
+                args.rarity,
+                args.biome,
+                block.timestamp,
+                args.discoverer,
+                args.artifactType,
+                0,
+                0,
+                0
+            );
+
+        artifacts[args.tokenId] = newArtifact;
+
+        return newArtifact;
+    }
+
+    function getArtifact(uint256 tokenId) public view returns (DarkForestTypes.Artifact memory) {
         return artifacts[tokenId];
     }
 
-    function getPlayerArtifactIds(address playerId)
-        public
-        view
-        returns (uint256[] memory)
-    {
+    function getPlayerArtifactIds(address playerId) public view returns (uint256[] memory) {
         uint256 balance = balanceOf(playerId);
-
         uint256[] memory results = new uint256[](balance);
 
         for (uint256 idx = 0; idx < balance; idx++) {
@@ -105,41 +68,27 @@ contract DarkForestTokens is ERC721Upgradeable {
         return results;
     }
 
-    function transferToCoreContract(uint256 tokenId) public {
-        require(
-            msg.sender == coreAddress,
-            "Only the Core Address can initiate a transfer to itself"
-        );
-        _transfer(ownerOf(tokenId), coreAddress, tokenId);
+    function transferArtifact(uint256 tokenId, address newOwner) public onlyAdminOrCore {
+        if (newOwner == address(0)) {
+            _burn(tokenId);
+        } else {
+            _transfer(ownerOf(tokenId), newOwner, tokenId);
+        }
+    }
+
+    function updateArtifact(DarkForestTypes.Artifact memory updatedArtifact)
+        public
+        onlyAdminOrCore
+    {
+        require(_exists(updatedArtifact.id), "you cannot update an artifact that doesn't exist");
+
+        artifacts[updatedArtifact.id] = updatedArtifact;
     }
 
     function doesArtifactExist(uint256 tokenId) public view returns (bool) {
         return _exists(tokenId);
     }
 
-    function createMythicArtifact(
-        uint256 tokenId,
-        address to,
-        DarkForestTypes.Biome planetBiome,
-        DarkForestTypes.ArtifactType artifactType
-    ) public {
-        require(
-            msg.sender == 0x5D99805Ca2867F22a318c4e6B0DC5C0EAC457386,
-            "Only the Admin Address can spawn artifacts"
-        );
-        _mint(to, tokenId);
-        DarkForestTypes.Artifact memory newArtifact = DarkForestTypes.Artifact(
-            tokenId,
-            0,
-            8,
-            planetBiome,
-            block.timestamp,
-            to,
-            artifactType
-        );
-        artifacts[tokenId] = newArtifact;
-    }
-    
     function setBaseUri() public {
         _setBaseURI("https://zkga.me/token-uri/artifact/");
     }

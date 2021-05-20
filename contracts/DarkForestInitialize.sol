@@ -1,14 +1,28 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.6.9;
+pragma solidity ^0.7.6;
 
 // Libraries
 import "./ABDKMath64x64.sol";
 import "./DarkForestTypes.sol";
 
 library DarkForestInitialize {
-    function initializeDefaults(
-        DarkForestTypes.PlanetDefaultStats[] storage planetDefaultStats
-    ) public {
+    // the only contract that ever calls this is DarkForestCore, which has a known storage layout
+    // we know that DFCore's GameStorage struct lives at storage slot 1
+    function getGameStorage() public pure returns (DarkForestTypes.GameStorage storage ret) {
+        bytes32 position = bytes32(uint256(1));
+        assembly {
+            ret.slot := position
+        }
+    }
+
+    // alias for accessing storage vars
+    function s() public pure returns (DarkForestTypes.GameStorage storage ret) {
+        ret = getGameStorage();
+    }
+
+    function initializeDefaults() public {
+        DarkForestTypes.PlanetDefaultStats[] storage planetDefaultStats = s().planetDefaultStats;
+
         planetDefaultStats.push(
             DarkForestTypes.PlanetDefaultStats({
                 label: "Asteroid",
@@ -16,7 +30,7 @@ library DarkForestInitialize {
                 populationGrowth: 417,
                 range: 99,
                 speed: 75,
-                defense: 800,
+                defense: 400,
                 silverGrowth: 0,
                 silverCap: 0,
                 barbarianPercentage: 0
@@ -30,9 +44,9 @@ library DarkForestInitialize {
                 populationGrowth: 833,
                 range: 177,
                 speed: 75,
-                defense: 800,
-                silverGrowth: 14,
-                silverCap: 50000,
+                defense: 400,
+                silverGrowth: 56,
+                silverCap: 100000,
                 barbarianPercentage: 1
             })
         );
@@ -44,9 +58,9 @@ library DarkForestInitialize {
                 populationGrowth: 1250,
                 range: 315,
                 speed: 75,
-                defense: 600,
-                silverGrowth: 69,
-                silverCap: 250000,
+                defense: 300,
+                silverGrowth: 167,
+                silverCap: 500000,
                 barbarianPercentage: 2
             })
         );
@@ -58,7 +72,7 @@ library DarkForestInitialize {
                 populationGrowth: 1667,
                 range: 591,
                 speed: 75,
-                defense: 400,
+                defense: 300,
                 silverGrowth: 417,
                 silverCap: 2500000,
                 barbarianPercentage: 3
@@ -68,13 +82,13 @@ library DarkForestInitialize {
         planetDefaultStats.push(
             DarkForestTypes.PlanetDefaultStats({
                 label: "Yellow Star",
-                populationCap: 20000000,
-                populationGrowth: 2167,
+                populationCap: 25000000,
+                populationGrowth: 2083,
                 range: 1025,
                 speed: 75,
-                defense: 200,
-                silverGrowth: 1667,
-                silverCap: 20000000,
+                defense: 300,
+                silverGrowth: 833,
+                silverCap: 12000000,
                 barbarianPercentage: 4
             })
         );
@@ -82,13 +96,13 @@ library DarkForestInitialize {
         planetDefaultStats.push(
             DarkForestTypes.PlanetDefaultStats({
                 label: "Blue Star",
-                populationCap: 40000000,
-                populationGrowth: 2667,
-                range: 1261,
+                populationCap: 100000000,
+                populationGrowth: 2500,
+                range: 1734,
                 speed: 75,
                 defense: 200,
-                silverGrowth: 2222,
-                silverCap: 40000000,
+                silverGrowth: 1667,
+                silverCap: 50000000,
                 barbarianPercentage: 5
             })
         );
@@ -96,13 +110,13 @@ library DarkForestInitialize {
         planetDefaultStats.push(
             DarkForestTypes.PlanetDefaultStats({
                 label: "Giant",
-                populationCap: 55000000,
+                populationCap: 300000000,
                 populationGrowth: 2917,
-                range: 1577,
+                range: 2838,
                 speed: 75,
                 defense: 200,
                 silverGrowth: 2778,
-                silverCap: 50000000,
+                silverCap: 100000000,
                 barbarianPercentage: 7
             })
         );
@@ -110,90 +124,102 @@ library DarkForestInitialize {
         planetDefaultStats.push(
             DarkForestTypes.PlanetDefaultStats({
                 label: "Supergiant",
-                populationCap: 65000000,
-                populationGrowth: 3000,
-                range: 1892,
+                populationCap: 500000000,
+                populationGrowth: 3333,
+                range: 4414,
                 speed: 75,
                 defense: 200,
-                silverGrowth: 3333,
-                silverCap: 60000000,
+                silverGrowth: 2778,
+                silverCap: 200000000,
                 barbarianPercentage: 10
+            })
+        );
+
+        planetDefaultStats.push(
+            DarkForestTypes.PlanetDefaultStats({
+                label: "Unlabeled1",
+                populationCap: 700000000,
+                populationGrowth: 3750,
+                range: 6306,
+                speed: 75,
+                defense: 200,
+                silverGrowth: 2778,
+                silverCap: 300000000,
+                barbarianPercentage: 20
+            })
+        );
+
+        planetDefaultStats.push(
+            DarkForestTypes.PlanetDefaultStats({
+                label: "Unlabeled2",
+                populationCap: 800000000,
+                populationGrowth: 4167,
+                range: 8829,
+                speed: 75,
+                defense: 200,
+                silverGrowth: 2778,
+                silverCap: 400000000,
+                barbarianPercentage: 25
             })
         );
     }
 
-    function initializeUpgrades(DarkForestTypes.Upgrade[4][3] storage upgrades)
-        public
-    {
+    function initializeUpgrades() public {
+        DarkForestTypes.Upgrade[4][3] storage upgrades = s().upgrades;
+
         // defense
-        upgrades[uint256(
-            DarkForestTypes.UpgradeBranch.DEFENSE
-        )][0] = DarkForestTypes.Upgrade({
+        upgrades[uint256(DarkForestTypes.UpgradeBranch.DEFENSE)][0] = DarkForestTypes.Upgrade({
             popCapMultiplier: 120,
             popGroMultiplier: 120,
             rangeMultiplier: 100,
             speedMultiplier: 100,
-            defMultiplier: 150
+            defMultiplier: 120
         });
-        upgrades[uint256(
-            DarkForestTypes.UpgradeBranch.DEFENSE
-        )][1] = DarkForestTypes.Upgrade({
+        upgrades[uint256(DarkForestTypes.UpgradeBranch.DEFENSE)][1] = DarkForestTypes.Upgrade({
             popCapMultiplier: 120,
             popGroMultiplier: 120,
             rangeMultiplier: 100,
             speedMultiplier: 100,
-            defMultiplier: 150
+            defMultiplier: 120
         });
-        upgrades[uint256(
-            DarkForestTypes.UpgradeBranch.DEFENSE
-        )][2] = DarkForestTypes.Upgrade({
+        upgrades[uint256(DarkForestTypes.UpgradeBranch.DEFENSE)][2] = DarkForestTypes.Upgrade({
             popCapMultiplier: 120,
             popGroMultiplier: 120,
             rangeMultiplier: 100,
             speedMultiplier: 100,
-            defMultiplier: 150
+            defMultiplier: 120
         });
-        upgrades[uint256(
-            DarkForestTypes.UpgradeBranch.DEFENSE
-        )][3] = DarkForestTypes.Upgrade({
+        upgrades[uint256(DarkForestTypes.UpgradeBranch.DEFENSE)][3] = DarkForestTypes.Upgrade({
             popCapMultiplier: 120,
             popGroMultiplier: 120,
             rangeMultiplier: 100,
             speedMultiplier: 100,
-            defMultiplier: 150
+            defMultiplier: 120
         });
 
         // range
-        upgrades[uint256(
-            DarkForestTypes.UpgradeBranch.RANGE
-        )][0] = DarkForestTypes.Upgrade({
+        upgrades[uint256(DarkForestTypes.UpgradeBranch.RANGE)][0] = DarkForestTypes.Upgrade({
             popCapMultiplier: 120,
             popGroMultiplier: 120,
             rangeMultiplier: 125,
             speedMultiplier: 100,
             defMultiplier: 100
         });
-        upgrades[uint256(
-            DarkForestTypes.UpgradeBranch.RANGE
-        )][1] = DarkForestTypes.Upgrade({
+        upgrades[uint256(DarkForestTypes.UpgradeBranch.RANGE)][1] = DarkForestTypes.Upgrade({
             popCapMultiplier: 120,
             popGroMultiplier: 120,
             rangeMultiplier: 125,
             speedMultiplier: 100,
             defMultiplier: 100
         });
-        upgrades[uint256(
-            DarkForestTypes.UpgradeBranch.RANGE
-        )][2] = DarkForestTypes.Upgrade({
+        upgrades[uint256(DarkForestTypes.UpgradeBranch.RANGE)][2] = DarkForestTypes.Upgrade({
             popCapMultiplier: 120,
             popGroMultiplier: 120,
             rangeMultiplier: 125,
             speedMultiplier: 100,
             defMultiplier: 100
         });
-        upgrades[uint256(
-            DarkForestTypes.UpgradeBranch.RANGE
-        )][3] = DarkForestTypes.Upgrade({
+        upgrades[uint256(DarkForestTypes.UpgradeBranch.RANGE)][3] = DarkForestTypes.Upgrade({
             popCapMultiplier: 120,
             popGroMultiplier: 120,
             rangeMultiplier: 125,
@@ -202,40 +228,32 @@ library DarkForestInitialize {
         });
 
         // speed
-        upgrades[uint256(
-            DarkForestTypes.UpgradeBranch.SPEED
-        )][0] = DarkForestTypes.Upgrade({
+        upgrades[uint256(DarkForestTypes.UpgradeBranch.SPEED)][0] = DarkForestTypes.Upgrade({
             popCapMultiplier: 120,
             popGroMultiplier: 120,
             rangeMultiplier: 100,
-            speedMultiplier: 150,
+            speedMultiplier: 175,
             defMultiplier: 100
         });
-        upgrades[uint256(
-            DarkForestTypes.UpgradeBranch.SPEED
-        )][1] = DarkForestTypes.Upgrade({
+        upgrades[uint256(DarkForestTypes.UpgradeBranch.SPEED)][1] = DarkForestTypes.Upgrade({
             popCapMultiplier: 120,
             popGroMultiplier: 120,
             rangeMultiplier: 100,
-            speedMultiplier: 150,
+            speedMultiplier: 175,
             defMultiplier: 100
         });
-        upgrades[uint256(
-            DarkForestTypes.UpgradeBranch.SPEED
-        )][2] = DarkForestTypes.Upgrade({
+        upgrades[uint256(DarkForestTypes.UpgradeBranch.SPEED)][2] = DarkForestTypes.Upgrade({
             popCapMultiplier: 120,
             popGroMultiplier: 120,
             rangeMultiplier: 100,
-            speedMultiplier: 150,
+            speedMultiplier: 175,
             defMultiplier: 100
         });
-        upgrades[uint256(
-            DarkForestTypes.UpgradeBranch.SPEED
-        )][3] = DarkForestTypes.Upgrade({
+        upgrades[uint256(DarkForestTypes.UpgradeBranch.SPEED)][3] = DarkForestTypes.Upgrade({
             popCapMultiplier: 120,
             popGroMultiplier: 120,
             rangeMultiplier: 100,
-            speedMultiplier: 150,
+            speedMultiplier: 175,
             defMultiplier: 100
         });
     }

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.6.9;
+pragma solidity ^0.7.6;
 pragma experimental ABIEncoderV2;
 
 // Import base Initializable contract
@@ -11,7 +11,6 @@ import "./DarkForestStorageV1.sol";
 import "./DarkForestTokens.sol";
 import "./DarkForestUtils.sol";
 import "./DarkForestPlanet.sol";
-import "./DarkForestLazyUpdate.sol";
 import "./DarkForestInitialize.sol";
 
 // .______       _______     ___       _______  .___  ___.  _______
@@ -35,49 +34,90 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
     using MathUpgradeable for uint256;
 
     event PlayerInitialized(address player, uint256 loc);
-    event ArrivalQueued(uint256 arrivalId);
-    event PlanetUpgraded(uint256 loc);
-    event BoughtHat(uint256 loc);
-    event PlanetTransferred(uint256 loc, address player);
-    event FoundArtifact(uint256 loc, address player, uint256 artifactId);
-    event DepositedArtifact(uint256 loc, address player, uint256 artifactId);
-    event WithdrewArtifact(uint256 loc, address player, uint256 artifactId);
+    event ArrivalQueued(
+        address player,
+        uint256 arrivalId,
+        uint256 from,
+        uint256 to,
+        uint256 artifactId
+    );
+    event PlanetUpgraded(address player, uint256 loc, uint256 branch, uint256 toBranchLevel); // emitted in DFPlanet library
+    event PlanetHatBought(address player, uint256 loc, uint256 tohatLevel);
+    event PlanetTransferred(address sender, uint256 loc, address receiver);
+    event LocationRevealed(address revealer, uint256 loc);
+
+    event PlanetProspected(address player, uint256 loc);
+    event ArtifactFound(address player, uint256 artifactId, uint256 loc);
+    event ArtifactDeposited(address player, uint256 artifactId, uint256 loc);
+    event ArtifactWithdrawn(address player, uint256 artifactId, uint256 loc);
+    event ArtifactActivated(address player, uint256 artifactId, uint256 loc); // emitted in DFPlanet library
+    event ArtifactDeactivated(address player, uint256 artifactId, uint256 loc); // emitted in DFPlanet library
+
+    event PlanetSilverWithdrawn(address player, uint256 loc, uint256 amount);
 
     function initialize(
         address _adminAddress,
         address payable _whitelistAddress,
         address payable _tokensAddress,
-        bool _disableZKCheck
+        DarkForestTypes.DFInitArgs memory initArgs
     ) public initializer {
-        adminAddress = _adminAddress;
-        whitelist = Whitelist(_whitelistAddress);
-        tokens = DarkForestTokens(_tokensAddress);
+        s.adminAddress = _adminAddress;
+        s.whitelist = Whitelist(_whitelistAddress);
+        s.tokens = DarkForestTokens(_tokensAddress);
 
-        paused = false;
-
-        DISABLE_ZK_CHECK = _disableZKCheck;
-
-        tokenMintEndTimestamp = 1611584314; // a month from contract deploy - 01/25/21 2:18:34 GMT
-        target4RadiusConstant = 800;
-
-        planetLevelThresholds = [
+        s.planetLevelsCount = 10;
+        s.planetLevelThresholds = [
             16777216,
-            4194256,
-            1048516,
-            262081,
-            65472,
-            16320,
-            4032,
-            960
+            4194292,
+            1048561,
+            262128,
+            65520,
+            16368,
+            4080,
+            1008,
+            240,
+            48
         ];
+        s.paused = false;
 
-        DarkForestInitialize.initializeDefaults(planetDefaultStats);
-        DarkForestInitialize.initializeUpgrades(upgrades);
+        s.snarkConstants = DarkForestTypes.SnarkConstants({
+            DISABLE_ZK_CHECKS: initArgs.DISABLE_ZK_CHECKS,
+            PLANETHASH_KEY: initArgs.PLANETHASH_KEY,
+            SPACETYPE_KEY: initArgs.SPACETYPE_KEY,
+            BIOMEBASE_KEY: initArgs.BIOMEBASE_KEY,
+            PERLIN_MIRROR_X: initArgs.PERLIN_MIRROR_X,
+            PERLIN_MIRROR_Y: initArgs.PERLIN_MIRROR_Y,
+            PERLIN_LENGTH_SCALE: initArgs.PERLIN_LENGTH_SCALE
+        });
+        s.gameConstants = DarkForestTypes.GameConstants({
+            MAX_NATURAL_PLANET_LEVEL: initArgs.MAX_NATURAL_PLANET_LEVEL,
+            TIME_FACTOR_HUNDREDTHS: initArgs.TIME_FACTOR_HUNDREDTHS,
+            PERLIN_THRESHOLD_1: initArgs.PERLIN_THRESHOLD_1,
+            PERLIN_THRESHOLD_2: initArgs.PERLIN_THRESHOLD_2,
+            PERLIN_THRESHOLD_3: initArgs.PERLIN_THRESHOLD_3,
+            INIT_PERLIN_MIN: initArgs.INIT_PERLIN_MIN,
+            INIT_PERLIN_MAX: initArgs.INIT_PERLIN_MAX,
+            BIOME_THRESHOLD_1: initArgs.BIOME_THRESHOLD_1,
+            BIOME_THRESHOLD_2: initArgs.BIOME_THRESHOLD_2,
+            PLANET_RARITY: initArgs.PLANET_RARITY,
+            PHOTOID_ACTIVATION_DELAY: initArgs.PHOTOID_ACTIVATION_DELAY,
+            LOCATION_REVEAL_COOLDOWN: initArgs.LOCATION_REVEAL_COOLDOWN,
+            PLANET_TYPE_WEIGHTS: initArgs.PLANET_TYPE_WEIGHTS
+        });
 
-        initializedPlanetCountByLevel = [0, 0, 0, 0, 0, 0, 0, 0];
-        for (uint256 i = 0; i < planetLevelThresholds.length; i += 1) {
-            cumulativeRarities.push(
-                (2**24 / planetLevelThresholds[i]) * PLANET_RARITY
+        s.worldRadius = initArgs.INITIAL_WORLD_RADIUS; // will be overridden by TARGET4_RADIUS if !WORLD_RADIUS_LOCKED
+        s.ADMIN_CAN_ADD_PLANETS = initArgs.ADMIN_CAN_ADD_PLANETS;
+        s.WORLD_RADIUS_LOCKED = initArgs.WORLD_RADIUS_LOCKED;
+        s.TOKEN_MINT_END_TIMESTAMP = initArgs.TOKEN_MINT_END_TIMESTAMP;
+        s.TARGET4_RADIUS = initArgs.TARGET4_RADIUS;
+
+        DarkForestInitialize.initializeDefaults();
+        DarkForestInitialize.initializeUpgrades();
+
+        s.initializedPlanetCountByLevel = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        for (uint256 i = 0; i < s.planetLevelThresholds.length; i += 1) {
+            s.cumulativeRarities.push(
+                (2**24 / s.planetLevelThresholds[i]) * initArgs.PLANET_RARITY
             );
         }
 
@@ -88,390 +128,102 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
     /// ACCESS CONTROL ///
     //////////////////////
     modifier onlyAdmin() {
-        require(msg.sender == adminAddress, "Sender is not a game master");
+        require(msg.sender == s.adminAddress, "Sender is not a game master");
         _;
     }
 
     modifier onlyWhitelisted() {
         require(
-            whitelist.isWhitelisted(msg.sender),
+            s.whitelist.isWhitelisted(msg.sender) || msg.sender == s.adminAddress,
             "Player is not whitelisted"
         );
         _;
     }
 
     modifier notPaused() {
-        require(!paused, "Game is paused");
+        require(!s.paused, "Game is paused");
         _;
     }
 
     modifier notTokenEnded() {
-        require(
-            block.timestamp < tokenMintEndTimestamp,
-            "Token mint period has ended"
-        );
+        require(block.timestamp < s.TOKEN_MINT_END_TIMESTAMP, "Token mint period has ended");
         _;
-    }
-
-    function changeAdmin(address _newAdmin) public onlyAdmin {
-        require(_newAdmin != address(0), "newOwner cannot be 0x0");
-        adminAddress = _newAdmin;
-    }
-
-    /////////////////////////////
-    /// Administrative Engine ///
-    /////////////////////////////
-
-    function pause() public onlyAdmin {
-        require(!paused, "Game is already paused");
-        paused = true;
-    }
-
-    function unpause() public onlyAdmin {
-        require(paused, "Game is already unpaused");
-        paused = false;
-    }
-
-    function changeTokenMintEndTime(uint256 _newEnd) public onlyAdmin {
-        tokenMintEndTimestamp = _newEnd;
-    }
-
-    function changeTarget4RadiusConstant(uint256 _newConstant)
-        public
-        onlyAdmin
-    {
-        target4RadiusConstant = _newConstant;
-        _updateWorldRadius();
-    }
-
-    function withdraw() public onlyAdmin {
-        msg.sender.transfer(address(this).balance);
     }
 
     //////////////
     /// Helper ///
     //////////////
 
-    // Public helper getters
-    function getNPlanets() public view returns (uint256) {
-        return planetIds.length;
-    }
-
-    function bulkGetPlanetIds(uint256 startIdx, uint256 endIdx)
-        public
-        view
-        returns (uint256[] memory ret)
-    {
-        // return slice of planetIds array from startIdx through endIdx - 1
-        ret = new uint256[](endIdx - startIdx);
-        for (uint256 i = startIdx; i < endIdx; i++) {
-            ret[i - startIdx] = planetIds[i];
-        }
-    }
-
-    function bulkGetPlanetsByIds(uint256[] calldata ids)
-        public
-        view
-        returns (DarkForestTypes.Planet[] memory ret)
-    {
-        ret = new DarkForestTypes.Planet[](ids.length);
-
-        for (uint256 i = 0; i < ids.length; i++) {
-            ret[i] = planets[ids[i]];
-        }
-    }
-
-    function bulkGetPlanetArrivalsByIds(uint256[] calldata ids)
-        public
-        view
-        returns (DarkForestTypes.ArrivalData[][] memory)
-    {
-
-            DarkForestTypes.ArrivalData[][] memory ret
-         = new DarkForestTypes.ArrivalData[][](ids.length);
-
-        for (uint256 i = 0; i < ids.length; i++) {
-            ret[i] = getPlanetArrivals(ids[i]);
-        }
-
-        return ret;
-    }
-
-    // this is meant to be called by a subgraph indexer at the exact timestamp
-    // that a newly-initiated arrival occurs.
-    // without it, in order to retrieve the most recent state of the from- and to-planets
-    // we have to make five contract calls per new arrival id: arrival data by id, and
-    // both planets and planetsExtendedInfo for both from- and to-planets
-    // with this we just have to make one call, since only owner/pop/silver would be modified
-    function bulkGetCompactArrivalsByIds(uint256[] calldata ids)
-        public
-        view
-        returns (DarkForestTypes.CompactArrival[] memory ret)
-    {
-        ret = new DarkForestTypes.CompactArrival[](ids.length);
-
-        for (uint256 i = 0; i < ids.length; i++) {
-            DarkForestTypes.ArrivalData memory arrival = planetArrivals[ids[i]];
-            DarkForestTypes.Planet memory from = planets[arrival.fromPlanet];
-            DarkForestTypes.Planet memory to = planets[arrival.toPlanet];
-            ret[i] = DarkForestTypes.CompactArrival({
-                popArriving: arrival.popArriving,
-                silverMoved: arrival.silverMoved,
-                departureTime: arrival.departureTime,
-                arrivalTime: arrival.arrivalTime,
-                fromPlanet: arrival.fromPlanet,
-                fromPlanetOwner: from.owner,
-                fromPlanetPopulation: from.population,
-                fromPlanetSilver: from.silver,
-                toPlanet: arrival.toPlanet,
-                toPlanetOwner: to.owner,
-                toPlanetPopulation: to.population,
-                toPlanetSilver: to.silver
-            });
-        }
-    }
-
-    function bulkGetPlanetsExtendedInfoByIds(uint256[] calldata ids)
-        public
-        view
-        returns (DarkForestTypes.PlanetExtendedInfo[] memory ret)
-    {
-        ret = new DarkForestTypes.PlanetExtendedInfo[](ids.length);
-
-        for (uint256 i = 0; i < ids.length; i++) {
-            ret[i] = planetsExtendedInfo[ids[i]];
-        }
-    }
-
-    function bulkGetPlanets(uint256 startIdx, uint256 endIdx)
-        public
-        view
-        returns (DarkForestTypes.Planet[] memory ret)
-    {
-        // return array of planets corresponding to planetIds[startIdx] through planetIds[endIdx - 1]
-        ret = new DarkForestTypes.Planet[](endIdx - startIdx);
-        for (uint256 i = startIdx; i < endIdx; i++) {
-            ret[i - startIdx] = planets[planetIds[i]];
-        }
-    }
-
-    function bulkGetPlanetsExtendedInfo(uint256 startIdx, uint256 endIdx)
-        public
-        view
-        returns (DarkForestTypes.PlanetExtendedInfo[] memory ret)
-    {
-        // return array of planets corresponding to planetIds[startIdx] through planetIds[endIdx - 1]
-        ret = new DarkForestTypes.PlanetExtendedInfo[](endIdx - startIdx);
-        for (uint256 i = startIdx; i < endIdx; i++) {
-            ret[i - startIdx] = planetsExtendedInfo[planetIds[i]];
-        }
-    }
-
-    function getNPlayers() public view returns (uint256) {
-        return playerIds.length;
-    }
-
-    function bulkGetPlayers(uint256 startIdx, uint256 endIdx)
-        public
-        view
-        returns (address[] memory ret)
-    {
-        // return slice of players array from startIdx through endIdx - 1
-        ret = new address[](endIdx - startIdx);
-        for (uint256 i = startIdx; i < endIdx; i++) {
-            ret[i - startIdx] = playerIds[i];
-        }
-    }
-
-    function getPlanetLevelThresholds() public view returns (uint256[] memory) {
-        return planetLevelThresholds;
-    }
-
-    function getPlanetCumulativeRarities()
-        public
-        view
-        returns (uint256[] memory)
-    {
-        return cumulativeRarities;
-    }
-
-    function getPlanetArrivals(uint256 _location)
-        public
-        view
-        returns (DarkForestTypes.ArrivalData[] memory ret)
-    {
-        uint256 arrivalCount = 0;
-        for (uint256 i = 0; i < planetEvents[_location].length; i += 1) {
-            if (
-                planetEvents[_location][i].eventType ==
-                DarkForestTypes.PlanetEventType.ARRIVAL
-            ) {
-                arrivalCount += 1;
-            }
-        }
-        ret = new DarkForestTypes.ArrivalData[](arrivalCount);
-        uint256 count = 0;
-        for (uint256 i = 0; i < planetEvents[_location].length; i += 1) {
-            if (
-                planetEvents[_location][i].eventType ==
-                DarkForestTypes.PlanetEventType.ARRIVAL
-            ) {
-                ret[count] = planetArrivals[planetEvents[_location][i].id];
-                count++;
-            }
-        }
-    }
-
-    function bulkGetPlanetArrivals(uint256 startIdx, uint256 endIdx)
-        public
-        view
-        returns (DarkForestTypes.ArrivalData[][] memory)
-    {
-        // return array of planets corresponding to planetIds[startIdx] through planetIds[endIdx - 1]
-
-
-            DarkForestTypes.ArrivalData[][] memory ret
-         = new DarkForestTypes.ArrivalData[][](endIdx - startIdx);
-        for (uint256 i = startIdx; i < endIdx; i++) {
-            ret[i - startIdx] = getPlanetArrivals(planetIds[i]);
-        }
-        return ret;
-    }
-
-    function getDefaultStats()
-        public
-        view
-        returns (DarkForestTypes.PlanetDefaultStats[] memory)
-    {
-
-            DarkForestTypes.PlanetDefaultStats[] memory ret
-         = new DarkForestTypes.PlanetDefaultStats[](
-            planetLevelThresholds.length
-        );
-        for (uint256 i = 0; i < planetLevelThresholds.length; i += 1) {
-            ret[i] = planetDefaultStats[i];
-        }
-        return ret;
-    }
-
-    function getUpgrades()
-        public
-        view
-        returns (DarkForestTypes.Upgrade[4][3] memory)
-    {
-        return upgrades;
-    }
-
-    function getPlayerArtifactIds(address playerId)
-        public
-        view
-        returns (uint256[] memory)
-    {
-        return tokens.getPlayerArtifactIds(playerId);
-    }
-
-    function doesArtifactExist(uint256 tokenId) public view returns (bool) {
-        return tokens.doesArtifactExist(tokenId);
-    }
-
-    function getArtifactById(uint256 artifactId)
-        public
-        view
-        returns (DarkForestTypes.ArtifactWithMetadata memory ret)
-    {
-        DarkForestTypes.Artifact memory artifact = tokens.getArtifact(
-            artifactId
-        );
-        DarkForestTypes.Upgrade memory upgrade = DarkForestUtils
-            ._getUpgradeForArtifact(artifact);
-        ret = DarkForestTypes.ArtifactWithMetadata({
-            artifact: artifact,
-            upgrade: upgrade,
-            owner: tokens.ownerOf(artifact.id),
-            locationId: contractOwnedArtifactLocations[artifact.id]
-        });
-    }
-
-    function bulkGetArtifactsByIds(uint256[] calldata ids)
-        public
-        view
-        returns (DarkForestTypes.ArtifactWithMetadata[] memory ret)
-    {
-        ret = new DarkForestTypes.ArtifactWithMetadata[](ids.length);
-
-        for (uint256 i = 0; i < ids.length; i++) {
-            DarkForestTypes.Artifact memory artifact = tokens.getArtifact(
-                ids[i]
-            );
-            DarkForestTypes.Upgrade memory upgrade = DarkForestUtils
-                ._getUpgradeForArtifact(artifact);
-            ret[i] = DarkForestTypes.ArtifactWithMetadata({
-                artifact: artifact,
-                upgrade: upgrade,
-                owner: tokens.ownerOf(artifact.id),
-                locationId: contractOwnedArtifactLocations[artifact.id]
-            });
-        }
-    }
-
-    // private utilities
-
-    function _locationIdValid(uint256 _loc) public pure returns (bool) {
-        return (_loc <
-            (21888242871839275222246405745257275088548364400416034343698204186575808495617 /
-                PLANET_RARITY));
-    }
-
     // Private helpers that modify state
     function _updateWorldRadius() private {
-        worldRadius = DarkForestUtils._getRadius(
-            initializedPlanetCountByLevel,
-            cumulativeRarities,
-            playerIds.length,
-            target4RadiusConstant
-        );
+        if (!s.WORLD_RADIUS_LOCKED) {
+            s.worldRadius = DarkForestUtils._getRadius();
+        }
     }
 
-    function _initializePlanet(
-        uint256 _location,
-        uint256 _perlin,
-        bool _isHomePlanet
+    function initializePlanet(
+        uint256 location,
+        uint256 perlin,
+        bool isHomePlanet
     ) private {
-        require(_locationIdValid(_location), "Not a valid planet location");
+        DarkForestPlanet.initializePlanetWithDefaults(location, perlin, isHomePlanet);
+    }
 
-        (
-            uint256 _level,
-            DarkForestTypes.PlanetResource _resource
-        ) = DarkForestUtils._getPlanetLevelAndResource(
-            _location,
-            _perlin,
-            PERLIN_THRESHOLD_1,
-            PERLIN_THRESHOLD_2,
-            SILVER_RARITY_1,
-            SILVER_RARITY_2,
-            SILVER_RARITY_3,
-            planetLevelThresholds,
-            planetDefaultStats
-        );
+    /////////////////////////////
+    /// Administrative Engine ///
+    /////////////////////////////
 
-        if (_isHomePlanet) {
-            require(_level == 0, "Can only initialize on planet level 0");
+    function changeAdmin(address _newAdmin) public onlyAdmin {
+        require(_newAdmin != address(0), "newOwner cannot be 0x0");
+        s.adminAddress = _newAdmin;
+    }
+
+    function pause() public onlyAdmin {
+        require(!s.paused, "Game is already paused");
+        s.paused = true;
+    }
+
+    function unpause() public onlyAdmin {
+        require(s.paused, "Game is already unpaused");
+        s.paused = false;
+    }
+
+    function changeTarget4RadiusConstant(uint256 _newConstant) public onlyAdmin {
+        s.TARGET4_RADIUS = _newConstant;
+        _updateWorldRadius();
+    }
+
+    function adminSetWorldRadius(uint256 _newRadius) public onlyAdmin {
+        s.worldRadius = _newRadius;
+    }
+
+    function changeLocationRevealCooldown(uint256 newCooldown) public onlyAdmin {
+        s.gameConstants.LOCATION_REVEAL_COOLDOWN = newCooldown;
+    }
+
+    function withdraw() public onlyAdmin {
+        msg.sender.transfer(address(this).balance);
+    }
+
+    function createPlanet(DarkForestTypes.AdminCreatePlanetArgs memory args) public onlyAdmin {
+        require(s.ADMIN_CAN_ADD_PLANETS, "admin can no longer add planets");
+        if (args.requireValidLocationId) {
+            require(DarkForestUtils._locationIdValid(args.location), "Not a valid planet location");
         }
-
-        DarkForestPlanet.initializePlanet(
-            planets[_location],
-            planetsExtendedInfo[_location],
-            planetDefaultStats[_level],
-            _perlin,
-            TIME_FACTOR_HUNDREDTHS,
-            PERLIN_THRESHOLD_1,
-            PERLIN_THRESHOLD_2,
-            _resource,
-            _level,
-            _location
+        DarkForestTypes.SpaceType spaceType = DarkForestUtils.spaceTypeFromPerlin(args.perlin);
+        DarkForestPlanet._initializePlanet(
+            DarkForestTypes.DFPInitPlanetArgs(
+                args.location,
+                args.perlin,
+                args.level,
+                s.gameConstants.TIME_FACTOR_HUNDREDTHS,
+                spaceType,
+                args.planetType,
+                false
+            )
         );
-        planetIds.push(_location);
-        initializedPlanetCountByLevel[_level] += 1;
+        s.planetIds.push(args.location);
+        s.initializedPlanetCountByLevel[args.level] += 1;
     }
 
     //////////////////////
@@ -479,52 +231,83 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
     //////////////////////
 
     function refreshPlanet(uint256 _location) public onlyWhitelisted notPaused {
-        DarkForestPlanet.refreshPlanet(
-            _location,
-            planets,
-            planetsExtendedInfo,
-            planetEvents,
-            planetArrivals
+        DarkForestPlanet.refreshPlanet(_location);
+    }
+
+    function checkRevealProof(
+        uint256[2] memory _a,
+        uint256[2][2] memory _b,
+        uint256[2] memory _c,
+        uint256[9] memory _input
+    ) public view returns (bool) {
+        if (!s.snarkConstants.DISABLE_ZK_CHECKS) {
+            require(Verifier.verifyRevealProof(_a, _b, _c, _input), "Failed reveal pf check");
+        }
+
+        DarkForestUtils.revertIfBadSnarkPerlinFlags(
+            [_input[4], _input[5], _input[6], _input[7], _input[8]],
+            false
         );
+
+        return true;
+    }
+
+    function revealLocation(
+        uint256[2] memory _a,
+        uint256[2][2] memory _b,
+        uint256[2] memory _c,
+        uint256[9] memory _input
+    ) public onlyWhitelisted returns (uint256) {
+        require(checkRevealProof(_a, _b, _c, _input), "Failed reveal pf check");
+
+        if (!s.planetsExtendedInfo[_input[0]].isInitialized) {
+            initializePlanet(_input[0], _input[1], false);
+        }
+
+        DarkForestPlanet.revealLocation(
+            _input[0],
+            _input[1],
+            _input[2],
+            _input[3],
+            msg.sender != s.adminAddress
+        );
+        emit LocationRevealed(msg.sender, _input[0]);
     }
 
     function initializePlayer(
         uint256[2] memory _a,
         uint256[2][2] memory _b,
         uint256[2] memory _c,
-        uint256[3] memory _input
-    ) public onlyWhitelisted notPaused returns (uint256) {
-        if (!DISABLE_ZK_CHECK) {
-            require(
-                Verifier.verifyInitProof(_a, _b, _c, _input),
-                "Failed init proof check"
-            );
+        uint256[8] memory _input
+    ) public onlyWhitelisted returns (uint256) {
+        if (!s.snarkConstants.DISABLE_ZK_CHECKS) {
+            require(Verifier.verifyInitProof(_a, _b, _c, _input), "Failed init proof check");
         }
 
         uint256 _location = _input[0];
         uint256 _perlin = _input[1];
         uint256 _radius = _input[2];
 
-        require(
-            DarkForestPlanet.checkInit(
-                _location,
-                _perlin,
-                _radius,
-                isPlayerInitialized,
-                planetsExtendedInfo,
-                worldRadius,
-                PERLIN_THRESHOLD_1
-            )
+        DarkForestUtils.revertIfBadSnarkPerlinFlags(
+            [_input[3], _input[4], _input[5], _input[6], _input[7]],
+            false
         );
 
+        require(DarkForestPlanet.checkPlayerInit(_location, _perlin, _radius));
+
         // Initialize player data
-        isPlayerInitialized[msg.sender] = true;
-        playerIds.push(msg.sender);
+        s.playerIds.push(msg.sender);
+        s.players[msg.sender] = DarkForestTypes.Player(
+            true,
+            msg.sender,
+            block.timestamp,
+            _location,
+            0,
+            0
+        );
 
         // Initialize planet information
-        _initializePlanet(_location, _perlin, true);
-        planets[_location].owner = msg.sender;
-        planets[_location].population = 50000;
+        initializePlanet(_location, _perlin, true);
         _updateWorldRadius();
         emit PlayerInitialized(msg.sender, _location);
         return _location;
@@ -534,83 +317,70 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         uint256[2] memory _a,
         uint256[2][2] memory _b,
         uint256[2] memory _c,
-        uint256[7] memory _input
+        uint256[13] memory _input
     ) public notPaused returns (uint256) {
-        uint256 _oldLoc = _input[0];
-        uint256 _newLoc = _input[1];
-        uint256 _newPerlin = _input[2];
-        uint256 _newRadius = _input[3];
-        uint256 _maxDist = _input[4];
-        uint256 _popMoved = _input[5];
-        uint256 _silverMoved = _input[6];
+        DarkForestUtils.revertIfBadSnarkPerlinFlags(
+            [_input[5], _input[6], _input[7], _input[8], _input[9]],
+            false
+        );
 
-        if (!DISABLE_ZK_CHECK) {
-            uint256[5] memory _proofInput = [
-                _oldLoc,
-                _newLoc,
-                _newPerlin,
-                _newRadius,
-                _maxDist
-            ];
-            require(
-                Verifier.verifyMoveProof(_a, _b, _c, _proofInput),
-                "Failed move proof check"
-            );
+        uint256 oldLoc = _input[0];
+        uint256 newLoc = _input[1];
+        uint256 newPerlin = _input[2];
+        uint256 newRadius = _input[3];
+        uint256 maxDist = _input[4];
+        uint256 popMoved = _input[10];
+        uint256 silverMoved = _input[11];
+        uint256 movedArtifactId = _input[12];
+
+        if (!s.snarkConstants.DISABLE_ZK_CHECKS) {
+            uint256[10] memory _proofInput =
+                [
+                    oldLoc,
+                    newLoc,
+                    newPerlin,
+                    newRadius,
+                    maxDist,
+                    _input[5],
+                    _input[6],
+                    _input[7],
+                    _input[8],
+                    _input[9]
+                ];
+            require(Verifier.verifyMoveProof(_a, _b, _c, _proofInput), "Failed move proof check");
         }
 
         // check radius
-        require(_newRadius <= worldRadius, "Attempting to move out of bounds");
+        require(newRadius <= s.worldRadius, "Attempting to move out of bounds");
 
         // Only perform if the toPlanet have never initialized previously
-        if (!planetsExtendedInfo[_newLoc].isInitialized) {
-            _initializePlanet(_newLoc, _newPerlin, false);
+        if (!s.planetsExtendedInfo[newLoc].isInitialized) {
+            initializePlanet(newLoc, newPerlin, false);
         } else {
             // need to do this so people can't deny service to planets with gas limit
-            refreshPlanet(_newLoc);
-            uint8 arrivalsFromOwner = 0;
-            uint8 arrivalsFromOthers = 0;
-            for (uint8 i = 0; i < planetEvents[_newLoc].length; i++) {
-                if (
-                    planetEvents[_newLoc][i].eventType ==
-                    DarkForestTypes.PlanetEventType.ARRIVAL
-                ) {
-                    if (
-                        planetArrivals[planetEvents[_newLoc][i].id].player ==
-                        planets[_newLoc].owner
-                    ) {
-                        arrivalsFromOwner++;
-                    } else {
-                        arrivalsFromOthers++;
-                    }
-                }
-            }
-            if (msg.sender == planets[_newLoc].owner) {
-                require(arrivalsFromOwner < 6, "Planet is rate-limited");
-            } else {
-                require(arrivalsFromOthers < 6, "Planet is rate-limited");
-            }
+            refreshPlanet(newLoc);
+            DarkForestUtils.checkPlanetDOS(newLoc);
         }
 
         // Refresh fromPlanet first before doing any action on it
-        refreshPlanet(_oldLoc);
+        refreshPlanet(oldLoc);
+
+        s.planetEventsCount++;
+
         DarkForestPlanet.move(
-            _oldLoc,
-            _newLoc,
-            _maxDist,
-            _popMoved,
-            _silverMoved,
-            planetEventsCount,
-            planets,
-            planetsExtendedInfo,
-            planetEvents,
-            planetArrivals
+            DarkForestTypes.DFPMoveArgs(
+                oldLoc,
+                newLoc,
+                maxDist,
+                popMoved,
+                silverMoved,
+                movedArtifactId
+            )
         );
 
-        planetEventsCount++;
-
         _updateWorldRadius();
-        emit ArrivalQueued(planetEventsCount - 1);
-        return (planetEventsCount - 1);
+        emit ArrivalQueued(msg.sender, s.planetEventsCount, oldLoc, newLoc, movedArtifactId);
+        return (s.planetEventsCount);
     }
 
     function upgradePlanet(uint256 _location, uint256 _branch)
@@ -623,222 +393,145 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         // 1 improves population
         // 2 improves range
         refreshPlanet(_location);
-        DarkForestPlanet.upgradePlanet(
-            _location,
-            _branch,
-            planets,
-            planetsExtendedInfo,
-            planetDefaultStats,
-            upgrades
-        );
-        emit PlanetUpgraded(_location);
+        DarkForestPlanet.upgradePlanet(_location, _branch);
         return (_location, _branch);
     }
 
-    function transferOwnership(uint256 _location, address _player)
-        public
-        notPaused
-    {
+    function transferOwnership(uint256 _location, address _player) public notPaused {
         require(
-            planetsExtendedInfo[_location].isInitialized == true,
+            s.planetsExtendedInfo[_location].isInitialized == true,
             "Planet is not initialized"
         );
 
         refreshPlanet(_location);
 
-        require(
-            planets[_location].owner == msg.sender,
-            "Only owner can transfer planet"
-        );
+        require(s.planets[_location].owner == msg.sender, "Only owner can transfer planet");
 
         require(_player != msg.sender, "Cannot transfer planet to self");
 
         require(
-            isPlayerInitialized[_player],
+            s.players[_player].isInitialized,
             "Can only transfer ownership to initialized players"
         );
 
-        planets[_location].owner = _player;
+        require(!s.planetsExtendedInfo[_location].destroyed, "can't transfer a destroyed planet");
 
-        emit PlanetTransferred(_location, _player);
+        s.planets[_location].owner = _player;
+
+        emit PlanetTransferred(msg.sender, _location, _player);
     }
 
     function buyHat(uint256 _location) public payable {
         require(
-            planetsExtendedInfo[_location].isInitialized == true,
+            s.planetsExtendedInfo[_location].isInitialized == true,
             "Planet is not initialized"
         );
-
         refreshPlanet(_location);
 
-        require(
-            planets[_location].owner == msg.sender,
-            "Only owner can buy hat for planet"
-        );
+        require(s.planets[_location].owner == msg.sender, "Only owner can buy hat for planet");
 
-        uint256 cost = (1 << planetsExtendedInfo[_location].hatLevel) * 1 ether;
+        uint256 cost = (1 << s.planetsExtendedInfo[_location].hatLevel) * 1 ether;
 
         require(msg.value >= cost, "Insufficient value sent");
 
-        planetsExtendedInfo[_location].hatLevel += 1;
-        emit BoughtHat(_location);
+        s.planetsExtendedInfo[_location].hatLevel += 1;
+        emit PlanetHatBought(msg.sender, _location, s.planetsExtendedInfo[_location].hatLevel);
     }
 
     function findArtifact(
         uint256[2] memory _a,
         uint256[2][2] memory _b,
         uint256[2] memory _c,
-        uint256[2] memory _input
+        uint256[7] memory _input
     ) public notPaused notTokenEnded {
         uint256 planetId = _input[0];
         uint256 biomebase = _input[1];
 
-        refreshPlanet(planetId);
-        DarkForestTypes.Planet storage planet = planets[planetId];
-
-
-            DarkForestTypes.PlanetExtendedInfo storage info
-         = planetsExtendedInfo[planetId];
-        DarkForestTypes.Biome biome = DarkForestUtils._getBiome(
-            info.spaceType,
-            biomebase,
-            BIOME_THRESHOLD_1,
-            BIOME_THRESHOLD_2
+        DarkForestUtils.revertIfBadSnarkPerlinFlags(
+            [_input[2], _input[3], _input[4], _input[5], _input[6]],
+            true
         );
 
-        if (!DISABLE_ZK_CHECK) {
+        refreshPlanet(planetId);
+
+        if (!s.snarkConstants.DISABLE_ZK_CHECKS) {
             require(
                 Verifier.verifyBiomebaseProof(_a, _b, _c, _input),
                 "biome zkSNARK failed doesn't check out"
             );
         }
 
-        require(
-            DarkForestUtils._isPlanetMineable(planetId, planet.planetLevel),
-            "you can't find an artifact on this planet"
-        );
-        require(!info.hasTriedFindingArtifact, "planet already plundered");
-        require(
-            planet.owner == msg.sender,
-            "you can only find artifacts on planets you own"
-        );
-        require(
-            (planet.population * 100) / planet.populationCap > 95,
-            "you must have 95% of the max energy"
-        );
-        require(
-            planet.planetResource == DarkForestTypes.PlanetResource.NONE,
-            "can't mint artifact on silver mine"
-        );
+        uint256 foundArtifactId =
+            DarkForestPlanet.findArtifact(
+                DarkForestTypes.DFPFindArtifactArgs(planetId, biomebase, address(this))
+            );
 
-        info.hasTriedFindingArtifact = true;
-
-        uint256 artifactSeed = DarkForestUtils._artifactSeed(
-            planetId,
-            planetEventsCount,
-            block.timestamp
-        );
-        (
-            DarkForestTypes.ArtifactType artifactType,
-            uint256 levelBonus
-        ) = DarkForestUtils._randomArtifactTypeAndLevelBonus(artifactSeed);
-
-        DarkForestTypes.Artifact memory foundArtifact = tokens.createArtifact(
-            artifactSeed,
-            msg.sender,
-            planetId,
-            planet.planetLevel,
-            levelBonus,
-            biome,
-            artifactType
-        );
-
-        DarkForestPlanet._putArtifactOnPlanet(
-            tokens,
-            foundArtifact.id,
-            planetId,
-            planet,
-            info,
-            contractOwnedArtifactLocations
-        );
-
-        emit FoundArtifact(planetId, msg.sender, foundArtifact.id);
-        return;
+        emit ArtifactFound(msg.sender, foundArtifactId, planetId);
     }
 
-    function depositArtifact(uint256 locationId, uint256 artifactId)
-        public
-        notPaused
-    {
+    function depositArtifact(uint256 locationId, uint256 artifactId) public notPaused {
         // should this be implemented as logic that is triggered when a player sends
         // an artifact to the contract with locationId in the extra data?
         // might be better use of the ERC721 standard - can use safeTransfer then
         refreshPlanet(locationId);
-        DarkForestTypes.Planet storage planet = planets[locationId];
 
+        DarkForestPlanet.depositArtifact(locationId, artifactId, address(this));
 
-            DarkForestTypes.PlanetExtendedInfo storage planetInfo
-         = planetsExtendedInfo[locationId];
-
-        require(
-            tokens.ownerOf(artifactId) == msg.sender,
-            "you can only deposit artifacts you own"
-        );
-        require(
-            planet.owner == msg.sender,
-            "you can only deposit on a planet you own"
-        );
-        require(
-            planetInfo.heldArtifactId == 0,
-            "planet already has an artifact"
-        );
-        require(
-            planet.planetResource == DarkForestTypes.PlanetResource.NONE,
-            "can't deposit artifact on silver mine"
-        );
-
-        DarkForestPlanet._putArtifactOnPlanet(
-            tokens,
-            artifactId,
-            locationId,
-            planet,
-            planetInfo,
-            contractOwnedArtifactLocations
-        );
-        emit DepositedArtifact(locationId, msg.sender, artifactId);
-        return;
+        emit ArtifactDeposited(msg.sender, artifactId, locationId);
     }
 
-    function withdrawArtifact(uint256 locationId) public notPaused {
+    // withdraws the given artifact from the given planet. you must own the planet,
+    // the artifact must be on the given planet
+    function withdrawArtifact(uint256 locationId, uint256 artifactId) public notPaused {
         refreshPlanet(locationId);
-        DarkForestTypes.Planet storage planet = planets[locationId];
 
+        DarkForestPlanet.withdrawArtifact(locationId, artifactId);
 
-            DarkForestTypes.PlanetExtendedInfo storage planetInfo
-         = planetsExtendedInfo[locationId];
+        emit ArtifactWithdrawn(msg.sender, artifactId, locationId);
+    }
 
-        uint256 artifactId = planetInfo.heldArtifactId;
+    // activates the given artifact on the given planet. the artifact must have
+    // been previously deposited on this planet. the artifact cannot be activated
+    // within a certain cooldown period, depending on the artifact type
+    function activateArtifact(
+        uint256 locationId,
+        uint256 artifactId,
+        uint256 wormholeTo
+    ) public notPaused {
+        refreshPlanet(locationId);
 
-        require(
-            planet.owner == msg.sender,
-            "you can only withdraw from a planet you own"
-        );
-        require(artifactId != 0, "planet has no artifact to withdraw");
-        require(
-            block.timestamp >
-                planetInfo.artifactLockedTimestamp +
-                    ARTIFACT_LOCKUP_DURATION_SECONDS,
-            "planet's artifact is in lockup period"
-        );
+        if (wormholeTo != 0) {
+            refreshPlanet(wormholeTo);
+        }
 
-        DarkForestPlanet._takeArtifactOffPlanet(
-            tokens,
-            address(this),
-            planet,
-            planetInfo,
-            contractOwnedArtifactLocations
-        );
-        emit WithdrewArtifact(locationId, msg.sender, artifactId);
-        return;
+        DarkForestPlanet.activateArtifact(locationId, artifactId, wormholeTo);
+        // event is emitted in the above library function
+    }
+
+    // if there's an activated artifact on this planet, deactivates it. otherwise reverts.
+    // deactivating an artifact this debuffs the planet, and also removes whatever special
+    // effect that the artifact bestowned upon this planet.
+    function deactivateArtifact(uint256 locationId) public notPaused {
+        refreshPlanet(locationId);
+
+        DarkForestPlanet.deactivateArtifact(locationId);
+        // event is emitted in the above library function
+    }
+
+    // in order to be able to find an artifact on a planet, the planet
+    // must first be 'prospected'. prospecting commits to a currently-unknown
+    // seed that is used to randomly generate the artifact that will be
+    // found on this planet.
+    function prospectPlanet(uint256 locationId) public notPaused {
+        refreshPlanet(locationId);
+        DarkForestPlanet.prospectPlanet(locationId);
+        emit PlanetProspected(msg.sender, locationId);
+    }
+
+    // withdraw silver
+    function withdrawSilver(uint256 locationId, uint256 amount) public notPaused {
+        refreshPlanet(locationId);
+        DarkForestPlanet.withdrawSilver(locationId, amount);
+        emit PlanetSilverWithdrawn(msg.sender, locationId, amount);
     }
 }

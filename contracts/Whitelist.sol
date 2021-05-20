@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.6.0;
+pragma solidity ^0.7.6;
 pragma experimental ABIEncoderV2;
 
 // Import base Initializable contract
@@ -7,7 +7,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
 
 contract Whitelist is Initializable {
     bool whitelistEnabled;
-    uint256 public drip = 0.05 ether;
+    uint256 public drip;
     mapping(address => bool) allowedAccounts;
     mapping(bytes32 => bool) allowedKeyHashes;
     address[] allowedAccountsArray;
@@ -15,10 +15,7 @@ contract Whitelist is Initializable {
 
     // administrative
     modifier onlyAdmin() {
-        require(
-            msg.sender == admin,
-            "Only administrator can perform this action"
-        );
+        require(msg.sender == admin, "Only administrator can perform this action");
         _;
     }
 
@@ -26,10 +23,8 @@ contract Whitelist is Initializable {
         admin = _newAdmin;
     }
 
-    function initialize(address _admin, bool _whitelistEnabled)
-        public
-        initializer
-    {
+    function initialize(address _admin, bool _whitelistEnabled) public initializer {
+        drip = 0.05 ether;
         admin = _admin;
         whitelistEnabled = _whitelistEnabled;
     }
@@ -70,20 +65,16 @@ contract Whitelist is Initializable {
     }
 
     function removeFromWhitelist(address toRemove) public onlyAdmin {
-        require(
-            allowedAccounts[toRemove],
-            "player was not whitelisted to begin with"
-        );
+        require(allowedAccounts[toRemove], "player was not whitelisted to begin with");
         allowedAccounts[toRemove] = false;
         for (uint256 i = 0; i < allowedAccountsArray.length; i++) {
             if (allowedAccountsArray[i] == toRemove) {
-                allowedAccountsArray[i] = allowedAccountsArray[allowedAccountsArray
-                    .length - 1];
+                allowedAccountsArray[i] = allowedAccountsArray[allowedAccountsArray.length - 1];
                 allowedAccountsArray.pop();
             }
         }
     }
-    
+
     function changeDrip(uint256 newDrip) public onlyAdmin {
         drip = newDrip;
     }

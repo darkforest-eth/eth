@@ -1,0 +1,81 @@
+specVersion: 0.0.2
+description: Dark Forest, the world's first decentralized real-time strategy game. Built on Ethereum with zkSNARKs
+repository: https://github.com/jacobrosenthal/darkforest-graph
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: DarkForestCore
+    network: xdai
+    source:
+      address: '{{{CORE_CONTRACT_ADDRESS}}}'
+      abi: DarkForestCore
+      startBlock: #{{{START_BLOCK}}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Player
+        - Planet
+        - Arrival
+        - Upgrade
+        - Hat
+        - ArrivalQueue
+        - DepartureQueue
+        - Meta
+      abis:
+        - name: DarkForestCore
+          file: '{{{CORE_ABI_PATH}}}'
+        - name: DarkForestGetters
+          file: '{{{GETTERS_ABI_PATH}}}'
+      eventHandlers:
+        - event: ArtifactDeposited(address,uint256,uint256)
+          handler: handleArtifactDeposited
+        - event: ArtifactWithdrawn(address,uint256,uint256)
+          handler: handleArtifactWithdrawn
+        - event: ArtifactFound(address,uint256,uint256)
+          handler: handleArtifactFound
+        - event: ArtifactActivated(address,uint256,uint256)
+          handler: handleArtifactActivated
+        - event: ArtifactDeactivated(address,uint256,uint256)
+          handler: handleArtifactDeactivated
+        - event: PlanetProspected(address,uint256)
+          handler: handlePlanetProspected
+        - event: PlanetTransferred(address,uint256,address)
+          handler: handlePlanetTransferred
+        - event: PlanetUpgraded(address,uint256,uint256,uint256)
+          handler: handlePlanetUpgraded
+        - event: PlanetHatBought(address,uint256,uint256)
+          handler: handlePlanetHatBought
+        - event: ArrivalQueued(address,uint256,uint256,uint256,uint256)
+          handler: handleArrivalQueued
+        - event: PlayerInitialized(address,uint256)
+          handler: handlePlayerInitialized
+        - event: PlanetSilverWithdrawn(address,uint256,uint256)
+          handler: handlePlanetSilverWithdrawn
+        - event: LocationRevealed(address,uint256)
+          handler: handleLocationRevealed
+      blockHandlers:
+        - handler: handleBlock
+      file: ./src/mapping.ts
+  - kind: ethereum/contract
+    name: DarkForestTokens
+    network: xdai
+    source:
+      address: '{{{TOKENS_CONTRACT_ADDRESS}}}'
+      abi: DarkForestTokens
+      startBlock: #{{{START_BLOCK}}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Artifact
+      abis:
+        - name: DarkForestTokens
+          file: '{{{TOKENS_ABI_PATH}}}'
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+      file: ./src/mappingTokens.ts

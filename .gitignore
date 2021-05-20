@@ -5,6 +5,15 @@ yarn-error.log
 *.env
 .env.prod
 
-.openzeppelin/dev-*.json
-!.openzeppelin/dev-100.json
+.openzeppelin/unknown-*.json
+!.openzeppelin/unknown-100.json
 .openzeppelin/.session
+
+#Hardhat files
+cache
+artifacts
+typechain
+
+subgraph/build/*
+subgraph/generated/*
+subgraph/subgraph.yaml
