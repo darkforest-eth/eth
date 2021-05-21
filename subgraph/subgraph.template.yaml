@@ -75,6 +75,8 @@ dataSources:
       abis:
         - name: DarkForestTokens
           file: '{{{TOKENS_ABI_PATH}}}'
+        - name: DarkForestGetters
+          file: '{{{GETTERS_ABI_PATH}}}'
       eventHandlers:
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer

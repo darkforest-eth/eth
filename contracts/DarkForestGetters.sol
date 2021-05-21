@@ -244,15 +244,21 @@ contract DarkForestGetters is Initializable {
     {
         DarkForestTypes.Artifact memory artifact = tokensContract.getArtifact(artifactId);
 
-        DarkForestTypes.Upgrade memory upgrade = DarkForestUtils._getUpgradeForArtifact(artifact);
-        DarkForestTypes.Upgrade memory timeDelayedUpgrade =
-            DarkForestUtils.timeDelayUpgrade(artifact);
+        address owner;
+
+        try tokensContract.ownerOf(artifact.id) returns (address addr) {
+            owner = addr;
+        } catch Error(string memory) {
+            // artifact is probably burned / owned by 0x0, so owner is 0x0
+        } catch (bytes memory) {
+            // this shouldn't happen
+        }
 
         ret = DarkForestTypes.ArtifactWithMetadata({
             artifact: artifact,
-            upgrade: upgrade,
-            timeDelayedUpgrade: timeDelayedUpgrade,
-            owner: tokensContract.ownerOf(artifact.id),
+            upgrade: DarkForestUtils._getUpgradeForArtifact(artifact),
+            timeDelayedUpgrade: DarkForestUtils.timeDelayUpgrade(artifact),
+            owner: owner,
             locationId: coreContract.artifactIdToPlanetId(artifact.id),
             voyageId: coreContract.artifactIdToVoyageId(artifact.id)
         });
@@ -297,11 +303,21 @@ contract DarkForestGetters is Initializable {
         for (uint256 i = 0; i < ids.length; i++) {
             DarkForestTypes.Artifact memory artifact = tokensContract.getArtifact(ids[i]);
 
+            address owner;
+
+            try tokensContract.ownerOf(artifact.id) returns (address addr) {
+                owner = addr;
+            } catch Error(string memory) {
+                // artifact is probably burned or owned by 0x0, so owner is 0x0
+            } catch (bytes memory) {
+                // this shouldn't happen
+            }
+
             ret[i] = DarkForestTypes.ArtifactWithMetadata({
                 artifact: artifact,
                 upgrade: DarkForestUtils._getUpgradeForArtifact(artifact),
                 timeDelayedUpgrade: DarkForestUtils.timeDelayUpgrade(artifact),
-                owner: tokensContract.ownerOf(artifact.id),
+                owner: owner,
                 locationId: coreContract.artifactIdToPlanetId(artifact.id),
                 voyageId: coreContract.artifactIdToVoyageId(artifact.id)
             });

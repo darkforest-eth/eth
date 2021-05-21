@@ -19,7 +19,10 @@ import {
   ArtifactActivated,
   ArtifactDeactivated,
 } from '../generated/DarkForestCore/DarkForestCore';
-import { DarkForestGetters } from '../generated/DarkForestCore/DarkForestGetters';
+import {
+  DarkForestGetters,
+  DarkForestGetters__bulkGetArtifactsByIdsResultRetStruct,
+} from '../generated/DarkForestCore/DarkForestGetters';
 
 import { CORE_CONTRACT_ADDRESS, GETTERS_CONTRACT_ADDRESS } from '@darkforest_eth/contracts';
 
@@ -235,8 +238,12 @@ export function handleLocationRevealed(event: LocationRevealed): void {
     player.lastRevealTimestamp = event.block.timestamp.toI32();
     player.save();
   } else {
-    log.error('attempting to process location reveal for unknown revealer: {}', [revealerAddress]);
-    throw new Error();
+    // revealed by admin, who is not included as a player
+    player = new Player(revealerAddress);
+    player.initTimestamp = event.block.timestamp.toI32();
+    player.milliWithdrawnSilver = 0;
+    player.lastRevealTimestamp = 0;
+    player.save();
   }
 }
 
@@ -375,15 +382,36 @@ function refreshTouchedArtifacts(meta: Meta): void {
   }
 
   let getters = DarkForestGetters.bind(Address.fromString(GETTERS_CONTRACT_ADDRESS));
-  let rawArtifacts = getters.bulkGetArtifactsByIds(meta._currentlyRefreshingArtifacts);
+  // TODO production: uncomment the following line
+  // let rawArtifacts = getters.bulkGetArtifactsByIds(meta._currentlyRefreshingArtifacts);
   // in AS we can't index into meta._currentlyRefreshingArtifacts within a for loop
   // (see https://github.com/AssemblyScript/assemblyscript/issues/222)
   // so we copy into memory array and index into that
   let artifactDecIds = meta._currentlyRefreshingArtifacts.map<BigInt>((x) => x);
   for (let i = 0; i < meta._currentlyRefreshingArtifacts.length; i++) {
+    // TODO production: uncomment these lines
+    /*
     let rawData = rawArtifacts[i];
     let artifact = refreshArtifactFromContractData(artifactDecIds[i], rawData);
     artifact.save();
+    */
+    // TODO production: kill the below. this is just because the staging getter is bad :/
+    let rawArtifactRes = getters.try_getArtifactById(artifactDecIds[i]);
+    if (rawArtifactRes.reverted) {
+      let artifactId = hexStringToPaddedUnprefixed(artifactDecIds[i].toHexString());
+      let artifact = Artifact.load(artifactId) as Artifact;
+      artifact.owner = toLowercase(CORE_CONTRACT_ADDRESS);
+      artifact.onPlanet = null;
+      artifact.onVoyage = null;
+      artifact.wormholeTo = null;
+      artifact.save();
+    } else {
+      let artifact = refreshArtifactFromContractData(
+        artifactDecIds[i],
+        rawArtifactRes.value as DarkForestGetters__bulkGetArtifactsByIdsResultRetStruct
+      );
+      artifact.save();
+    }
   }
 
   meta._currentlyRefreshingArtifacts = [];
