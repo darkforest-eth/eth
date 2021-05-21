@@ -26,7 +26,16 @@ import {
 
 import { CORE_CONTRACT_ADDRESS, GETTERS_CONTRACT_ADDRESS } from '@darkforest_eth/contracts';
 
-import { Arrival, ArrivalQueue, Meta, Player, Planet, Hat, Artifact } from '../generated/schema';
+import {
+  Arrival,
+  ArrivalQueue,
+  Meta,
+  Player,
+  Planet,
+  Hat,
+  Artifact,
+  RevertedArtifactCall,
+} from '../generated/schema';
 import { hexStringToPaddedUnprefixed, toLowercase } from './helpers/converters';
 import {
   refreshArtifactFromContractData,
@@ -41,7 +50,7 @@ import { arrive } from './helpers/arrivalHelpers';
 // result be very careful with your copy pastes. And TODO, unify the codebases
 
 export function handleArtifactFound(event: ArtifactFound): void {
-  let meta = getMeta(event.block.timestamp.toI32());
+  let meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
   addToPlanetRefreshQueue(meta, event.params.loc);
   meta.save();
 
@@ -52,21 +61,21 @@ export function handleArtifactFound(event: ArtifactFound): void {
 }
 
 export function handleArtifactDeposited(event: ArtifactDeposited): void {
-  let meta = getMeta(event.block.timestamp.toI32());
+  let meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
   addToPlanetRefreshQueue(meta, event.params.loc);
   addToArtifactRefreshQueue(meta, event.params.artifactId);
   meta.save();
 }
 
 export function handleArtifactWithdrawn(event: ArtifactWithdrawn): void {
-  let meta = getMeta(event.block.timestamp.toI32());
+  let meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
   addToPlanetRefreshQueue(meta, event.params.loc);
   addToArtifactRefreshQueue(meta, event.params.artifactId);
   meta.save();
 }
 
 export function handleArtifactActivated(event: ArtifactActivated): void {
-  let meta = getMeta(event.block.timestamp.toI32());
+  let meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
   addToPlanetRefreshQueue(meta, event.params.loc);
   addToArtifactRefreshQueue(meta, event.params.artifactId);
   meta.save();
@@ -84,7 +93,7 @@ export function handleArtifactActivated(event: ArtifactActivated): void {
 }
 
 export function handleArtifactDeactivated(event: ArtifactDeactivated): void {
-  let meta = getMeta(event.block.timestamp.toI32());
+  let meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
   addToPlanetRefreshQueue(meta, event.params.loc);
   addToArtifactRefreshQueue(meta, event.params.artifactId);
   meta.save();
@@ -101,13 +110,13 @@ export function handleArtifactDeactivated(event: ArtifactDeactivated): void {
 }
 
 export function handlePlanetProspected(event: PlanetProspected): void {
-  let meta = getMeta(event.block.timestamp.toI32());
+  let meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
   addToPlanetRefreshQueue(meta, event.params.loc);
   meta.save();
 }
 
 export function handlePlanetTransferred(event: PlanetTransferred): void {
-  let meta = getMeta(event.block.timestamp.toI32());
+  let meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
   addToPlanetRefreshQueue(meta, event.params.loc);
   meta.save();
 }
@@ -124,14 +133,14 @@ export function handlePlayerInitialized(event: PlayerInitialized): void {
   player.lastRevealTimestamp = 0;
   player.save();
 
-  let meta = getMeta(event.block.timestamp.toI32());
+  let meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
   addToPlanetRefreshQueue(meta, locationDec);
   meta.save();
 }
 
 export function handleBlock(block: ethereum.Block): void {
   let current = block.timestamp.toI32();
-  let meta = getMeta(current);
+  let meta = getMeta(current, block.number.toI32());
 
   processScheduledArrivalsSinceLastBlock(meta, current);
   refreshTouchedPlanets(meta);
@@ -148,7 +157,7 @@ export function handlePlanetHatBought(event: PlanetHatBought): void {
   let locationDec = event.params.loc;
 
   // queue planet to refresh
-  let meta = getMeta(event.block.timestamp.toI32());
+  let meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
   addToPlanetRefreshQueue(meta, locationDec);
   meta.save();
 
@@ -186,7 +195,7 @@ export function handlePlanetHatBought(event: PlanetHatBought): void {
 // We delay minirefresh to the blockhandler
 export function handleArrivalQueued(event: ArrivalQueued): void {
   let current = event.block.timestamp.toI32();
-  let meta = getMeta(current);
+  let meta = getMeta(current, event.block.number.toI32());
 
   // add voyage ID to Meta, for later processing
   addToVoyageAddQueue(meta, event.params.arrivalId);
@@ -204,14 +213,14 @@ export function handleArrivalQueued(event: ArrivalQueued): void {
 
 export function handlePlanetUpgraded(event: PlanetUpgraded): void {
   // queue planet to refresh
-  let meta = getMeta(event.block.timestamp.toI32());
+  let meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
   addToPlanetRefreshQueue(meta, event.params.loc);
   meta.save();
 }
 
 export function handlePlanetSilverWithdrawn(event: PlanetSilverWithdrawn): void {
   // queue planet to refresh
-  let meta = getMeta(event.block.timestamp.toI32());
+  let meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
   addToPlanetRefreshQueue(meta, event.params.loc);
   meta.save();
 
@@ -228,7 +237,7 @@ export function handlePlanetSilverWithdrawn(event: PlanetSilverWithdrawn): void 
 
 export function handleLocationRevealed(event: LocationRevealed): void {
   // queue planet to refresh
-  let meta = getMeta(event.block.timestamp.toI32());
+  let meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
   addToPlanetRefreshQueue(meta, event.params.loc);
   meta.save();
 
@@ -399,12 +408,12 @@ function refreshTouchedArtifacts(meta: Meta): void {
     let rawArtifactRes = getters.try_getArtifactById(artifactDecIds[i]);
     if (rawArtifactRes.reverted) {
       let artifactId = hexStringToPaddedUnprefixed(artifactDecIds[i].toHexString());
-      let artifact = Artifact.load(artifactId) as Artifact;
-      artifact.owner = toLowercase(CORE_CONTRACT_ADDRESS);
-      artifact.onPlanet = null;
-      artifact.onVoyage = null;
-      artifact.wormholeTo = null;
-      artifact.save();
+      let revertedCall = new RevertedArtifactCall(
+        BigInt.fromI32(meta.blockNumber).toString() + '-' + artifactId
+      );
+      revertedCall.block = meta.blockNumber;
+      revertedCall.artifactID = artifactId;
+      revertedCall.save();
     } else {
       let artifact = refreshArtifactFromContractData(
         artifactDecIds[i],
@@ -457,13 +466,12 @@ function addNewDepartures(meta: Meta): void {
   meta.save();
 }
 
-function getMeta(timestamp: i32): Meta {
+function getMeta(timestamp: i32, blockNumber: i32): Meta {
   let meta = Meta.load('0');
 
   if (meta === null) {
     // not instantiated yet, so instantiate it
     meta = new Meta('0');
-    meta.lastProcessed = timestamp;
     meta._currentlyRefreshingPlanets = [];
     meta._currentlyAddingVoyages = [];
     meta._currentlyRefreshingArtifacts = [];
@@ -482,5 +490,7 @@ function getMeta(timestamp: i32): Meta {
     coreContract.lastRevealTimestamp = 0;
     coreContract.save();
   }
+  meta.lastProcessed = timestamp;
+  meta.blockNumber = blockNumber;
   return meta as Meta;
 }

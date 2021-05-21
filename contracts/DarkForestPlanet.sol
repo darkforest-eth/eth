@@ -630,11 +630,7 @@ library DarkForestPlanet {
         if (shouldDeactivateAndBurn) {
             artifact.lastDeactivated = block.timestamp; // immediately deactivate
             s().tokens.updateArtifact(artifact); // save artifact state immediately, because _takeArtifactOffPlanet will access pull it from tokens contract
-            emit ArtifactDeactivated(
-                msg.sender,
-                DarkForestUtils.getActiveArtifact(locationId).id,
-                locationId
-            );
+            emit ArtifactDeactivated(msg.sender, artifactId, locationId);
             // burn it after use. will be owned by contract but not on a planet anyone can control
             DarkForestUtils._takeArtifactOffPlanet(artifactId, locationId);
         } else {

@@ -274,7 +274,7 @@ const compose: DFContainerCreateOptions[] = [
   {
     name: 'thegraph_graph-node',
     stdout: true,
-    Image: 'graphprotocol/graph-node:latest',
+    Image: 'graphprotocol/graph-node:bf1bd38', // as of 5/21, `latest` tagged container is broken
     HostConfig: {
       PortBindings: {
         '8000/tcp': [{ HostPort: '8000' }],

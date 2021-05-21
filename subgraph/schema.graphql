@@ -88,12 +88,22 @@ type Meta @entity {
   id: ID!
   "the last block timestamp in seconds that was processed"
   lastProcessed: Int!
+  "last block number processed"
+  blockNumber: Int!
   "Internal use only: the planet IDs we need to refresh with contract data"
   _currentlyRefreshingPlanets: [BigInt!]!
   "Internal use only: the artifact IDs we need to refresh with contract data"
   _currentlyRefreshingArtifacts: [BigInt!]!
   "Internal use only: the voyage IDs we need to refresh with contract data"
   _currentlyAddingVoyages: [BigInt!]!
+}
+
+# TODO production: remove this entity
+"for debugging"
+type RevertedArtifactCall @entity {
+  id: ID!
+  block: Int!
+  artifactID: String!
 }
 
 type Arrival @entity {
