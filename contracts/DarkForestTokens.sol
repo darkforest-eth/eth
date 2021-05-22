@@ -21,7 +21,7 @@ contract DarkForestTokens is ERC721Upgradeable {
     function initialize(address _coreAddress, address _adminAddress) public initializer {
         coreAddress = _coreAddress;
         adminAddress = _adminAddress;
-        _setBaseURI("https://zkga.me/token-uri/artifact/");
+        _setBaseURI("https://api.zkga.me/token-uri/artifact/");
     }
 
     function createArtifact(DarkForestTypes.DFTCreateArtifactArgs memory args)
@@ -87,9 +87,5 @@ contract DarkForestTokens is ERC721Upgradeable {
 
     function doesArtifactExist(uint256 tokenId) public view returns (bool) {
         return _exists(tokenId);
-    }
-
-    function setBaseUri() public {
-        _setBaseURI("https://zkga.me/token-uri/artifact/");
     }
 }

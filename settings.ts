@@ -84,7 +84,7 @@ export const Initializers = yup
     BIOME_THRESHOLD_1: yup.number().default(15),
     BIOME_THRESHOLD_2: yup.number().default(17),
     PLANET_RARITY: yup.number().default(16384),
-    PHOTOID_ACTIVATION_DELAY: yup.number().default(60 * 60 * 24),
+    PHOTOID_ACTIVATION_DELAY: yup.number().default(60 * 60 * 12),
     LOCATION_REVEAL_COOLDOWN: yup.number().default(60 * 60 * 24),
     PLANET_TYPE_WEIGHTS: yup
       .array(yup.array(yup.array(yup.number().min(0).max(255)).length(5)).length(10))

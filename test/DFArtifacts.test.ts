@@ -112,7 +112,7 @@ describe('DarkForestArtifacts', function () {
     const artifactsOnPlanet = await world.contracts.core.planetArtifacts(planetWithArtifact1Id);
     const tokenUri = await world.contracts.tokens.tokenURI(artifactsOnPlanet[0]);
 
-    expect(tokenUri).to.eq('https://zkga.me/token-uri/artifact/' + artifactsOnPlanet);
+    expect(tokenUri).to.eq('https://api.zkga.me/token-uri/artifact/' + artifactsOnPlanet);
   });
 
   it('should be able to withdraw from / deposit onto trading posts you own', async function () {

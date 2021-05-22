@@ -19,10 +19,7 @@ import {
   ArtifactActivated,
   ArtifactDeactivated,
 } from '../generated/DarkForestCore/DarkForestCore';
-import {
-  DarkForestGetters,
-  DarkForestGetters__bulkGetArtifactsByIdsResultRetStruct,
-} from '../generated/DarkForestCore/DarkForestGetters';
+import { DarkForestGetters } from '../generated/DarkForestCore/DarkForestGetters';
 
 import { CORE_CONTRACT_ADDRESS, GETTERS_CONTRACT_ADDRESS } from '@darkforest_eth/contracts';
 
@@ -386,30 +383,15 @@ function refreshTouchedArtifacts(meta: Meta): void {
   }
 
   let getters = DarkForestGetters.bind(Address.fromString(GETTERS_CONTRACT_ADDRESS));
-  // TODO production: uncomment the following line
-  // let rawArtifacts = getters.bulkGetArtifactsByIds(meta._currentlyRefreshingArtifacts);
+  let rawArtifacts = getters.bulkGetArtifactsByIds(meta._currentlyRefreshingArtifacts);
   // in AS we can't index into meta._currentlyRefreshingArtifacts within a for loop
   // (see https://github.com/AssemblyScript/assemblyscript/issues/222)
   // so we copy into memory array and index into that
   let artifactDecIds = meta._currentlyRefreshingArtifacts.map<BigInt>((x) => x);
   for (let i = 0; i < meta._currentlyRefreshingArtifacts.length; i++) {
-    // TODO production: uncomment these lines
-    /*
     let rawData = rawArtifacts[i];
     let artifact = refreshArtifactFromContractData(artifactDecIds[i], rawData);
     artifact.save();
-    */
-    // TODO production: kill the below. this is just because the staging getter is bad :/
-    let rawArtifactRes = getters.try_getArtifactById(artifactDecIds[i]);
-    if (rawArtifactRes.reverted) {
-      // do nothing here
-    } else {
-      let artifact = refreshArtifactFromContractData(
-        artifactDecIds[i],
-        rawArtifactRes.value as DarkForestGetters__bulkGetArtifactsByIdsResultRetStruct
-      );
-      artifact.save();
-    }
   }
 
   meta._currentlyRefreshingArtifacts = [];

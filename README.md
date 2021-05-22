@@ -38,7 +38,7 @@ To run the tests run `yarn test`
 To deploy contracts locally, you'll need to run 2 commands:
 
 1. Start a node by running `yarn hardhat:node`
-2. Then (in another terminal) deploy contracts by running `yarn hardhat:dev deploy`
+2. Then (in another terminal) deploy contracts by running `yarn hardhat:dev deploy --whitelist false`
 
 You can import the private key of one of the accounts `hardhat node` created and funded, which are printed when you started the node such as:
 

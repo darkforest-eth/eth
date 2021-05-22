@@ -57,7 +57,7 @@ extendEnvironment((env: HardhatRuntimeEnvironment) => {
 // The xdai config, but it isn't added to networks unless we have a DEPLOYER_MNEMONIC
 const xdai = {
   // Using our archive node instead of https://rpc.xdaichain.com/ until fixed
-  url: 'https://rpc.xdaichain.com/',
+  url: 'https://xdai-archive-df.xdaichain.com/',
   accounts: {
     mnemonic: DEPLOYER_MNEMONIC,
   },

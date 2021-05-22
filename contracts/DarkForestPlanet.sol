@@ -418,7 +418,12 @@ library DarkForestPlanet {
             "Tried to move more silver than what exists"
         );
 
-        require(s().planetArtifacts[args.newLoc].length < 5, "too many artifacts on this planet");
+        if (args.movedArtifactId != 0) {
+            require(
+                s().planetArtifacts[args.newLoc].length < 5,
+                "too many artifacts on this planet"
+            );
+        }
 
         uint256 effectiveDistTimesHundred = args.maxDist * 100; // for precision
         DarkForestTypes.ArrivalType arrivalType = DarkForestTypes.ArrivalType.Normal;

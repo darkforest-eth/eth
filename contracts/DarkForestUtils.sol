@@ -164,7 +164,6 @@ library DarkForestUtils {
 
         DarkForestTypes.ArtifactType artifactType = DarkForestTypes.ArtifactType.Pyramid;
 
-        // simple artifacts
         if (lastByteOfSeed < 39) {
             artifactType = DarkForestTypes.ArtifactType.Monolith;
         } else if (lastByteOfSeed < 78) {
@@ -173,16 +172,28 @@ library DarkForestUtils {
             artifactType = DarkForestTypes.ArtifactType.Spaceship;
         } else if (lastByteOfSeed < 156) {
             artifactType = DarkForestTypes.ArtifactType.Pyramid;
-        } else if (lastByteOfSeed < 176) {
+        } else if (lastByteOfSeed < 171) {
             artifactType = DarkForestTypes.ArtifactType.Wormhole;
-        } else if (lastByteOfSeed < 196) {
+        } else if (lastByteOfSeed < 186) {
             artifactType = DarkForestTypes.ArtifactType.PlanetaryShield;
-        } else if (lastByteOfSeed < 216) {
+        } else if (lastByteOfSeed < 201) {
             artifactType = DarkForestTypes.ArtifactType.PhotoidCannon;
-        } else if (lastByteOfSeed < 236) {
+        } else if (lastByteOfSeed < 216) {
             artifactType = DarkForestTypes.ArtifactType.BloomFilter;
-        } else {
+        } else if (lastByteOfSeed < 231) {
             artifactType = DarkForestTypes.ArtifactType.BlackDomain;
+        } else {
+            if (biome == DarkForestTypes.Biome.Ice) {
+                artifactType = DarkForestTypes.ArtifactType.PlanetaryShield;
+            } else if (biome == DarkForestTypes.Biome.Lava) {
+                artifactType = DarkForestTypes.ArtifactType.PhotoidCannon;
+            } else if (biome == DarkForestTypes.Biome.Wasteland) {
+                artifactType = DarkForestTypes.ArtifactType.BloomFilter;
+            } else if (biome == DarkForestTypes.Biome.Corrupted) {
+                artifactType = DarkForestTypes.ArtifactType.BlackDomain;
+            } else {
+                artifactType = DarkForestTypes.ArtifactType.Wormhole;
+            }
         }
 
         uint256 bonus = 0;
