@@ -157,26 +157,89 @@ async function deploySave(
   const addrFileContents = prettier.format(
     `
   /**
-   * Network information
+   * This package contains deployed contract addresses, ABIs, and Typechain types
+   * for the Dark Forest game.
+   *
+   * ## Installation
+   *
+   * You can install this package using [\`npm\`](https://www.npmjs.com) or
+   * [\`yarn\`](https://classic.yarnpkg.com/lang/en/) by running:
+   *
+   * \`\`\`bash
+   * npm install --save @darkforest_eth/contracts
+   * \`\`\`
+   * \`\`\`bash
+   * yarn add @darkforest_eth/contracts
+   * \`\`\`
+   *
+   * When using this in a plugin, you might want to load it with [skypack](https://www.skypack.dev)
+   *
+   * \`\`\`js
+   * import * as contracts from 'http://cdn.skypack.dev/@darkforest_eth/contracts'
+   * \`\`\`
+   *
+   * ## Typechain
+   *
+   * The Typechain types can be found in the \`typechain\` directory.
+   *
+   * ## ABIs
+   *
+   * The contract ABIs can be found in the \`abis\` directory.
+   *
+   * @packageDocumentation
+   */
+
+  /**
+   * The name of the network where these contracts are deployed.
    */
   export const NETWORK = '${hre.network.name}';
+  /**
+   * The id of the network where these contracts are deployed.
+   */
   export const NETWORK_ID = ${hre.network.config.chainId};
+  /**
+   * The block in which the DarkForestCore contract was deployed.
+   */
   export const START_BLOCK = ${isDev ? 0 : args.coreBlockNumber};
   /**
-   * Library addresses
+   * The address for the DarkForestUtils library.
    */
   export const UTILS_LIBRARY_ADDRESS = '${args.libraries.utils.address}';
+  /**
+   * The address for the DarkForestPlanet library.
+   */
   export const PLANET_LIBRARY_ADDRESS = '${args.libraries.planet.address}';
+  /**
+   * The address for the Verifier library.
+   */
   export const VERIFIER_LIBRARY_ADDRESS = '${args.libraries.verifier.address}';
+  /**
+   * The address for the DarkForestInitialize library.
+   */
   export const INITIALIZE_LIBRARY_ADDRESS = '${args.libraries.initialize.address}';
+  /**
+   * The address for the DarkForestLazyUpdate library.
+   */
   export const LAZY_UPDATE_LIBRARY_ADDRESS = '${args.libraries.lazyUpdate.address}';
   /**
-   * Contract addresses
+   * The address for the DarkForestCore contract.
    */
   export const CORE_CONTRACT_ADDRESS = '${args.coreAddress}';
+  /**
+   * The address for the DarkForestTokens contract.
+   */
   export const TOKENS_CONTRACT_ADDRESS = '${args.tokensAddress}';
+  /**
+   * The address for the DarkForestGetters contract.
+   */
   export const GETTERS_CONTRACT_ADDRESS = '${args.gettersAddress}';
+  /**
+   * The address for the Whitelist contract.
+   */
   export const WHITELIST_CONTRACT_ADDRESS = '${args.whitelistAddress}';
+  /**
+   * The address for the DarkForestGPTCredit contract.
+   */
   export const GPT_CREDIT_CONTRACT_ADDRESS = '${args.gptCreditAddress}';
   `,
     { ...options, parser: 'babel-ts' }
