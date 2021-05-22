@@ -3,6 +3,23 @@ import { task, types, subtask } from 'hardhat/config';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import type { Whitelist } from '../task-types';
 
+import * as fs from 'fs';
+
+task('whitelist:changeDrip', 'change the faucet amount for whitelisted players')
+  .addPositionalParam('value', 'drip value (in ether or xDAI)', undefined, types.float)
+  .setAction(changeDrip);
+
+async function changeDrip(args: { value: number }, hre: HardhatRuntimeEnvironment) {
+  await hre.run('utils:assertChainId');
+
+  const whitelist: Whitelist = await hre.run('utils:getWhitelist');
+
+  const txReceipt = await whitelist.changeDrip(hre.ethers.utils.parseEther(args.value.toString()));
+  await txReceipt.wait();
+
+  console.log(`changed drip to ${args.value}`);
+}
+
 task('whitelist:generate', 'create n keys and add to whitelist contract')
   .addPositionalParam('number', 'number of keys', undefined, types.int)
   .setAction(whitelistGenerate);
@@ -35,6 +52,10 @@ async function whitelistGenerate(args: { number: number }, hre: HardhatRuntimeEn
 
   console.log('generated keys: ');
   console.log(allKeys);
+
+  for (const key of allKeys) {
+    fs.appendFileSync('./keys.txt', key + '\n');
+  }
 }
 
 task('whitelist:exists', 'check if previously whitelisted')
