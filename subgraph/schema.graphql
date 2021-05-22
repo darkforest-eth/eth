@@ -74,6 +74,10 @@ type Planet @entity {
   artifacts: [Artifact!]! @derivedFrom(field: "onPlanet")
   activatedArtifact: Artifact
   incomingWormholes: [Artifact!]! @derivedFrom(field: "wormholeTo")
+
+  # voyages
+  voyagesFrom: [Arrival!]! @derivedFrom(field: "fromPlanet")
+  voyagesTo: [Arrival!]! @derivedFrom(field: "toPlanet")
 }
 
 "Scheduled arrivals by arrival blocktime"
@@ -96,14 +100,6 @@ type Meta @entity {
   _currentlyRefreshingArtifacts: [BigInt!]!
   "Internal use only: the voyage IDs we need to refresh with contract data"
   _currentlyAddingVoyages: [BigInt!]!
-}
-
-# TODO production: remove this entity
-"for debugging"
-type RevertedArtifactCall @entity {
-  id: ID!
-  block: Int!
-  artifactID: String!
 }
 
 type Arrival @entity {

@@ -78,11 +78,8 @@ function updatePlanetToTime(planet: Planet, atTimeS: i32): Planet {
   return planet;
 }
 
-export function arrive(
-  toPlanet: Planet,
-  arrival: Arrival,
-  artifact: Artifact = new Artifact('0')
-): Planet {
+// applies arrival to a planet. modifies planet, but not arrival or artifact (if one exists)
+export function arrive(toPlanet: Planet, arrival: Arrival): Planet {
   // update toPlanet energy and silver right before arrival
   toPlanet = updatePlanetToTime(toPlanet, arrival.arrivalTime);
 
@@ -116,15 +113,6 @@ export function arrive(
   } else {
     toPlanet.milliSilverLazy += arrival.milliSilverMoved;
   }
-
-  // move artifact if necessary
-  if (artifact.id !== '0000000000000000000000000000000000000000000000000000000000000000') {
-    artifact.onVoyage = null;
-    artifact.onPlanet = toPlanet.id;
-  }
-
-  // mark arrival as arrived
-  arrival.arrived = true;
 
   return toPlanet;
 }

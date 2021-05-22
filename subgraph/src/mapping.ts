@@ -26,16 +26,7 @@ import {
 
 import { CORE_CONTRACT_ADDRESS, GETTERS_CONTRACT_ADDRESS } from '@darkforest_eth/contracts';
 
-import {
-  Arrival,
-  ArrivalQueue,
-  Meta,
-  Player,
-  Planet,
-  Hat,
-  Artifact,
-  RevertedArtifactCall,
-} from '../generated/schema';
+import { Arrival, ArrivalQueue, Meta, Player, Planet, Hat, Artifact } from '../generated/schema';
 import { hexStringToPaddedUnprefixed, toLowercase } from './helpers/converters';
 import {
   refreshArtifactFromContractData,
@@ -148,6 +139,7 @@ export function handleBlock(block: ethereum.Block): void {
   addNewDepartures(meta);
 
   meta.lastProcessed = current;
+  meta.blockNumber = block.number.toI32();
   meta.save();
 }
 
@@ -266,35 +258,38 @@ function processScheduledArrivalsSinceLastBlock(meta: Meta, current: i32): void 
       let arrivals = bucket.arrivals.map<Arrival | null>((aid) => Arrival.load(aid));
 
       for (let i = 0; i < arrivals.length; i++) {
-        let a = arrivals[i];
+        let arrival = arrivals[i];
 
-        if (!a) {
+        if (!arrival) {
           log.error('attempting to process unknown arrival', []);
           throw new Error();
         }
 
-        let toPlanet = Planet.load(a.toPlanet);
+        let toPlanet = Planet.load(arrival.toPlanet);
         if (!toPlanet) {
-          log.error('attempting to process unknown planet: {}', [a.toPlanet]);
+          log.error('attempting to process unknown planet: {}', [arrival.toPlanet]);
           throw new Error();
         }
 
-        if (a.carriedArtifact) {
-          let artifact = Artifact.load(a.carriedArtifact);
+        toPlanet = arrive(toPlanet as Planet, arrival as Arrival);
+        toPlanet.save();
+
+        arrival.arrived = true;
+        arrival.save();
+
+        if (arrival.carriedArtifact) {
+          let artifact = Artifact.load(arrival.carriedArtifact);
           if (artifact) {
-            toPlanet = arrive(toPlanet as Planet, a as Arrival, artifact as Artifact);
+            artifact.onVoyage = null;
+            artifact.onPlanet = toPlanet.id;
             artifact.save();
           } else {
-            log.error('attempting to process arrival with unknown artifact: {}', [
-              a.carriedArtifact,
+            log.error('attempting to move apply arrival with artifact: {}', [
+              arrival.carriedArtifact,
             ]);
             throw new Error();
           }
-        } else {
-          toPlanet = arrive(toPlanet as Planet, a as Arrival); // we know these aren't null but AS gets mad
         }
-        a.save();
-        toPlanet.save();
       }
     }
   }
@@ -407,13 +402,7 @@ function refreshTouchedArtifacts(meta: Meta): void {
     // TODO production: kill the below. this is just because the staging getter is bad :/
     let rawArtifactRes = getters.try_getArtifactById(artifactDecIds[i]);
     if (rawArtifactRes.reverted) {
-      let artifactId = hexStringToPaddedUnprefixed(artifactDecIds[i].toHexString());
-      let revertedCall = new RevertedArtifactCall(
-        BigInt.fromI32(meta.blockNumber).toString() + '-' + artifactId
-      );
-      revertedCall.block = meta.blockNumber;
-      revertedCall.artifactID = artifactId;
-      revertedCall.save();
+      // do nothing here
     } else {
       let artifact = refreshArtifactFromContractData(
         artifactDecIds[i],
@@ -472,6 +461,8 @@ function getMeta(timestamp: i32, blockNumber: i32): Meta {
   if (meta === null) {
     // not instantiated yet, so instantiate it
     meta = new Meta('0');
+    meta.lastProcessed = timestamp;
+    meta.blockNumber = blockNumber;
     meta._currentlyRefreshingPlanets = [];
     meta._currentlyAddingVoyages = [];
     meta._currentlyRefreshingArtifacts = [];
@@ -490,7 +481,5 @@ function getMeta(timestamp: i32, blockNumber: i32): Meta {
     coreContract.lastRevealTimestamp = 0;
     coreContract.save();
   }
-  meta.lastProcessed = timestamp;
-  meta.blockNumber = blockNumber;
   return meta as Meta;
 }
