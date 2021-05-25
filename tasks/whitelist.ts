@@ -40,11 +40,19 @@ async function whitelistGenerate(args: { number: number }, hre: HardhatRuntimeEn
     const keys: string[] = generateKeys(keysToGenerate);
     const hashes: string[] = keys.map((x) => hre.ethers.utils.id(x));
 
-    const akReceipt = await whitelist.addKeys(hashes);
-    await akReceipt.wait();
+    try {
+      const akReceipt = await whitelist.addKeys(hashes);
+      await akReceipt.wait();
 
-    allKeys = allKeys.concat(keys);
-    keysGenerated += keysPerTx;
+      allKeys = allKeys.concat(keys);
+      keysGenerated += keysPerTx;
+
+      for (const key of keys) {
+        fs.appendFileSync('./keys.txt', key + '\n');
+      }
+    } catch (e) {
+      console.log(`Error generating keyset ${i}: ${e}`);
+    }
   }
 
   const balance = await hre.ethers.provider.getBalance(whitelist.address);
@@ -52,10 +60,6 @@ async function whitelistGenerate(args: { number: number }, hre: HardhatRuntimeEn
 
   console.log('generated keys: ');
   console.log(allKeys);
-
-  for (const key of allKeys) {
-    fs.appendFileSync('./keys.txt', key + '\n');
-  }
 }
 
 task('whitelist:exists', 'check if previously whitelisted')
