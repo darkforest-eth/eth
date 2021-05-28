@@ -4,7 +4,7 @@ type Player @entity {
   initTimestamp: Int!
   "allows null because 0x0000000000000000000000000000000000000000 has no homeWorld"
   homeWorld: Planet
-  milliWithdrawnSilver: Int!
+  milliWithdrawnSilver: BigInt!
   lastRevealTimestamp: Int!
   planets: [Planet!]! @derivedFrom(field: "owner")
   sentVoyages: [Arrival!]! @derivedFrom(field: "player")
@@ -32,17 +32,17 @@ type Planet @entity {
   "Value divided by 100 for percentage. Less than 100 is negative"
   defense: Int!
   "NOTE: This needs to be divided by 1000. NOTE: This is stored lazily and needs to be updated from lastUpdated to current time"
-  milliEnergyLazy: Int!
+  milliEnergyLazy: BigInt!
   "NOTE: This needs to be divided by 1000"
-  milliEnergyCap: Int!
+  milliEnergyCap: BigInt!
   "NOTE: This needs to be divided by 1000"
-  milliEnergyGrowth: Int!
+  milliEnergyGrowth: BigInt!
   "NOTE: This needs to be divided by 1000. NOTE: This is stored lazily and needs to be updated from lastUpdated to current time"
-  milliSilverLazy: Int!
+  milliSilverLazy: BigInt!
   "NOTE: This needs to be divided by 1000"
-  milliSilverCap: Int!
+  milliSilverCap: BigInt!
   "NOTE: This needs to be divided by 1000"
-  milliSilverGrowth: Int!
+  milliSilverGrowth: BigInt!
   planetLevel: Int!
   defenseUpgrades: Int!
   rangeUpgrades: Int!
@@ -111,9 +111,9 @@ type Arrival @entity {
   fromPlanet: Planet!
   toPlanet: Planet!
   "NOTE: This needs to be divided by 1000"
-  milliEnergyArriving: Int!
+  milliEnergyArriving: BigInt!
   "NOTE: This needs to be divided by 1000"
-  milliSilverMoved: Int!
+  milliSilverMoved: BigInt!
   "Seconds since epoch, needs to be multiplied by 1000 for javascript representation"
   departureTime: Int!
   "Seconds since epoch, needs to be multiplied by 1000 for javascript representation"
