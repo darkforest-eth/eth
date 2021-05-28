@@ -432,7 +432,7 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
 
         uint256 cost = (1 << s.planetsExtendedInfo[_location].hatLevel) * 1 ether;
 
-        require(msg.value >= cost, "Insufficient value sent");
+        require(msg.value == cost, "Wrong value sent");
 
         s.planetsExtendedInfo[_location].hatLevel += 1;
         emit PlanetHatBought(msg.sender, _location, s.planetsExtendedInfo[_location].hatLevel);

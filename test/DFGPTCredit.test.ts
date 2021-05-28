@@ -29,6 +29,19 @@ describe('DarkForestGPTCredit', function () {
     expect(await world.contracts.gptCredits.credits(world.user1.address)).to.equal(creditsToBuy);
   });
 
+  it('should reject GPT credit purchase with not enough xDAI', async function () {
+    const creditPrice = await world.contracts.gptCredits.creditPrice();
+
+    expect(await world.contracts.gptCredits.credits(world.user1.address)).to.equal(BN_ZERO);
+
+    const creditsToBuy = 5;
+    const buyTxPromise = world.user1GPTCredit.buyCredits(creditsToBuy, {
+      value: creditPrice.mul(creditsToBuy - 1).toString(),
+    });
+
+    await expect(buyTxPromise).to.be.revertedWith('Wrong value sent');
+  });
+
   it('should allow admin (and only admin) to decrease player credits', async function () {
     const creditPrice = await world.contracts.gptCredits.creditPrice();
     const creditsToBuy = 5;

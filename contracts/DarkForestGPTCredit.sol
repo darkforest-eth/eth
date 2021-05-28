@@ -65,7 +65,7 @@ contract DarkForestGPTCredit is Initializable {
 
         uint256 cost = amount * creditPrice;
         require(cost / amount == creditPrice, "multiplication overflow");
-        require(msg.value >= cost, "Insufficient value sent");
+        require(msg.value == cost, "Wrong value sent");
 
         require(credits[msg.sender] + amount >= credits[msg.sender], "addition overflow");
         credits[msg.sender] = credits[msg.sender] + amount;

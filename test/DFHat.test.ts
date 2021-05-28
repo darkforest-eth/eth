@@ -57,7 +57,7 @@ describe('DarkForestHat', function () {
       world.user1Core.buyHat(planetId, {
         value: '1500000000000000000',
       })
-    ).to.be.revertedWith('Insufficient value sent');
+    ).to.be.revertedWith('Wrong value sent');
   });
 
   it('should allow admin to withdraw all funds', async function () {
