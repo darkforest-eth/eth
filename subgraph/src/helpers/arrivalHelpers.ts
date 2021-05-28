@@ -37,6 +37,11 @@ function getEnergyAtTime(planet: Planet, atTimeS: i32): BigInt {
     return planet.milliEnergyLazy;
   }
 
+  // we divide by energyGro further down, so special case to avoid div by 0
+  if (planet.milliEnergyGrowth.equals(BigInt.fromI32(0))) {
+    return planet.milliEnergyLazy;
+  }
+
   if (planet.milliEnergyLazy.equals(BigInt.fromI32(0))) {
     return BigInt.fromI32(0);
   }
