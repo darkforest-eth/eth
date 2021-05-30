@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import {
+  conquerUnownedPlanet,
   hexToBigNumber,
   increaseBlockchainTime,
   makeInitArgs,
@@ -16,6 +17,7 @@ import {
   silverStar1,
   star1,
   outOfBoundsLocation,
+  silverBank1,
 } from './utils/WorldConstants';
 import { initializeWorld, World } from './utils/TestWorld';
 
@@ -272,6 +274,36 @@ describe('move to friendly planet', function () {
 
     expect((await world.contracts.core.planets(toId2)).silver).to.be.above(oldSilverValue);
     expect((await world.contracts.core.planets(toId2)).silver).to.be.below(silverCap);
+  });
+
+  it('should not allow overpopulation of quasars', async function () {
+    const planetId = hexToBigNumber(star1.hex);
+    const quasarId = hexToBigNumber(silverBank1.hex);
+
+    await conquerUnownedPlanet(world, world.user1Core, asteroid1, star1);
+    await conquerUnownedPlanet(world, world.user1Core, asteroid1, silverBank1);
+
+    const star1Data = await world.contracts.core.planets(planetId);
+    for (let i = 0; i < 15; i++) {
+      await increaseBlockchainTime();
+      await world.user1Core.move(
+        ...makeMoveArgs(star1, silverBank1, 0, star1Data.populationCap.toNumber() * 0.9, 0)
+      );
+    }
+
+    // quasar should be full
+    await increaseBlockchainTime();
+    await world.contracts.core.refreshPlanet(quasarId);
+    let quasarData = await world.contracts.core.planets(quasarId);
+    expect(quasarData.populationCap.toNumber()).to.equal(quasarData.population.toNumber());
+
+    // shouldn't accept any more population
+    await world.user1Core.move(
+      ...makeMoveArgs(star1, silverBank1, 0, star1Data.populationCap.toNumber() * 0.9, 0)
+    );
+    await world.contracts.core.refreshPlanet(quasarId);
+    quasarData = await world.contracts.core.planets(quasarId);
+    expect(quasarData.populationCap.toNumber()).to.equal(quasarData.population.toNumber());
   });
 });
 

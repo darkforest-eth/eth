@@ -96,6 +96,14 @@ library DarkForestLazyUpdate {
         _planet.population = ABDKMath64x64.toUInt(
             ABDKMath64x64.div(ABDKMath64x64.fromUInt(_planet.populationCap), _denominator)
         );
+
+        // quasars have 0 energy growth, so they have 0 energy decay as well
+        // so don't allow them to become overful
+        if (_planet.planetType == DarkForestTypes.PlanetType.SILVER_BANK) {
+            if (_planet.population > _planet.populationCap) {
+                _planet.population = _planet.populationCap;
+            }
+        }
     }
 
     function updatePlanet(uint256 _location, uint256 _updateToTime) public {
@@ -148,6 +156,14 @@ library DarkForestLazyUpdate {
                     // make sure pop is never 0
                     _planet.population = 1;
                 }
+            }
+        }
+
+        // quasars have 0 energy growth, so they have 0 energy decay as well
+        // so don't allow them to become overful
+        if (_planet.planetType == DarkForestTypes.PlanetType.SILVER_BANK) {
+            if (_planet.population > _planet.populationCap) {
+                _planet.population = _planet.populationCap;
             }
         }
 

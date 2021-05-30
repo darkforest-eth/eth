@@ -310,6 +310,7 @@ describe('DarkForestPlanet', function () {
     const quasarData = await world.contracts.core.planets(quasarId);
 
     // debuffs
+    expect(quasarData.planetType).to.be.equal(4);
     expect(Math.floor(planetData.silverCap.toNumber() * 10)).to.be.equal(
       quasarData.silverCap.toNumber()
     );
