@@ -432,6 +432,8 @@ library DarkForestPlanet {
         {
             DarkForestTypes.Artifact memory relevantWormhole;
 
+            // TODO: take the greater rarity of these, or disallow wormholes between planets that
+            // already have a wormhole between them
             if (
                 activeArtifactFrom.isInitialized &&
                 activeArtifactFrom.artifactType == DarkForestTypes.ArtifactType.Wormhole &&
