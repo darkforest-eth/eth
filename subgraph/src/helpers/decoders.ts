@@ -122,9 +122,13 @@ export function refreshArtifactFromContractData(
   let artifact = Artifact.load(artifactId) || new Artifact(artifactId);
 
   artifact.idDec = artifactIdDec;
-  artifact.planetDiscoveredOn = hexStringToPaddedUnprefixed(
-    rawArtifact.artifact.planetDiscoveredOn.toHexString()
-  );
+  if (rawArtifact.artifact.planetDiscoveredOn.equals(BigInt.fromI32(0))) {
+    artifact.planetDiscoveredOn = null;
+  } else {
+    artifact.planetDiscoveredOn = hexStringToPaddedUnprefixed(
+      rawArtifact.artifact.planetDiscoveredOn.toHexString()
+    );
+  }
   artifact.rarity = toArtifactRarity(rawArtifact.artifact.rarity);
   artifact.planetBiome = toBiome(rawArtifact.artifact.planetBiome);
   artifact.mintedAtTimestamp = rawArtifact.artifact.mintedAtTimestamp.toI32();

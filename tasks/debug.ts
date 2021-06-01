@@ -29,6 +29,12 @@ task('debug:giveArtifact', 'gives the player some amount of a particular type of
   .addPositionalParam('amount', 'the amount of this artifact to give', 1, types.int)
   .addPositionalParam('rarity', 'the rarity of the artifact to give', 1, types.int)
   .addPositionalParam('biome', 'the biome of the artifact to give', 1, types.int)
+  .addPositionalParam(
+    'discoveredOn',
+    'the planet ID (decimal string) this was discovered on',
+    '0',
+    types.string
+  )
   .setAction(giveArtifact);
 
 async function giveArtifact(
@@ -38,7 +44,15 @@ async function giveArtifact(
     amount,
     rarity,
     biome,
-  }: { playerAddress: string; artifactType: string; amount: number; rarity: number; biome: number },
+    discoveredOn,
+  }: {
+    playerAddress: string;
+    artifactType: string;
+    amount: number;
+    rarity: number;
+    biome: number;
+    discoveredOn: string;
+  },
   hre: HardhatRuntimeEnvironment
 ) {
   const chosenArtifactType = artifactOptions.indexOf(artifactType) + 1;
@@ -49,7 +63,7 @@ async function giveArtifact(
     const createArtifactArgs = {
       tokenId: random256Id(),
       discoverer: playerAddress,
-      planetId: '0',
+      planetId: discoveredOn,
       rarity: rarity,
       biome: biome,
       artifactType: chosenArtifactType,
@@ -58,14 +72,6 @@ async function giveArtifact(
 
     await (await tokens.createArtifact(createArtifactArgs)).wait();
   }
-}
-
-task('debug:specialSetAdmin', 'set admin to 0x5D...').setAction(specialSetAdmin);
-
-async function specialSetAdmin({}, hre: HardhatRuntimeEnvironment) {
-  const tokens: DarkForestTokens = await hre.run('utils:getTokens');
-
-  await (await tokens.specialSetAdmin()).wait();
 }
 
 // yarn workspace eth hardhat:dev debug:giveOneOfEachArtifact "0x5bcf0ac4c057dcaf9b23e4dd7cb7b035a71dd0dc" 10
@@ -89,7 +95,14 @@ async function giveOneOfEachArtifact(
   for (const artifact of artifactOptions) {
     for (let i = 1; i < 6; i++) {
       await giveArtifact(
-        { playerAddress, artifactType: artifact, amount: 1, rarity: i, biome },
+        {
+          playerAddress,
+          artifactType: artifact,
+          amount: 1,
+          rarity: i,
+          biome,
+          discoveredOn: '0',
+        },
         hre
       );
     }

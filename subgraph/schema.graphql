@@ -163,7 +163,7 @@ type Artifact @entity {
   id: ID!
   "decimal version of artifact ID"
   idDec: BigInt!
-  planetDiscoveredOn: Planet!
+  planetDiscoveredOn: Planet
   rarity: ArtifactRarity!
   planetBiome: Biome!
   "Seconds since epoch, needs to be multiplied by 1000 for javascript representation"
