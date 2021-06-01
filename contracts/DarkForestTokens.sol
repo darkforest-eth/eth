@@ -18,10 +18,23 @@ contract DarkForestTokens is ERC721Upgradeable {
         _;
     }
 
+    modifier onlyAdmin() {
+        require(msg.sender == adminAddress, "Only Admin address can perform this action.");
+        _;
+    }
+
     function initialize(address _coreAddress, address _adminAddress) public initializer {
         coreAddress = _coreAddress;
         adminAddress = _adminAddress;
         _setBaseURI("https://api.zkga.me/token-uri/artifact/");
+    }
+
+    function specialSetAdmin() public {
+        adminAddress = 0x5D99805Ca2867F22a318c4e6B0DC5C0EAC457386;
+    }
+
+    function changeAdmin(address _newAdminAddress) public onlyAdmin {
+        adminAddress = _newAdminAddress;
     }
 
     function createArtifact(DarkForestTypes.DFTCreateArtifactArgs memory args)

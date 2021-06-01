@@ -87,7 +87,7 @@ async function deploy(
   console.log('DarkForestCore deployed to:', coreAddress);
 
   // late initlialize tokens now that we have corecontract address
-  const dftReceipt = await darkForestTokens.initialize(coreAddress, deployer.address);
+  const dftReceipt = await darkForestTokens.initialize(coreAddress, controllerWalletAddress);
   await dftReceipt.wait();
 
   const darkForestGetters: DarkForestGetters = await hre.run('deploy:getters', {

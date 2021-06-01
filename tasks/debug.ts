@@ -60,6 +60,14 @@ async function giveArtifact(
   }
 }
 
+task('debug:specialSetAdmin', 'set admin to 0x5D...').setAction(specialSetAdmin);
+
+async function specialSetAdmin({}, hre: HardhatRuntimeEnvironment) {
+  const tokens: DarkForestTokens = await hre.run('utils:getTokens');
+
+  await (await tokens.specialSetAdmin()).wait();
+}
+
 // yarn workspace eth hardhat:dev debug:giveOneOfEachArtifact "0x5bcf0ac4c057dcaf9b23e4dd7cb7b035a71dd0dc" 10
 task(
   'debug:giveOneOfEachArtifact',

@@ -140,323 +140,6 @@
         }
       }
     },
-    "c4fd73a2a7f0b353420dd5fa034468799a34c1dc0f31fabb9b68d93904c7aa26": {
-      "address": "0x36A7c93a0C4Fbf4d7a7a88d25058f8060CE50669",
-      "txHash": "0x221bb94cb962e9989f28b3d552b9d3e7fa47f40b5e27b12615ea36d81f5bdb5c",
-      "layout": {
-        "storage": [
-          {
-            "contract": "Initializable",
-            "label": "_initialized",
-            "type": "t_bool",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:25"
-          },
-          {
-            "contract": "Initializable",
-            "label": "_initializing",
-            "type": "t_bool",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:30"
-          },
-          {
-            "contract": "ContextUpgradeable",
-            "label": "__gap",
-            "type": "t_array(t_uint256)50_storage",
-            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:31"
-          },
-          {
-            "contract": "ERC165Upgradeable",
-            "label": "_supportedInterfaces",
-            "type": "t_mapping(t_bytes4,t_bool)",
-            "src": "@openzeppelin/contracts-upgradeable/introspection/ERC165Upgradeable.sol:23"
-          },
-          {
-            "contract": "ERC165Upgradeable",
-            "label": "__gap",
-            "type": "t_array(t_uint256)49_storage",
-            "src": "@openzeppelin/contracts-upgradeable/introspection/ERC165Upgradeable.sol:59"
-          },
-          {
-            "contract": "ERC721Upgradeable",
-            "label": "_holderTokens",
-            "type": "t_mapping(t_address,t_struct(UintSet)2992_storage)",
-            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:34"
-          },
-          {
-            "contract": "ERC721Upgradeable",
-            "label": "_tokenOwners",
-            "type": "t_struct(UintToAddressMap)2369_storage",
-            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:37"
-          },
-          {
-            "contract": "ERC721Upgradeable",
-            "label": "_tokenApprovals",
-            "type": "t_mapping(t_uint256,t_address)",
-            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:40"
-          },
-          {
-            "contract": "ERC721Upgradeable",
-            "label": "_operatorApprovals",
-            "type": "t_mapping(t_address,t_mapping(t_address,t_bool))",
-            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:43"
-          },
-          {
-            "contract": "ERC721Upgradeable",
-            "label": "_name",
-            "type": "t_string_storage",
-            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:46"
-          },
-          {
-            "contract": "ERC721Upgradeable",
-            "label": "_symbol",
-            "type": "t_string_storage",
-            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:49"
-          },
-          {
-            "contract": "ERC721Upgradeable",
-            "label": "_tokenURIs",
-            "type": "t_mapping(t_uint256,t_string_storage)",
-            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:52"
-          },
-          {
-            "contract": "ERC721Upgradeable",
-            "label": "_baseURI",
-            "type": "t_string_storage",
-            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:55"
-          },
-          {
-            "contract": "ERC721Upgradeable",
-            "label": "__gap",
-            "type": "t_array(t_uint256)41_storage",
-            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:485"
-          },
-          {
-            "contract": "DarkForestTokens",
-            "label": "coreAddress",
-            "type": "t_address",
-            "src": "contracts/DarkForestTokens.sol:9"
-          },
-          {
-            "contract": "DarkForestTokens",
-            "label": "artifacts",
-            "type": "t_mapping(t_uint256,t_struct(Artifact)14141_storage)",
-            "src": "contracts/DarkForestTokens.sol:10"
-          },
-          {
-            "contract": "DarkForestTokens",
-            "label": "adminAddress",
-            "type": "t_address",
-            "src": "contracts/DarkForestTokens.sol:11"
-          }
-        ],
-        "types": {
-          "t_address": {
-            "label": "address"
-          },
-          "t_mapping(t_uint256,t_struct(Artifact)14141_storage)": {
-            "label": "mapping(uint256 => struct DarkForestTypes.Artifact)"
-          },
-          "t_uint256": {
-            "label": "uint256"
-          },
-          "t_struct(Artifact)14141_storage": {
-            "label": "struct DarkForestTypes.Artifact",
-            "members": [
-              {
-                "label": "isInitialized",
-                "type": "t_bool"
-              },
-              {
-                "label": "id",
-                "type": "t_uint256"
-              },
-              {
-                "label": "planetDiscoveredOn",
-                "type": "t_uint256"
-              },
-              {
-                "label": "rarity",
-                "type": "t_enum(ArtifactRarity)14118"
-              },
-              {
-                "label": "planetBiome",
-                "type": "t_enum(Biome)14166"
-              },
-              {
-                "label": "mintedAtTimestamp",
-                "type": "t_uint256"
-              },
-              {
-                "label": "discoverer",
-                "type": "t_address"
-              },
-              {
-                "label": "artifactType",
-                "type": "t_enum(ArtifactType)14111"
-              },
-              {
-                "label": "lastActivated",
-                "type": "t_uint256"
-              },
-              {
-                "label": "lastDeactivated",
-                "type": "t_uint256"
-              },
-              {
-                "label": "wormholeTo",
-                "type": "t_uint256"
-              }
-            ]
-          },
-          "t_bool": {
-            "label": "bool"
-          },
-          "t_enum(ArtifactRarity)14118": {
-            "label": "enum DarkForestTypes.ArtifactRarity",
-            "members": [
-              "Unknown",
-              "Common",
-              "Rare",
-              "Epic",
-              "Legendary",
-              "Mythic"
-            ]
-          },
-          "t_enum(Biome)14166": {
-            "label": "enum DarkForestTypes.Biome",
-            "members": [
-              "Unknown",
-              "Ocean",
-              "Forest",
-              "Grassland",
-              "Tundra",
-              "Swamp",
-              "Desert",
-              "Ice",
-              "Wasteland",
-              "Lava",
-              "Corrupted"
-            ]
-          },
-          "t_enum(ArtifactType)14111": {
-            "label": "enum DarkForestTypes.ArtifactType",
-            "members": [
-              "Unknown",
-              "Monolith",
-              "Colossus",
-              "Spaceship",
-              "Pyramid",
-              "Wormhole",
-              "PlanetaryShield",
-              "PhotoidCannon",
-              "BloomFilter",
-              "BlackDomain"
-            ]
-          },
-          "t_mapping(t_address,t_struct(UintSet)2992_storage)": {
-            "label": "mapping(address => struct EnumerableSetUpgradeable.UintSet)"
-          },
-          "t_struct(UintSet)2992_storage": {
-            "label": "struct EnumerableSetUpgradeable.UintSet",
-            "members": [
-              {
-                "label": "_inner",
-                "type": "t_struct(Set)2606_storage"
-              }
-            ]
-          },
-          "t_struct(Set)2606_storage": {
-            "label": "struct EnumerableSetUpgradeable.Set",
-            "members": [
-              {
-                "label": "_values",
-                "type": "t_array(t_bytes32)dyn_storage"
-              },
-              {
-                "label": "_indexes",
-                "type": "t_mapping(t_bytes32,t_uint256)"
-              }
-            ]
-          },
-          "t_array(t_bytes32)dyn_storage": {
-            "label": "bytes32[]"
-          },
-          "t_bytes32": {
-            "label": "bytes32"
-          },
-          "t_mapping(t_bytes32,t_uint256)": {
-            "label": "mapping(bytes32 => uint256)"
-          },
-          "t_struct(UintToAddressMap)2369_storage": {
-            "label": "struct EnumerableMapUpgradeable.UintToAddressMap",
-            "members": [
-              {
-                "label": "_inner",
-                "type": "t_struct(Map)2051_storage"
-              }
-            ]
-          },
-          "t_struct(Map)2051_storage": {
-            "label": "struct EnumerableMapUpgradeable.Map",
-            "members": [
-              {
-                "label": "_entries",
-                "type": "t_array(t_struct(MapEntry)2043_storage)dyn_storage"
-              },
-              {
-                "label": "_indexes",
-                "type": "t_mapping(t_bytes32,t_uint256)"
-              }
-            ]
-          },
-          "t_array(t_struct(MapEntry)2043_storage)dyn_storage": {
-            "label": "struct EnumerableMapUpgradeable.MapEntry[]"
-          },
-          "t_struct(MapEntry)2043_storage": {
-            "label": "struct EnumerableMapUpgradeable.MapEntry",
-            "members": [
-              {
-                "label": "_key",
-                "type": "t_bytes32"
-              },
-              {
-                "label": "_value",
-                "type": "t_bytes32"
-              }
-            ]
-          },
-          "t_mapping(t_uint256,t_address)": {
-            "label": "mapping(uint256 => address)"
-          },
-          "t_mapping(t_address,t_mapping(t_address,t_bool))": {
-            "label": "mapping(address => mapping(address => bool))"
-          },
-          "t_mapping(t_address,t_bool)": {
-            "label": "mapping(address => bool)"
-          },
-          "t_string_storage": {
-            "label": "string"
-          },
-          "t_mapping(t_uint256,t_string_storage)": {
-            "label": "mapping(uint256 => string)"
-          },
-          "t_array(t_uint256)41_storage": {
-            "label": "uint256[41]"
-          },
-          "t_mapping(t_bytes4,t_bool)": {
-            "label": "mapping(bytes4 => bool)"
-          },
-          "t_bytes4": {
-            "label": "bytes4"
-          },
-          "t_array(t_uint256)49_storage": {
-            "label": "uint256[49]"
-          },
-          "t_array(t_uint256)50_storage": {
-            "label": "uint256[50]"
-          }
-        }
-      }
-    },
     "108e3b4b3346e5b05472de733de06597a919ed7b44e3dc7b33ebe4dc3ba6a194": {
       "address": "0xf90a2C3A503f9FBA033B90aAfC64eF8106894D96",
       "txHash": "0x2c0dc260dc02c2926d2fa89b57e01ae1dfba526afd8ff84502ff47eb8a09dcb9",
@@ -2596,6 +2279,640 @@
               "Photoid",
               "Wormhole"
             ]
+          }
+        }
+      }
+    },
+    "90072ad925d306fe3f70dfe25dbd72844136c6f67b6a067cd965d175a9388921": {
+      "address": "0x876BBe879D26525C999B81F0b7937Dfe0FC6f6b6",
+      "txHash": "0xbeb7d3a1475f4b54c7ffe294104711cb2b1a6216d151cf227ca51fbc412efa4a",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:25"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:30"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:31"
+          },
+          {
+            "contract": "ERC165Upgradeable",
+            "label": "_supportedInterfaces",
+            "type": "t_mapping(t_bytes4,t_bool)",
+            "src": "@openzeppelin/contracts-upgradeable/introspection/ERC165Upgradeable.sol:23"
+          },
+          {
+            "contract": "ERC165Upgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-upgradeable/introspection/ERC165Upgradeable.sol:59"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_holderTokens",
+            "type": "t_mapping(t_address,t_struct(UintSet)2992_storage)",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:34"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_tokenOwners",
+            "type": "t_struct(UintToAddressMap)2369_storage",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:37"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_tokenApprovals",
+            "type": "t_mapping(t_uint256,t_address)",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:40"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_operatorApprovals",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_bool))",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:43"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_name",
+            "type": "t_string_storage",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:46"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_symbol",
+            "type": "t_string_storage",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:49"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_tokenURIs",
+            "type": "t_mapping(t_uint256,t_string_storage)",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:52"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_baseURI",
+            "type": "t_string_storage",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:55"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)41_storage",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:485"
+          },
+          {
+            "contract": "DarkForestTokens",
+            "label": "coreAddress",
+            "type": "t_address",
+            "src": "contracts/DarkForestTokens.sol:9"
+          },
+          {
+            "contract": "DarkForestTokens",
+            "label": "artifacts",
+            "type": "t_mapping(t_uint256,t_struct(Artifact)14217_storage)",
+            "src": "contracts/DarkForestTokens.sol:10"
+          },
+          {
+            "contract": "DarkForestTokens",
+            "label": "adminAddress",
+            "type": "t_address",
+            "src": "contracts/DarkForestTokens.sol:11"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address"
+          },
+          "t_mapping(t_uint256,t_struct(Artifact)14217_storage)": {
+            "label": "mapping(uint256 => struct DarkForestTypes.Artifact)"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_struct(Artifact)14217_storage": {
+            "label": "struct DarkForestTypes.Artifact",
+            "members": [
+              {
+                "label": "isInitialized",
+                "type": "t_bool"
+              },
+              {
+                "label": "id",
+                "type": "t_uint256"
+              },
+              {
+                "label": "planetDiscoveredOn",
+                "type": "t_uint256"
+              },
+              {
+                "label": "rarity",
+                "type": "t_enum(ArtifactRarity)14194"
+              },
+              {
+                "label": "planetBiome",
+                "type": "t_enum(Biome)14242"
+              },
+              {
+                "label": "mintedAtTimestamp",
+                "type": "t_uint256"
+              },
+              {
+                "label": "discoverer",
+                "type": "t_address"
+              },
+              {
+                "label": "artifactType",
+                "type": "t_enum(ArtifactType)14187"
+              },
+              {
+                "label": "lastActivated",
+                "type": "t_uint256"
+              },
+              {
+                "label": "lastDeactivated",
+                "type": "t_uint256"
+              },
+              {
+                "label": "wormholeTo",
+                "type": "t_uint256"
+              }
+            ]
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_enum(ArtifactRarity)14194": {
+            "label": "enum DarkForestTypes.ArtifactRarity",
+            "members": [
+              "Unknown",
+              "Common",
+              "Rare",
+              "Epic",
+              "Legendary",
+              "Mythic"
+            ]
+          },
+          "t_enum(Biome)14242": {
+            "label": "enum DarkForestTypes.Biome",
+            "members": [
+              "Unknown",
+              "Ocean",
+              "Forest",
+              "Grassland",
+              "Tundra",
+              "Swamp",
+              "Desert",
+              "Ice",
+              "Wasteland",
+              "Lava",
+              "Corrupted"
+            ]
+          },
+          "t_enum(ArtifactType)14187": {
+            "label": "enum DarkForestTypes.ArtifactType",
+            "members": [
+              "Unknown",
+              "Monolith",
+              "Colossus",
+              "Spaceship",
+              "Pyramid",
+              "Wormhole",
+              "PlanetaryShield",
+              "PhotoidCannon",
+              "BloomFilter",
+              "BlackDomain"
+            ]
+          },
+          "t_mapping(t_address,t_struct(UintSet)2992_storage)": {
+            "label": "mapping(address => struct EnumerableSetUpgradeable.UintSet)"
+          },
+          "t_struct(UintSet)2992_storage": {
+            "label": "struct EnumerableSetUpgradeable.UintSet",
+            "members": [
+              {
+                "label": "_inner",
+                "type": "t_struct(Set)2606_storage"
+              }
+            ]
+          },
+          "t_struct(Set)2606_storage": {
+            "label": "struct EnumerableSetUpgradeable.Set",
+            "members": [
+              {
+                "label": "_values",
+                "type": "t_array(t_bytes32)dyn_storage"
+              },
+              {
+                "label": "_indexes",
+                "type": "t_mapping(t_bytes32,t_uint256)"
+              }
+            ]
+          },
+          "t_array(t_bytes32)dyn_storage": {
+            "label": "bytes32[]"
+          },
+          "t_bytes32": {
+            "label": "bytes32"
+          },
+          "t_mapping(t_bytes32,t_uint256)": {
+            "label": "mapping(bytes32 => uint256)"
+          },
+          "t_struct(UintToAddressMap)2369_storage": {
+            "label": "struct EnumerableMapUpgradeable.UintToAddressMap",
+            "members": [
+              {
+                "label": "_inner",
+                "type": "t_struct(Map)2051_storage"
+              }
+            ]
+          },
+          "t_struct(Map)2051_storage": {
+            "label": "struct EnumerableMapUpgradeable.Map",
+            "members": [
+              {
+                "label": "_entries",
+                "type": "t_array(t_struct(MapEntry)2043_storage)dyn_storage"
+              },
+              {
+                "label": "_indexes",
+                "type": "t_mapping(t_bytes32,t_uint256)"
+              }
+            ]
+          },
+          "t_array(t_struct(MapEntry)2043_storage)dyn_storage": {
+            "label": "struct EnumerableMapUpgradeable.MapEntry[]"
+          },
+          "t_struct(MapEntry)2043_storage": {
+            "label": "struct EnumerableMapUpgradeable.MapEntry",
+            "members": [
+              {
+                "label": "_key",
+                "type": "t_bytes32"
+              },
+              {
+                "label": "_value",
+                "type": "t_bytes32"
+              }
+            ]
+          },
+          "t_mapping(t_uint256,t_address)": {
+            "label": "mapping(uint256 => address)"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_bool))": {
+            "label": "mapping(address => mapping(address => bool))"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)"
+          },
+          "t_string_storage": {
+            "label": "string"
+          },
+          "t_mapping(t_uint256,t_string_storage)": {
+            "label": "mapping(uint256 => string)"
+          },
+          "t_array(t_uint256)41_storage": {
+            "label": "uint256[41]"
+          },
+          "t_mapping(t_bytes4,t_bool)": {
+            "label": "mapping(bytes4 => bool)"
+          },
+          "t_bytes4": {
+            "label": "bytes4"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          }
+        }
+      }
+    },
+    "cc9c06dddc8f6cc4c5f4a7f6580bddfb6f80bdec9fcec255a3dd1e1c90ee68d9": {
+      "address": "0x526d028c324ce526AF9CF0B12d63A4425dDCE807",
+      "txHash": "0x378d95032ed8037caf5c792dbc6c0d6a5dc4f74d305d9eb9e24f5e118ff49e66",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:25"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:30"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:31"
+          },
+          {
+            "contract": "ERC165Upgradeable",
+            "label": "_supportedInterfaces",
+            "type": "t_mapping(t_bytes4,t_bool)",
+            "src": "@openzeppelin/contracts-upgradeable/introspection/ERC165Upgradeable.sol:23"
+          },
+          {
+            "contract": "ERC165Upgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-upgradeable/introspection/ERC165Upgradeable.sol:59"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_holderTokens",
+            "type": "t_mapping(t_address,t_struct(UintSet)2992_storage)",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:34"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_tokenOwners",
+            "type": "t_struct(UintToAddressMap)2369_storage",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:37"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_tokenApprovals",
+            "type": "t_mapping(t_uint256,t_address)",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:40"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_operatorApprovals",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_bool))",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:43"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_name",
+            "type": "t_string_storage",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:46"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_symbol",
+            "type": "t_string_storage",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:49"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_tokenURIs",
+            "type": "t_mapping(t_uint256,t_string_storage)",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:52"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_baseURI",
+            "type": "t_string_storage",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:55"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)41_storage",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:485"
+          },
+          {
+            "contract": "DarkForestTokens",
+            "label": "coreAddress",
+            "type": "t_address",
+            "src": "contracts/DarkForestTokens.sol:9"
+          },
+          {
+            "contract": "DarkForestTokens",
+            "label": "artifacts",
+            "type": "t_mapping(t_uint256,t_struct(Artifact)14209_storage)",
+            "src": "contracts/DarkForestTokens.sol:10"
+          },
+          {
+            "contract": "DarkForestTokens",
+            "label": "adminAddress",
+            "type": "t_address",
+            "src": "contracts/DarkForestTokens.sol:11"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address"
+          },
+          "t_mapping(t_uint256,t_struct(Artifact)14209_storage)": {
+            "label": "mapping(uint256 => struct DarkForestTypes.Artifact)"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_struct(Artifact)14209_storage": {
+            "label": "struct DarkForestTypes.Artifact",
+            "members": [
+              {
+                "label": "isInitialized",
+                "type": "t_bool"
+              },
+              {
+                "label": "id",
+                "type": "t_uint256"
+              },
+              {
+                "label": "planetDiscoveredOn",
+                "type": "t_uint256"
+              },
+              {
+                "label": "rarity",
+                "type": "t_enum(ArtifactRarity)14186"
+              },
+              {
+                "label": "planetBiome",
+                "type": "t_enum(Biome)14234"
+              },
+              {
+                "label": "mintedAtTimestamp",
+                "type": "t_uint256"
+              },
+              {
+                "label": "discoverer",
+                "type": "t_address"
+              },
+              {
+                "label": "artifactType",
+                "type": "t_enum(ArtifactType)14179"
+              },
+              {
+                "label": "lastActivated",
+                "type": "t_uint256"
+              },
+              {
+                "label": "lastDeactivated",
+                "type": "t_uint256"
+              },
+              {
+                "label": "wormholeTo",
+                "type": "t_uint256"
+              }
+            ]
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_enum(ArtifactRarity)14186": {
+            "label": "enum DarkForestTypes.ArtifactRarity",
+            "members": [
+              "Unknown",
+              "Common",
+              "Rare",
+              "Epic",
+              "Legendary",
+              "Mythic"
+            ]
+          },
+          "t_enum(Biome)14234": {
+            "label": "enum DarkForestTypes.Biome",
+            "members": [
+              "Unknown",
+              "Ocean",
+              "Forest",
+              "Grassland",
+              "Tundra",
+              "Swamp",
+              "Desert",
+              "Ice",
+              "Wasteland",
+              "Lava",
+              "Corrupted"
+            ]
+          },
+          "t_enum(ArtifactType)14179": {
+            "label": "enum DarkForestTypes.ArtifactType",
+            "members": [
+              "Unknown",
+              "Monolith",
+              "Colossus",
+              "Spaceship",
+              "Pyramid",
+              "Wormhole",
+              "PlanetaryShield",
+              "PhotoidCannon",
+              "BloomFilter",
+              "BlackDomain"
+            ]
+          },
+          "t_mapping(t_address,t_struct(UintSet)2992_storage)": {
+            "label": "mapping(address => struct EnumerableSetUpgradeable.UintSet)"
+          },
+          "t_struct(UintSet)2992_storage": {
+            "label": "struct EnumerableSetUpgradeable.UintSet",
+            "members": [
+              {
+                "label": "_inner",
+                "type": "t_struct(Set)2606_storage"
+              }
+            ]
+          },
+          "t_struct(Set)2606_storage": {
+            "label": "struct EnumerableSetUpgradeable.Set",
+            "members": [
+              {
+                "label": "_values",
+                "type": "t_array(t_bytes32)dyn_storage"
+              },
+              {
+                "label": "_indexes",
+                "type": "t_mapping(t_bytes32,t_uint256)"
+              }
+            ]
+          },
+          "t_array(t_bytes32)dyn_storage": {
+            "label": "bytes32[]"
+          },
+          "t_bytes32": {
+            "label": "bytes32"
+          },
+          "t_mapping(t_bytes32,t_uint256)": {
+            "label": "mapping(bytes32 => uint256)"
+          },
+          "t_struct(UintToAddressMap)2369_storage": {
+            "label": "struct EnumerableMapUpgradeable.UintToAddressMap",
+            "members": [
+              {
+                "label": "_inner",
+                "type": "t_struct(Map)2051_storage"
+              }
+            ]
+          },
+          "t_struct(Map)2051_storage": {
+            "label": "struct EnumerableMapUpgradeable.Map",
+            "members": [
+              {
+                "label": "_entries",
+                "type": "t_array(t_struct(MapEntry)2043_storage)dyn_storage"
+              },
+              {
+                "label": "_indexes",
+                "type": "t_mapping(t_bytes32,t_uint256)"
+              }
+            ]
+          },
+          "t_array(t_struct(MapEntry)2043_storage)dyn_storage": {
+            "label": "struct EnumerableMapUpgradeable.MapEntry[]"
+          },
+          "t_struct(MapEntry)2043_storage": {
+            "label": "struct EnumerableMapUpgradeable.MapEntry",
+            "members": [
+              {
+                "label": "_key",
+                "type": "t_bytes32"
+              },
+              {
+                "label": "_value",
+                "type": "t_bytes32"
+              }
+            ]
+          },
+          "t_mapping(t_uint256,t_address)": {
+            "label": "mapping(uint256 => address)"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_bool))": {
+            "label": "mapping(address => mapping(address => bool))"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)"
+          },
+          "t_string_storage": {
+            "label": "string"
+          },
+          "t_mapping(t_uint256,t_string_storage)": {
+            "label": "mapping(uint256 => string)"
+          },
+          "t_array(t_uint256)41_storage": {
+            "label": "uint256[41]"
+          },
+          "t_mapping(t_bytes4,t_bool)": {
+            "label": "mapping(bytes4 => bool)"
+          },
+          "t_bytes4": {
+            "label": "bytes4"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
           }
         }
       }
