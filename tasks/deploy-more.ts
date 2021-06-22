@@ -106,18 +106,24 @@ async function deployLibraries({}, hre: HardhatRuntimeEnvironment): Promise<Libr
   const utils = await UtilsFactory.deploy();
   await utils.deployTransaction.wait();
 
-  const LazyUpdateFactory = await hre.ethers.getContractFactory('DarkForestLazyUpdate', {
+  const LazyUpdateFactory = await hre.ethers.getContractFactory('DarkForestLazyUpdate');
+  const lazyUpdate = await LazyUpdateFactory.deploy();
+  await lazyUpdate.deployTransaction.wait();
+
+  const ArtifactUtilsFactory = await hre.ethers.getContractFactory('DarkForestArtifactUtils', {
     libraries: {
       DarkForestUtils: utils.address,
     },
   });
-  const lazyUpdate = await LazyUpdateFactory.deploy();
-  await lazyUpdate.deployTransaction.wait();
+
+  const artifactUtils = await ArtifactUtilsFactory.deploy();
+  await artifactUtils.deployTransaction.wait();
 
   const PlanetFactory = await hre.ethers.getContractFactory('DarkForestPlanet', {
     libraries: {
       DarkForestUtils: utils.address,
       DarkForestLazyUpdate: lazyUpdate.address,
+      DarkForestArtifactUtils: artifactUtils.address,
     },
   });
   const planet = await PlanetFactory.deploy();
@@ -137,6 +143,8 @@ async function deployLibraries({}, hre: HardhatRuntimeEnvironment): Promise<Libr
     planet: planet as DarkForestPlanet,
     initialize,
     verifier: verifier as Verifier,
+    // @ts-ignore
+    artifactUtils: artifactUtils as DarkForestArtifactUtils,
   };
 }
 
@@ -148,6 +156,7 @@ subtask('deploy:core', 'deploy and return tokens contract')
   .addParam('planetAddress', '', undefined, types.string)
   .addParam('utilsAddress', '', undefined, types.string)
   .addParam('verifierAddress', '', undefined, types.string)
+  .addParam('artifactUtilsAddress', '', undefined, types.string)
   .setAction(deployCore);
 
 async function deployCore(
@@ -159,6 +168,7 @@ async function deployCore(
     planetAddress: string;
     utilsAddress: string;
     verifierAddress: string;
+    artifactUtilsAddress: string;
   },
   hre: HardhatRuntimeEnvironment
 ): Promise<DarkForestCoreReturn> {
@@ -170,6 +180,7 @@ async function deployCore(
         DarkForestPlanet: args.planetAddress,
         DarkForestUtils: args.utilsAddress,
         Verifier: args.verifierAddress,
+        DarkForestArtifactUtils: args.artifactUtilsAddress,
       },
     },
     contractArgs: [

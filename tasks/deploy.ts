@@ -81,6 +81,7 @@ async function deploy(
     planetAddress: libraries.planet.address,
     utilsAddress: libraries.utils.address,
     verifierAddress: libraries.verifier.address,
+    artifactUtilsAddress: libraries.artifactUtils.address,
   });
 
   const coreAddress = darkForestCoreReturn.contract.address;
@@ -209,6 +210,10 @@ async function deploySave(
    * The address for the DarkForestPlanet library.
    */
   export const PLANET_LIBRARY_ADDRESS = '${args.libraries.planet.address}';
+  /**
+   * The address for the DarkForestArtifactUtils library.
+   */
+  export const ARTIFACT_UTILS_LIBRARY_ADDRESS = '${args.libraries.artifactUtils.address}';
   /**
    * The address for the Verifier library.
    */

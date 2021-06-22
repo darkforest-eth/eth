@@ -5,6 +5,7 @@ import type {
   DarkForestGetters,
   DarkForestPlanet,
   DarkForestUtils,
+  DarkForestArtifactUtils,
   Verifier,
   Whitelist,
   DarkForestGPTCredit,
@@ -18,6 +19,7 @@ export {
   DarkForestPlanet,
   DarkForestUtils,
   DarkForestGPTCredit,
+  DarkForestArtifactUtils,
   Verifier,
   Whitelist,
 };
@@ -28,6 +30,7 @@ export interface LibraryContracts {
   planet: DarkForestPlanet;
   initialize: Contract;
   verifier: Verifier;
+  artifactUtils: DarkForestArtifactUtils;
 }
 
 export interface DarkForestCoreReturn {

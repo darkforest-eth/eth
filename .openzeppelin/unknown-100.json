@@ -1,69 +1,68 @@
 {
   "manifestVersion": "3.2",
   "admin": {
-    "address": "0x5181e41F454cF7C270D49d460A798dA1F2Bef64E",
-    "txHash": "0xa755f7200a6c34f5b5c7c1d92a38aea06de75b6abbd04b58ca3b48ea5c0c8743",
+    "address": "0x0AC4625eD0FD3134223221A0A8124f952e629730",
+    "txHash": "0x5cb0aeed14835ee226bb7ad8aa5d4fd81afa079cb7324d90f22039cc5164c8bd",
     "deployTransaction": {
-      "hash": "0xa755f7200a6c34f5b5c7c1d92a38aea06de75b6abbd04b58ca3b48ea5c0c8743",
+      "hash": "0x5cb0aeed14835ee226bb7ad8aa5d4fd81afa079cb7324d90f22039cc5164c8bd",
       "blockHash": null,
       "blockNumber": null,
       "transactionIndex": null,
       "confirmations": 0,
-      "from": "0x0C6B6A25f2bf0d15fB9CfF9BE80d28F69964655E",
+      "from": "0x5D99805Ca2867F22a318c4e6B0DC5C0EAC457386",
       "gasPrice": {
         "type": "BigNumber",
-        "hex": "0x06fc23ac00"
+        "hex": "0x04a817c800"
       },
       "gasLimit": {
         "type": "BigNumber",
-        "hex": "0x0762b4"
+        "hex": "0x076b4d"
       },
       "to": null,
       "value": {
         "type": "BigNumber",
         "hex": "0x00"
       },
-      "nonce": 856,
+      "nonce": 9484,
       "data": "0x608060405234801561001057600080fd5b50600080546001600160a01b031916339081178255604051909182917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0908290a350610759806100616000396000f3fe60806040526004361061007b5760003560e01c80639623609d1161004e5780639623609d1461011157806399a88ec414610124578063f2fde38b14610144578063f3b7dead146101645761007b565b8063204e1c7a14610080578063715018a6146100bc5780637eff275e146100d35780638da5cb5b146100f3575b600080fd5b34801561008c57600080fd5b506100a061009b366004610515565b610184565b6040516001600160a01b03909116815260200160405180910390f35b3480156100c857600080fd5b506100d1610215565b005b3480156100df57600080fd5b506100d16100ee366004610554565b610292565b3480156100ff57600080fd5b506000546001600160a01b03166100a0565b6100d161011f36600461058c565b61031c565b34801561013057600080fd5b506100d161013f366004610554565b6103ad565b34801561015057600080fd5b506100d161015f366004610515565b610405565b34801561017057600080fd5b506100a061017f366004610515565b6104ef565b6000806000836001600160a01b03166040516101aa90635c60da1b60e01b815260040190565b600060405180830381855afa9150503d80600081146101e5576040519150601f19603f3d011682016040523d82523d6000602084013e6101ea565b606091505b5091509150816101f957600080fd5b8080602001905181019061020d9190610538565b949350505050565b6000546001600160a01b031633146102485760405162461bcd60e51b815260040161023f906106c0565b60405180910390fd5b600080546040516001600160a01b03909116907f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0908390a3600080546001600160a01b0319169055565b6000546001600160a01b031633146102bc5760405162461bcd60e51b815260040161023f906106c0565b6040516308f2839760e41b81526001600160a01b038281166004830152831690638f283970906024015b600060405180830381600087803b15801561030057600080fd5b505af1158015610314573d6000803e3d6000fd5b505050505050565b6000546001600160a01b031633146103465760405162461bcd60e51b815260040161023f906106c0565b60405163278f794360e11b81526001600160a01b03841690634f1ef286903490610376908690869060040161065d565b6000604051808303818588803b15801561038f57600080fd5b505af11580156103a3573d6000803e3d6000fd5b5050505050505050565b6000546001600160a01b031633146103d75760405162461bcd60e51b815260040161023f906106c0565b604051631b2ce7f360e11b81526001600160a01b038281166004830152831690633659cfe6906024016102e6565b6000546001600160a01b0316331461042f5760405162461bcd60e51b815260040161023f906106c0565b6001600160a01b0381166104945760405162461bcd60e51b815260206004820152602660248201527f4f776e61626c653a206e6577206f776e657220697320746865207a65726f206160448201526564647265737360d01b606482015260840161023f565b600080546040516001600160a01b03808516939216917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e091a3600080546001600160a01b0319166001600160a01b0392909216919091179055565b6000806000836001600160a01b03166040516101aa906303e1469160e61b815260040190565b600060208284031215610526578081fd5b81356105318161070b565b9392505050565b600060208284031215610549578081fd5b81516105318161070b565b60008060408385031215610566578081fd5b82356105718161070b565b915060208301356105818161070b565b809150509250929050565b6000806000606084860312156105a0578081fd5b83356105ab8161070b565b925060208401356105bb8161070b565b9150604084013567ffffffffffffffff808211156105d7578283fd5b818601915086601f8301126105ea578283fd5b8135818111156105fc576105fc6106f5565b604051601f8201601f19908116603f01168101908382118183101715610624576106246106f5565b8160405282815289602084870101111561063c578586fd5b82602086016020830137856020848301015280955050505050509250925092565b600060018060a01b038416825260206040818401528351806040850152825b818110156106985785810183015185820160600152820161067c565b818111156106a95783606083870101525b50601f01601f191692909201606001949350505050565b6020808252818101527f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e6572604082015260600190565b634e487b7160e01b600052604160045260246000fd5b6001600160a01b038116811461072057600080fd5b5056fea2646970667358221220d849f96f3086b9f82cdcf665adb8c697ace05638da1c7c16ab2d26293717af6764736f6c63430008020033",
-      "r": "0xcd5d84c472a35a20caa56042f22e32489ddb2b0c5e29e95d5ca448ecc9467a99",
-      "s": "0x1b67e4f9bb44134eadcefd6d2d831c27bc997ee776709493365cec860c734f67",
-      "v": 235,
-      "creates": "0x5181e41F454cF7C270D49d460A798dA1F2Bef64E",
-      "raw": "0xf908108203588506fc23ac00830762b48080b907ba608060405234801561001057600080fd5b50600080546001600160a01b031916339081178255604051909182917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0908290a350610759806100616000396000f3fe60806040526004361061007b5760003560e01c80639623609d1161004e5780639623609d1461011157806399a88ec414610124578063f2fde38b14610144578063f3b7dead146101645761007b565b8063204e1c7a14610080578063715018a6146100bc5780637eff275e146100d35780638da5cb5b146100f3575b600080fd5b34801561008c57600080fd5b506100a061009b366004610515565b610184565b6040516001600160a01b03909116815260200160405180910390f35b3480156100c857600080fd5b506100d1610215565b005b3480156100df57600080fd5b506100d16100ee366004610554565b610292565b3480156100ff57600080fd5b506000546001600160a01b03166100a0565b6100d161011f36600461058c565b61031c565b34801561013057600080fd5b506100d161013f366004610554565b6103ad565b34801561015057600080fd5b506100d161015f366004610515565b610405565b34801561017057600080fd5b506100a061017f366004610515565b6104ef565b6000806000836001600160a01b03166040516101aa90635c60da1b60e01b815260040190565b600060405180830381855afa9150503d80600081146101e5576040519150601f19603f3d011682016040523d82523d6000602084013e6101ea565b606091505b5091509150816101f957600080fd5b8080602001905181019061020d9190610538565b949350505050565b6000546001600160a01b031633146102485760405162461bcd60e51b815260040161023f906106c0565b60405180910390fd5b600080546040516001600160a01b03909116907f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0908390a3600080546001600160a01b0319169055565b6000546001600160a01b031633146102bc5760405162461bcd60e51b815260040161023f906106c0565b6040516308f2839760e41b81526001600160a01b038281166004830152831690638f283970906024015b600060405180830381600087803b15801561030057600080fd5b505af1158015610314573d6000803e3d6000fd5b505050505050565b6000546001600160a01b031633146103465760405162461bcd60e51b815260040161023f906106c0565b60405163278f794360e11b81526001600160a01b03841690634f1ef286903490610376908690869060040161065d565b6000604051808303818588803b15801561038f57600080fd5b505af11580156103a3573d6000803e3d6000fd5b5050505050505050565b6000546001600160a01b031633146103d75760405162461bcd60e51b815260040161023f906106c0565b604051631b2ce7f360e11b81526001600160a01b038281166004830152831690633659cfe6906024016102e6565b6000546001600160a01b0316331461042f5760405162461bcd60e51b815260040161023f906106c0565b6001600160a01b0381166104945760405162461bcd60e51b815260206004820152602660248201527f4f776e61626c653a206e6577206f776e657220697320746865207a65726f206160448201526564647265737360d01b606482015260840161023f565b600080546040516001600160a01b03808516939216917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e091a3600080546001600160a01b0319166001600160a01b0392909216919091179055565b6000806000836001600160a01b03166040516101aa906303e1469160e61b815260040190565b600060208284031215610526578081fd5b81356105318161070b565b9392505050565b600060208284031215610549578081fd5b81516105318161070b565b60008060408385031215610566578081fd5b82356105718161070b565b915060208301356105818161070b565b809150509250929050565b6000806000606084860312156105a0578081fd5b83356105ab8161070b565b925060208401356105bb8161070b565b9150604084013567ffffffffffffffff808211156105d7578283fd5b818601915086601f8301126105ea578283fd5b8135818111156105fc576105fc6106f5565b604051601f8201601f19908116603f01168101908382118183101715610624576106246106f5565b8160405282815289602084870101111561063c578586fd5b82602086016020830137856020848301015280955050505050509250925092565b600060018060a01b038416825260206040818401528351806040850152825b818110156106985785810183015185820160600152820161067c565b818111156106a95783606083870101525b50601f01601f191692909201606001949350505050565b6020808252818101527f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e6572604082015260600190565b634e487b7160e01b600052604160045260246000fd5b6001600160a01b038116811461072057600080fd5b5056fea2646970667358221220d849f96f3086b9f82cdcf665adb8c697ace05638da1c7c16ab2d26293717af6764736f6c6343000802003381eba0cd5d84c472a35a20caa56042f22e32489ddb2b0c5e29e95d5ca448ecc9467a99a01b67e4f9bb44134eadcefd6d2d831c27bc997ee776709493365cec860c734f67",
+      "r": "0xeaf199824465441d1ec1c4425079adec0bfcd84f9f11e47617bfd0c11ed92bcb",
+      "s": "0x78a8c3091eedfa335bdcb7ff90fe132037b4681cee4589dc28bbe06bd5a1a41f",
+      "v": 236,
+      "creates": "0x0AC4625eD0FD3134223221A0A8124f952e629730",
       "chainId": 100
     }
   },
   "proxies": [
     {
-      "address": "0xf9E964e6A91C09BC0EE9BC0A5Aa89870c2C2056d",
-      "txHash": "0xd5f576759b51332dce0f85d536fb0a1bff6376cd355177ef28533a0226179734",
+      "address": "0xd6a6323600937582CFE141C6FE9f40de387e063D",
+      "txHash": "0x3f9f5a91643c65f06b32bd8a2ea560c8105e51fd2a30a1e86b33f8a781e9da67",
       "kind": "transparent"
     },
     {
-      "address": "0x661Aa290fdA44736742844C496afd81c7F983EDc",
-      "txHash": "0x6e39004fd867dff2080c95d842661f5b6701f5e4409c0eb3c9d3f26d6e982765",
+      "address": "0x1c680Fd907a6bC3e3ccE3A4f7A41875d89a06b1F",
+      "txHash": "0xa7e22b723a0d54a28ba21e7e3f17342f716afdf72664d18b30d7b7563a708bdf",
       "kind": "transparent"
     },
     {
-      "address": "0x1f566931438F5c8ae408A07a02502046a771FD3b",
-      "txHash": "0xb4c96d7574639caeb1dcbeededa2a17bb4b5e8dbaa36b644a0b179d85c694f1d",
+      "address": "0x433c2cDFd315990C22A3B90923D036f3D109C0F7",
+      "txHash": "0x2ef05a02d4d59baceffa0265b4a983455797cfb94507ff0a8529d34c01403aa3",
       "kind": "transparent"
     },
     {
-      "address": "0x3a5E4D642BaCfB7b1Aa9B3a4D29c15fB66cc006a",
-      "txHash": "0xf6c8a19173a7791acaf6477fe533e4b19b22ac71576a2b78e0193275ea2c81f7",
+      "address": "0x552C614bd8EB03Cd580E10Bb9B1884B7A8729E58",
+      "txHash": "0xaeb3aceb8e9aba20ce3abfe33d27b9cc1ecf31819afda5945de9c3c105d0d8ad",
       "kind": "transparent"
     },
     {
-      "address": "0xaAd830cEFEf788770C9B9044D96D5a0eb413CE00",
-      "txHash": "0x4e119fbbe4c14f34b82d36cc85dcc8e114708e4793d39c0ce8f3051a64e3cd8d",
+      "address": "0x7D0cfDdc4392B08876231101fA81d3a2FaB1A4D8",
+      "txHash": "0xabf41a6360447c090071a55a52d1fb19def88ff6d382c685edb6950b7470b7d3",
       "kind": "transparent"
     }
   ],
   "impls": {
     "da8309a3318943ee3ee1fb7fb49939d1bba5c192840ec046450ca2291602dd08": {
-      "address": "0xf51737E6A716F8cA59a1FD0Ad3900A2C0f5E006B",
-      "txHash": "0xb48c0fce5e4f47d76d4e4464b5d83bf4859c5e05d23af8f1db9ccb530b3e404e",
+      "address": "0x4138e285Ef7d46CecB436e7756e3e8381054DcB9",
+      "txHash": "0x111cb0cc0753ea139c93714911c72f795653ec956270bbc4364bbb290fce9a10",
       "layout": {
         "storage": [
           {
@@ -140,9 +139,326 @@
         }
       }
     },
-    "108e3b4b3346e5b05472de733de06597a919ed7b44e3dc7b33ebe4dc3ba6a194": {
-      "address": "0xf90a2C3A503f9FBA033B90aAfC64eF8106894D96",
-      "txHash": "0x2c0dc260dc02c2926d2fa89b57e01ae1dfba526afd8ff84502ff47eb8a09dcb9",
+    "cc9c06dddc8f6cc4c5f4a7f6580bddfb6f80bdec9fcec255a3dd1e1c90ee68d9": {
+      "address": "0x117D0f08E2D046cf83A875D17A9a9D268Ef7b430",
+      "txHash": "0xc9d48f0e03fb2e7fab4e1a03db6bc9587b2ca7f3d8fc3504eafd6feeb0488935",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:25"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:30"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:31"
+          },
+          {
+            "contract": "ERC165Upgradeable",
+            "label": "_supportedInterfaces",
+            "type": "t_mapping(t_bytes4,t_bool)",
+            "src": "@openzeppelin/contracts-upgradeable/introspection/ERC165Upgradeable.sol:23"
+          },
+          {
+            "contract": "ERC165Upgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-upgradeable/introspection/ERC165Upgradeable.sol:59"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_holderTokens",
+            "type": "t_mapping(t_address,t_struct(UintSet)2992_storage)",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:34"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_tokenOwners",
+            "type": "t_struct(UintToAddressMap)2369_storage",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:37"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_tokenApprovals",
+            "type": "t_mapping(t_uint256,t_address)",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:40"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_operatorApprovals",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_bool))",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:43"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_name",
+            "type": "t_string_storage",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:46"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_symbol",
+            "type": "t_string_storage",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:49"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_tokenURIs",
+            "type": "t_mapping(t_uint256,t_string_storage)",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:52"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "_baseURI",
+            "type": "t_string_storage",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:55"
+          },
+          {
+            "contract": "ERC721Upgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)41_storage",
+            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:485"
+          },
+          {
+            "contract": "DarkForestTokens",
+            "label": "coreAddress",
+            "type": "t_address",
+            "src": "contracts/DarkForestTokens.sol:9"
+          },
+          {
+            "contract": "DarkForestTokens",
+            "label": "artifacts",
+            "type": "t_mapping(t_uint256,t_struct(Artifact)14517_storage)",
+            "src": "contracts/DarkForestTokens.sol:10"
+          },
+          {
+            "contract": "DarkForestTokens",
+            "label": "adminAddress",
+            "type": "t_address",
+            "src": "contracts/DarkForestTokens.sol:11"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address"
+          },
+          "t_mapping(t_uint256,t_struct(Artifact)14517_storage)": {
+            "label": "mapping(uint256 => struct DarkForestTypes.Artifact)"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_struct(Artifact)14517_storage": {
+            "label": "struct DarkForestTypes.Artifact",
+            "members": [
+              {
+                "label": "isInitialized",
+                "type": "t_bool"
+              },
+              {
+                "label": "id",
+                "type": "t_uint256"
+              },
+              {
+                "label": "planetDiscoveredOn",
+                "type": "t_uint256"
+              },
+              {
+                "label": "rarity",
+                "type": "t_enum(ArtifactRarity)14494"
+              },
+              {
+                "label": "planetBiome",
+                "type": "t_enum(Biome)14542"
+              },
+              {
+                "label": "mintedAtTimestamp",
+                "type": "t_uint256"
+              },
+              {
+                "label": "discoverer",
+                "type": "t_address"
+              },
+              {
+                "label": "artifactType",
+                "type": "t_enum(ArtifactType)14487"
+              },
+              {
+                "label": "lastActivated",
+                "type": "t_uint256"
+              },
+              {
+                "label": "lastDeactivated",
+                "type": "t_uint256"
+              },
+              {
+                "label": "wormholeTo",
+                "type": "t_uint256"
+              }
+            ]
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_enum(ArtifactRarity)14494": {
+            "label": "enum DarkForestTypes.ArtifactRarity",
+            "members": [
+              "Unknown",
+              "Common",
+              "Rare",
+              "Epic",
+              "Legendary",
+              "Mythic"
+            ]
+          },
+          "t_enum(Biome)14542": {
+            "label": "enum DarkForestTypes.Biome",
+            "members": [
+              "Unknown",
+              "Ocean",
+              "Forest",
+              "Grassland",
+              "Tundra",
+              "Swamp",
+              "Desert",
+              "Ice",
+              "Wasteland",
+              "Lava",
+              "Corrupted"
+            ]
+          },
+          "t_enum(ArtifactType)14487": {
+            "label": "enum DarkForestTypes.ArtifactType",
+            "members": [
+              "Unknown",
+              "Monolith",
+              "Colossus",
+              "Spaceship",
+              "Pyramid",
+              "Wormhole",
+              "PlanetaryShield",
+              "PhotoidCannon",
+              "BloomFilter",
+              "BlackDomain"
+            ]
+          },
+          "t_mapping(t_address,t_struct(UintSet)2992_storage)": {
+            "label": "mapping(address => struct EnumerableSetUpgradeable.UintSet)"
+          },
+          "t_struct(UintSet)2992_storage": {
+            "label": "struct EnumerableSetUpgradeable.UintSet",
+            "members": [
+              {
+                "label": "_inner",
+                "type": "t_struct(Set)2606_storage"
+              }
+            ]
+          },
+          "t_struct(Set)2606_storage": {
+            "label": "struct EnumerableSetUpgradeable.Set",
+            "members": [
+              {
+                "label": "_values",
+                "type": "t_array(t_bytes32)dyn_storage"
+              },
+              {
+                "label": "_indexes",
+                "type": "t_mapping(t_bytes32,t_uint256)"
+              }
+            ]
+          },
+          "t_array(t_bytes32)dyn_storage": {
+            "label": "bytes32[]"
+          },
+          "t_bytes32": {
+            "label": "bytes32"
+          },
+          "t_mapping(t_bytes32,t_uint256)": {
+            "label": "mapping(bytes32 => uint256)"
+          },
+          "t_struct(UintToAddressMap)2369_storage": {
+            "label": "struct EnumerableMapUpgradeable.UintToAddressMap",
+            "members": [
+              {
+                "label": "_inner",
+                "type": "t_struct(Map)2051_storage"
+              }
+            ]
+          },
+          "t_struct(Map)2051_storage": {
+            "label": "struct EnumerableMapUpgradeable.Map",
+            "members": [
+              {
+                "label": "_entries",
+                "type": "t_array(t_struct(MapEntry)2043_storage)dyn_storage"
+              },
+              {
+                "label": "_indexes",
+                "type": "t_mapping(t_bytes32,t_uint256)"
+              }
+            ]
+          },
+          "t_array(t_struct(MapEntry)2043_storage)dyn_storage": {
+            "label": "struct EnumerableMapUpgradeable.MapEntry[]"
+          },
+          "t_struct(MapEntry)2043_storage": {
+            "label": "struct EnumerableMapUpgradeable.MapEntry",
+            "members": [
+              {
+                "label": "_key",
+                "type": "t_bytes32"
+              },
+              {
+                "label": "_value",
+                "type": "t_bytes32"
+              }
+            ]
+          },
+          "t_mapping(t_uint256,t_address)": {
+            "label": "mapping(uint256 => address)"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_bool))": {
+            "label": "mapping(address => mapping(address => bool))"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)"
+          },
+          "t_string_storage": {
+            "label": "string"
+          },
+          "t_mapping(t_uint256,t_string_storage)": {
+            "label": "mapping(uint256 => string)"
+          },
+          "t_array(t_uint256)41_storage": {
+            "label": "uint256[41]"
+          },
+          "t_mapping(t_bytes4,t_bool)": {
+            "label": "mapping(bytes4 => bool)"
+          },
+          "t_bytes4": {
+            "label": "bytes4"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          }
+        }
+      }
+    },
+    "f3adde4d7ac2ef2d2d31acaf016cc4db2c4bb6c4149f7a551b42c2e74a36a26b": {
+      "address": "0x603d74d6DefA32A3aa04ee526cA568f29B258ab7",
+      "txHash": "0xa08d3975f9891dac1690085bf8f90c5eba14be4e53ec111c3007f11d8f1d0e11",
       "layout": {
         "storage": [
           {
@@ -160,12 +476,12 @@
           {
             "contract": "DarkForestStorageV1",
             "label": "s",
-            "type": "t_struct(GameStorage)14258_storage",
+            "type": "t_struct(GameStorage)14634_storage",
             "src": "contracts/DarkForestStorageV1.sol:9"
           }
         ],
         "types": {
-          "t_struct(GameStorage)14258_storage": {
+          "t_struct(GameStorage)14634_storage": {
             "label": "struct DarkForestTypes.GameStorage",
             "members": [
               {
@@ -174,11 +490,11 @@
               },
               {
                 "label": "whitelist",
-                "type": "t_contract(Whitelist)18395"
+                "type": "t_contract(Whitelist)18771"
               },
               {
                 "label": "tokens",
-                "type": "t_contract(DarkForestTokens)13745"
+                "type": "t_contract(DarkForestTokens)14121"
               },
               {
                 "label": "paused",
@@ -202,11 +518,11 @@
               },
               {
                 "label": "snarkConstants",
-                "type": "t_struct(SnarkConstants)13888_storage"
+                "type": "t_struct(SnarkConstants)14264_storage"
               },
               {
                 "label": "gameConstants",
-                "type": "t_struct(GameConstants)13921_storage"
+                "type": "t_struct(GameConstants)14297_storage"
               },
               {
                 "label": "planetLevelsCount",
@@ -226,11 +542,11 @@
               },
               {
                 "label": "planetDefaultStats",
-                "type": "t_array(t_struct(PlanetDefaultStats)14089_storage)dyn_storage"
+                "type": "t_array(t_struct(PlanetDefaultStats)14465_storage)dyn_storage"
               },
               {
                 "label": "upgrades",
-                "type": "t_array(t_array(t_struct(Upgrade)14100_storage)4_storage)3_storage"
+                "type": "t_array(t_array(t_struct(Upgrade)14476_storage)4_storage)3_storage"
               },
               {
                 "label": "planetIds",
@@ -254,15 +570,15 @@
               },
               {
                 "label": "planets",
-                "type": "t_mapping(t_uint256,t_struct(Planet)13807_storage)"
+                "type": "t_mapping(t_uint256,t_struct(Planet)14183_storage)"
               },
               {
                 "label": "revealedCoords",
-                "type": "t_mapping(t_uint256,t_struct(RevealedCoords)13816_storage)"
+                "type": "t_mapping(t_uint256,t_struct(RevealedCoords)14192_storage)"
               },
               {
                 "label": "planetsExtendedInfo",
-                "type": "t_mapping(t_uint256,t_struct(PlanetExtendedInfo)13841_storage)"
+                "type": "t_mapping(t_uint256,t_struct(PlanetExtendedInfo)14217_storage)"
               },
               {
                 "label": "artifactIdToPlanetId",
@@ -274,15 +590,15 @@
               },
               {
                 "label": "players",
-                "type": "t_mapping(t_address,t_struct(Player)13780_storage)"
+                "type": "t_mapping(t_address,t_struct(Player)14156_storage)"
               },
               {
                 "label": "planetEvents",
-                "type": "t_mapping(t_uint256,t_array(t_struct(PlanetEventMetadata)13868_storage)dyn_storage)"
+                "type": "t_mapping(t_uint256,t_array(t_struct(PlanetEventMetadata)14244_storage)dyn_storage)"
               },
               {
                 "label": "planetArrivals",
-                "type": "t_mapping(t_uint256,t_struct(ArrivalData)14070_storage)"
+                "type": "t_mapping(t_uint256,t_struct(ArrivalData)14446_storage)"
               },
               {
                 "label": "planetArtifacts",
@@ -293,10 +609,10 @@
           "t_address": {
             "label": "address"
           },
-          "t_contract(Whitelist)18395": {
+          "t_contract(Whitelist)18771": {
             "label": "contract Whitelist"
           },
-          "t_contract(DarkForestTokens)13745": {
+          "t_contract(DarkForestTokens)14121": {
             "label": "contract DarkForestTokens"
           },
           "t_bool": {
@@ -305,7 +621,7 @@
           "t_uint256": {
             "label": "uint256"
           },
-          "t_struct(SnarkConstants)13888_storage": {
+          "t_struct(SnarkConstants)14264_storage": {
             "label": "struct DarkForestTypes.SnarkConstants",
             "members": [
               {
@@ -338,7 +654,7 @@
               }
             ]
           },
-          "t_struct(GameConstants)13921_storage": {
+          "t_struct(GameConstants)14297_storage": {
             "label": "struct DarkForestTypes.GameConstants",
             "members": [
               {
@@ -398,10 +714,10 @@
           "t_array(t_uint256)dyn_storage": {
             "label": "uint256[]"
           },
-          "t_array(t_struct(PlanetDefaultStats)14089_storage)dyn_storage": {
+          "t_array(t_struct(PlanetDefaultStats)14465_storage)dyn_storage": {
             "label": "struct DarkForestTypes.PlanetDefaultStats[]"
           },
-          "t_struct(PlanetDefaultStats)14089_storage": {
+          "t_struct(PlanetDefaultStats)14465_storage": {
             "label": "struct DarkForestTypes.PlanetDefaultStats",
             "members": [
               {
@@ -442,13 +758,13 @@
               }
             ]
           },
-          "t_array(t_array(t_struct(Upgrade)14100_storage)4_storage)3_storage": {
+          "t_array(t_array(t_struct(Upgrade)14476_storage)4_storage)3_storage": {
             "label": "struct DarkForestTypes.Upgrade[4][3]"
           },
-          "t_array(t_struct(Upgrade)14100_storage)4_storage": {
+          "t_array(t_struct(Upgrade)14476_storage)4_storage": {
             "label": "struct DarkForestTypes.Upgrade[4]"
           },
-          "t_struct(Upgrade)14100_storage": {
+          "t_struct(Upgrade)14476_storage": {
             "label": "struct DarkForestTypes.Upgrade",
             "members": [
               {
@@ -476,10 +792,10 @@
           "t_array(t_address)dyn_storage": {
             "label": "address[]"
           },
-          "t_mapping(t_uint256,t_struct(Planet)13807_storage)": {
+          "t_mapping(t_uint256,t_struct(Planet)14183_storage)": {
             "label": "mapping(uint256 => struct DarkForestTypes.Planet)"
           },
-          "t_struct(Planet)13807_storage": {
+          "t_struct(Planet)14183_storage": {
             "label": "struct DarkForestTypes.Planet",
             "members": [
               {
@@ -528,7 +844,7 @@
               },
               {
                 "label": "planetType",
-                "type": "t_enum(PlanetType)13756"
+                "type": "t_enum(PlanetType)14132"
               },
               {
                 "label": "isHomePlanet",
@@ -536,10 +852,10 @@
               }
             ]
           },
-          "t_mapping(t_uint256,t_struct(RevealedCoords)13816_storage)": {
+          "t_mapping(t_uint256,t_struct(RevealedCoords)14192_storage)": {
             "label": "mapping(uint256 => struct DarkForestTypes.RevealedCoords)"
           },
-          "t_struct(RevealedCoords)13816_storage": {
+          "t_struct(RevealedCoords)14192_storage": {
             "label": "struct DarkForestTypes.RevealedCoords",
             "members": [
               {
@@ -560,10 +876,10 @@
               }
             ]
           },
-          "t_mapping(t_uint256,t_struct(PlanetExtendedInfo)13841_storage)": {
+          "t_mapping(t_uint256,t_struct(PlanetExtendedInfo)14217_storage)": {
             "label": "mapping(uint256 => struct DarkForestTypes.PlanetExtendedInfo)"
           },
-          "t_struct(PlanetExtendedInfo)13841_storage": {
+          "t_struct(PlanetExtendedInfo)14217_storage": {
             "label": "struct DarkForestTypes.PlanetExtendedInfo",
             "members": [
               {
@@ -584,7 +900,7 @@
               },
               {
                 "label": "spaceType",
-                "type": "t_enum(SpaceType)13763"
+                "type": "t_enum(SpaceType)14139"
               },
               {
                 "label": "upgradeState0",
@@ -619,10 +935,10 @@
           "t_mapping(t_uint256,t_uint256)": {
             "label": "mapping(uint256 => uint256)"
           },
-          "t_mapping(t_address,t_struct(Player)13780_storage)": {
+          "t_mapping(t_address,t_struct(Player)14156_storage)": {
             "label": "mapping(address => struct DarkForestTypes.Player)"
           },
-          "t_struct(Player)13780_storage": {
+          "t_struct(Player)14156_storage": {
             "label": "struct DarkForestTypes.Player",
             "members": [
               {
@@ -651,13 +967,13 @@
               }
             ]
           },
-          "t_mapping(t_uint256,t_array(t_struct(PlanetEventMetadata)13868_storage)dyn_storage)": {
+          "t_mapping(t_uint256,t_array(t_struct(PlanetEventMetadata)14244_storage)dyn_storage)": {
             "label": "mapping(uint256 => struct DarkForestTypes.PlanetEventMetadata[])"
           },
-          "t_array(t_struct(PlanetEventMetadata)13868_storage)dyn_storage": {
+          "t_array(t_struct(PlanetEventMetadata)14244_storage)dyn_storage": {
             "label": "struct DarkForestTypes.PlanetEventMetadata[]"
           },
-          "t_struct(PlanetEventMetadata)13868_storage": {
+          "t_struct(PlanetEventMetadata)14244_storage": {
             "label": "struct DarkForestTypes.PlanetEventMetadata",
             "members": [
               {
@@ -666,7 +982,7 @@
               },
               {
                 "label": "eventType",
-                "type": "t_enum(PlanetEventType)13758"
+                "type": "t_enum(PlanetEventType)14134"
               },
               {
                 "label": "timeTrigger",
@@ -678,10 +994,10 @@
               }
             ]
           },
-          "t_mapping(t_uint256,t_struct(ArrivalData)14070_storage)": {
+          "t_mapping(t_uint256,t_struct(ArrivalData)14446_storage)": {
             "label": "mapping(uint256 => struct DarkForestTypes.ArrivalData)"
           },
-          "t_struct(ArrivalData)14070_storage": {
+          "t_struct(ArrivalData)14446_storage": {
             "label": "struct DarkForestTypes.ArrivalData",
             "members": [
               {
@@ -718,7 +1034,7 @@
               },
               {
                 "label": "arrivalType",
-                "type": "t_enum(ArrivalType)13873"
+                "type": "t_enum(ArrivalType)14249"
               },
               {
                 "label": "carriedArtifactId",
@@ -748,7 +1064,7 @@
           "t_string_storage": {
             "label": "string"
           },
-          "t_enum(PlanetType)13756": {
+          "t_enum(PlanetType)14132": {
             "label": "enum DarkForestTypes.PlanetType",
             "members": [
               "PLANET",
@@ -758,7 +1074,7 @@
               "SILVER_BANK"
             ]
           },
-          "t_enum(SpaceType)13763": {
+          "t_enum(SpaceType)14139": {
             "label": "enum DarkForestTypes.SpaceType",
             "members": [
               "NEBULA",
@@ -767,13 +1083,13 @@
               "DEAD_SPACE"
             ]
           },
-          "t_enum(PlanetEventType)13758": {
+          "t_enum(PlanetEventType)14134": {
             "label": "enum DarkForestTypes.PlanetEventType",
             "members": [
               "ARRIVAL"
             ]
           },
-          "t_enum(ArrivalType)13873": {
+          "t_enum(ArrivalType)14249": {
             "label": "enum DarkForestTypes.ArrivalType",
             "members": [
               "Unknown",
@@ -785,9 +1101,9 @@
         }
       }
     },
-    "a99426eb59a18e842ec7c45a16393f9670c2615cd66ba934f54f59fee568c206": {
-      "address": "0xCf964aDb3f71E5815fedD4cCDF567e3a61e4e43F",
-      "txHash": "0x325e68ee918b68cb4cd75e06d30b1ee2a8c596d3c9582d6c514048a61714ba82",
+    "43c0e5c699977371bc52e4026bdefa888f3a9ac1e4a02c9008a1da6a245f61ec": {
+      "address": "0xC68d2bdF4E6117198014D5a9D6F0667a11109645",
+      "txHash": "0xa36589eec472b1e0950d8ab829609824d39f3d2b9b067f6dcb408f45274e44f2",
       "layout": {
         "storage": [
           {
@@ -811,13 +1127,13 @@
           {
             "contract": "DarkForestGetters",
             "label": "coreContract",
-            "type": "t_contract(DarkForestCore)7634",
+            "type": "t_contract(DarkForestCore)8631",
             "src": "contracts/DarkForestGetters.sol:11"
           },
           {
             "contract": "DarkForestGetters",
             "label": "tokensContract",
-            "type": "t_contract(DarkForestTokens)13745",
+            "type": "t_contract(DarkForestTokens)14121",
             "src": "contracts/DarkForestGetters.sol:12"
           }
         ],
@@ -825,63 +1141,11 @@
           "t_address": {
             "label": "address"
           },
-          "t_contract(DarkForestCore)7634": {
+          "t_contract(DarkForestCore)8631": {
             "label": "contract DarkForestCore"
           },
-          "t_contract(DarkForestTokens)13745": {
+          "t_contract(DarkForestTokens)14121": {
             "label": "contract DarkForestTokens"
-          },
-          "t_bool": {
-            "label": "bool"
-          }
-        }
-      }
-    },
-    "b50e50734983a0d738e3d44381c175d8780b98e4e8b9401238f9450433904769": {
-      "address": "0x83A1AE21e6B5C81d940e8301cc076AdC50096c53",
-      "txHash": "0x92218957b56fe06b8144e6f076d342be36fe97e2198103d97e5cb8b032d64d2a",
-      "layout": {
-        "storage": [
-          {
-            "contract": "Initializable",
-            "label": "_initialized",
-            "type": "t_bool",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:25"
-          },
-          {
-            "contract": "Initializable",
-            "label": "_initializing",
-            "type": "t_bool",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:30"
-          },
-          {
-            "contract": "DarkForestGPTCredit",
-            "label": "credits",
-            "type": "t_mapping(t_address,t_uint256)",
-            "src": "contracts/DarkForestGPTCredit.sol:10"
-          },
-          {
-            "contract": "DarkForestGPTCredit",
-            "label": "creditPrice",
-            "type": "t_uint256",
-            "src": "contracts/DarkForestGPTCredit.sol:11"
-          },
-          {
-            "contract": "DarkForestGPTCredit",
-            "label": "admin",
-            "type": "t_address",
-            "src": "contracts/DarkForestGPTCredit.sol:12"
-          }
-        ],
-        "types": {
-          "t_mapping(t_address,t_uint256)": {
-            "label": "mapping(address => uint256)"
-          },
-          "t_address": {
-            "label": "address"
-          },
-          "t_uint256": {
-            "label": "uint256"
           },
           "t_bool": {
             "label": "bool"
@@ -890,8 +1154,8 @@
       }
     },
     "2201932d496619e06403ebaa814b47386d7da715ae85e3276601e3872070d608": {
-      "address": "0x659cD899aE3a3aB9d1E0d2270C583a0aacf32Fa4",
-      "txHash": "0xe311cdc081dd9994bae203172e4bb7ea76de2690016972d2287d1cacd9c3c7db",
+      "address": "0x779F78aCe3aad84f4C2F17fE2b4888E87D251b4E",
+      "txHash": "0x8ed4c35d40e0fd9800c7185ef884f69a4ef3b270f4e0931683f5f60a98bbc2d2",
       "layout": {
         "storage": [
           {
@@ -937,1982 +1201,6 @@
           },
           "t_bool": {
             "label": "bool"
-          }
-        }
-      }
-    },
-    "f7a5e0a9d4690745df7c66c3659016cf16b659dd97f67c5ddc3ef70779cfca1c": {
-      "address": "0x11ADF1886e6d9F92735d8bC1b7F32c9B9264EDC3",
-      "txHash": "0x9400a682e127dae5b5ed5576ed665797beefb919cf2ec5b352fb0425f1cebf81",
-      "layout": {
-        "storage": [
-          {
-            "contract": "Initializable",
-            "label": "_initialized",
-            "type": "t_bool",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:25"
-          },
-          {
-            "contract": "Initializable",
-            "label": "_initializing",
-            "type": "t_bool",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:30"
-          },
-          {
-            "contract": "DarkForestStorageV1",
-            "label": "s",
-            "type": "t_struct(GameStorage)14258_storage",
-            "src": "contracts/DarkForestStorageV1.sol:9"
-          }
-        ],
-        "types": {
-          "t_struct(GameStorage)14258_storage": {
-            "label": "struct DarkForestTypes.GameStorage",
-            "members": [
-              {
-                "label": "adminAddress",
-                "type": "t_address"
-              },
-              {
-                "label": "whitelist",
-                "type": "t_contract(Whitelist)18395"
-              },
-              {
-                "label": "tokens",
-                "type": "t_contract(DarkForestTokens)13745"
-              },
-              {
-                "label": "paused",
-                "type": "t_bool"
-              },
-              {
-                "label": "ADMIN_CAN_ADD_PLANETS",
-                "type": "t_bool"
-              },
-              {
-                "label": "WORLD_RADIUS_LOCKED",
-                "type": "t_bool"
-              },
-              {
-                "label": "TOKEN_MINT_END_TIMESTAMP",
-                "type": "t_uint256"
-              },
-              {
-                "label": "TARGET4_RADIUS",
-                "type": "t_uint256"
-              },
-              {
-                "label": "snarkConstants",
-                "type": "t_struct(SnarkConstants)13888_storage"
-              },
-              {
-                "label": "gameConstants",
-                "type": "t_struct(GameConstants)13921_storage"
-              },
-              {
-                "label": "planetLevelsCount",
-                "type": "t_uint256"
-              },
-              {
-                "label": "planetLevelThresholds",
-                "type": "t_array(t_uint256)dyn_storage"
-              },
-              {
-                "label": "cumulativeRarities",
-                "type": "t_array(t_uint256)dyn_storage"
-              },
-              {
-                "label": "initializedPlanetCountByLevel",
-                "type": "t_array(t_uint256)dyn_storage"
-              },
-              {
-                "label": "planetDefaultStats",
-                "type": "t_array(t_struct(PlanetDefaultStats)14089_storage)dyn_storage"
-              },
-              {
-                "label": "upgrades",
-                "type": "t_array(t_array(t_struct(Upgrade)14100_storage)4_storage)3_storage"
-              },
-              {
-                "label": "planetIds",
-                "type": "t_array(t_uint256)dyn_storage"
-              },
-              {
-                "label": "revealedPlanetIds",
-                "type": "t_array(t_uint256)dyn_storage"
-              },
-              {
-                "label": "playerIds",
-                "type": "t_array(t_address)dyn_storage"
-              },
-              {
-                "label": "worldRadius",
-                "type": "t_uint256"
-              },
-              {
-                "label": "planetEventsCount",
-                "type": "t_uint256"
-              },
-              {
-                "label": "planets",
-                "type": "t_mapping(t_uint256,t_struct(Planet)13807_storage)"
-              },
-              {
-                "label": "revealedCoords",
-                "type": "t_mapping(t_uint256,t_struct(RevealedCoords)13816_storage)"
-              },
-              {
-                "label": "planetsExtendedInfo",
-                "type": "t_mapping(t_uint256,t_struct(PlanetExtendedInfo)13841_storage)"
-              },
-              {
-                "label": "artifactIdToPlanetId",
-                "type": "t_mapping(t_uint256,t_uint256)"
-              },
-              {
-                "label": "artifactIdToVoyageId",
-                "type": "t_mapping(t_uint256,t_uint256)"
-              },
-              {
-                "label": "players",
-                "type": "t_mapping(t_address,t_struct(Player)13780_storage)"
-              },
-              {
-                "label": "planetEvents",
-                "type": "t_mapping(t_uint256,t_array(t_struct(PlanetEventMetadata)13868_storage)dyn_storage)"
-              },
-              {
-                "label": "planetArrivals",
-                "type": "t_mapping(t_uint256,t_struct(ArrivalData)14070_storage)"
-              },
-              {
-                "label": "planetArtifacts",
-                "type": "t_mapping(t_uint256,t_array(t_uint256)dyn_storage)"
-              }
-            ]
-          },
-          "t_address": {
-            "label": "address"
-          },
-          "t_contract(Whitelist)18395": {
-            "label": "contract Whitelist"
-          },
-          "t_contract(DarkForestTokens)13745": {
-            "label": "contract DarkForestTokens"
-          },
-          "t_bool": {
-            "label": "bool"
-          },
-          "t_uint256": {
-            "label": "uint256"
-          },
-          "t_struct(SnarkConstants)13888_storage": {
-            "label": "struct DarkForestTypes.SnarkConstants",
-            "members": [
-              {
-                "label": "DISABLE_ZK_CHECKS",
-                "type": "t_bool"
-              },
-              {
-                "label": "PLANETHASH_KEY",
-                "type": "t_uint256"
-              },
-              {
-                "label": "SPACETYPE_KEY",
-                "type": "t_uint256"
-              },
-              {
-                "label": "BIOMEBASE_KEY",
-                "type": "t_uint256"
-              },
-              {
-                "label": "PERLIN_MIRROR_X",
-                "type": "t_bool"
-              },
-              {
-                "label": "PERLIN_MIRROR_Y",
-                "type": "t_bool"
-              },
-              {
-                "label": "PERLIN_LENGTH_SCALE",
-                "type": "t_uint256"
-              }
-            ]
-          },
-          "t_struct(GameConstants)13921_storage": {
-            "label": "struct DarkForestTypes.GameConstants",
-            "members": [
-              {
-                "label": "MAX_NATURAL_PLANET_LEVEL",
-                "type": "t_uint256"
-              },
-              {
-                "label": "TIME_FACTOR_HUNDREDTHS",
-                "type": "t_uint256"
-              },
-              {
-                "label": "PERLIN_THRESHOLD_1",
-                "type": "t_uint256"
-              },
-              {
-                "label": "PERLIN_THRESHOLD_2",
-                "type": "t_uint256"
-              },
-              {
-                "label": "PERLIN_THRESHOLD_3",
-                "type": "t_uint256"
-              },
-              {
-                "label": "INIT_PERLIN_MIN",
-                "type": "t_uint256"
-              },
-              {
-                "label": "INIT_PERLIN_MAX",
-                "type": "t_uint256"
-              },
-              {
-                "label": "BIOME_THRESHOLD_1",
-                "type": "t_uint256"
-              },
-              {
-                "label": "BIOME_THRESHOLD_2",
-                "type": "t_uint256"
-              },
-              {
-                "label": "PLANET_RARITY",
-                "type": "t_uint256"
-              },
-              {
-                "label": "PHOTOID_ACTIVATION_DELAY",
-                "type": "t_uint256"
-              },
-              {
-                "label": "LOCATION_REVEAL_COOLDOWN",
-                "type": "t_uint256"
-              },
-              {
-                "label": "PLANET_TYPE_WEIGHTS",
-                "type": "t_array(t_array(t_array(t_uint8)5_storage)10_storage)4_storage"
-              }
-            ]
-          },
-          "t_array(t_uint256)dyn_storage": {
-            "label": "uint256[]"
-          },
-          "t_array(t_struct(PlanetDefaultStats)14089_storage)dyn_storage": {
-            "label": "struct DarkForestTypes.PlanetDefaultStats[]"
-          },
-          "t_struct(PlanetDefaultStats)14089_storage": {
-            "label": "struct DarkForestTypes.PlanetDefaultStats",
-            "members": [
-              {
-                "label": "label",
-                "type": "t_string_storage"
-              },
-              {
-                "label": "populationCap",
-                "type": "t_uint256"
-              },
-              {
-                "label": "populationGrowth",
-                "type": "t_uint256"
-              },
-              {
-                "label": "range",
-                "type": "t_uint256"
-              },
-              {
-                "label": "speed",
-                "type": "t_uint256"
-              },
-              {
-                "label": "defense",
-                "type": "t_uint256"
-              },
-              {
-                "label": "silverGrowth",
-                "type": "t_uint256"
-              },
-              {
-                "label": "silverCap",
-                "type": "t_uint256"
-              },
-              {
-                "label": "barbarianPercentage",
-                "type": "t_uint256"
-              }
-            ]
-          },
-          "t_array(t_array(t_struct(Upgrade)14100_storage)4_storage)3_storage": {
-            "label": "struct DarkForestTypes.Upgrade[4][3]"
-          },
-          "t_array(t_struct(Upgrade)14100_storage)4_storage": {
-            "label": "struct DarkForestTypes.Upgrade[4]"
-          },
-          "t_struct(Upgrade)14100_storage": {
-            "label": "struct DarkForestTypes.Upgrade",
-            "members": [
-              {
-                "label": "popCapMultiplier",
-                "type": "t_uint256"
-              },
-              {
-                "label": "popGroMultiplier",
-                "type": "t_uint256"
-              },
-              {
-                "label": "rangeMultiplier",
-                "type": "t_uint256"
-              },
-              {
-                "label": "speedMultiplier",
-                "type": "t_uint256"
-              },
-              {
-                "label": "defMultiplier",
-                "type": "t_uint256"
-              }
-            ]
-          },
-          "t_array(t_address)dyn_storage": {
-            "label": "address[]"
-          },
-          "t_mapping(t_uint256,t_struct(Planet)13807_storage)": {
-            "label": "mapping(uint256 => struct DarkForestTypes.Planet)"
-          },
-          "t_struct(Planet)13807_storage": {
-            "label": "struct DarkForestTypes.Planet",
-            "members": [
-              {
-                "label": "owner",
-                "type": "t_address"
-              },
-              {
-                "label": "range",
-                "type": "t_uint256"
-              },
-              {
-                "label": "speed",
-                "type": "t_uint256"
-              },
-              {
-                "label": "defense",
-                "type": "t_uint256"
-              },
-              {
-                "label": "population",
-                "type": "t_uint256"
-              },
-              {
-                "label": "populationCap",
-                "type": "t_uint256"
-              },
-              {
-                "label": "populationGrowth",
-                "type": "t_uint256"
-              },
-              {
-                "label": "silverCap",
-                "type": "t_uint256"
-              },
-              {
-                "label": "silverGrowth",
-                "type": "t_uint256"
-              },
-              {
-                "label": "silver",
-                "type": "t_uint256"
-              },
-              {
-                "label": "planetLevel",
-                "type": "t_uint256"
-              },
-              {
-                "label": "planetType",
-                "type": "t_enum(PlanetType)13756"
-              },
-              {
-                "label": "isHomePlanet",
-                "type": "t_bool"
-              }
-            ]
-          },
-          "t_mapping(t_uint256,t_struct(RevealedCoords)13816_storage)": {
-            "label": "mapping(uint256 => struct DarkForestTypes.RevealedCoords)"
-          },
-          "t_struct(RevealedCoords)13816_storage": {
-            "label": "struct DarkForestTypes.RevealedCoords",
-            "members": [
-              {
-                "label": "locationId",
-                "type": "t_uint256"
-              },
-              {
-                "label": "x",
-                "type": "t_uint256"
-              },
-              {
-                "label": "y",
-                "type": "t_uint256"
-              },
-              {
-                "label": "revealer",
-                "type": "t_address"
-              }
-            ]
-          },
-          "t_mapping(t_uint256,t_struct(PlanetExtendedInfo)13841_storage)": {
-            "label": "mapping(uint256 => struct DarkForestTypes.PlanetExtendedInfo)"
-          },
-          "t_struct(PlanetExtendedInfo)13841_storage": {
-            "label": "struct DarkForestTypes.PlanetExtendedInfo",
-            "members": [
-              {
-                "label": "isInitialized",
-                "type": "t_bool"
-              },
-              {
-                "label": "createdAt",
-                "type": "t_uint256"
-              },
-              {
-                "label": "lastUpdated",
-                "type": "t_uint256"
-              },
-              {
-                "label": "perlin",
-                "type": "t_uint256"
-              },
-              {
-                "label": "spaceType",
-                "type": "t_enum(SpaceType)13763"
-              },
-              {
-                "label": "upgradeState0",
-                "type": "t_uint256"
-              },
-              {
-                "label": "upgradeState1",
-                "type": "t_uint256"
-              },
-              {
-                "label": "upgradeState2",
-                "type": "t_uint256"
-              },
-              {
-                "label": "hatLevel",
-                "type": "t_uint256"
-              },
-              {
-                "label": "hasTriedFindingArtifact",
-                "type": "t_bool"
-              },
-              {
-                "label": "prospectedBlockNumber",
-                "type": "t_uint256"
-              },
-              {
-                "label": "destroyed",
-                "type": "t_bool"
-              }
-            ]
-          },
-          "t_mapping(t_uint256,t_uint256)": {
-            "label": "mapping(uint256 => uint256)"
-          },
-          "t_mapping(t_address,t_struct(Player)13780_storage)": {
-            "label": "mapping(address => struct DarkForestTypes.Player)"
-          },
-          "t_struct(Player)13780_storage": {
-            "label": "struct DarkForestTypes.Player",
-            "members": [
-              {
-                "label": "isInitialized",
-                "type": "t_bool"
-              },
-              {
-                "label": "player",
-                "type": "t_address"
-              },
-              {
-                "label": "initTimestamp",
-                "type": "t_uint256"
-              },
-              {
-                "label": "homePlanetId",
-                "type": "t_uint256"
-              },
-              {
-                "label": "lastRevealTimestamp",
-                "type": "t_uint256"
-              },
-              {
-                "label": "withdrawnSilver",
-                "type": "t_uint256"
-              }
-            ]
-          },
-          "t_mapping(t_uint256,t_array(t_struct(PlanetEventMetadata)13868_storage)dyn_storage)": {
-            "label": "mapping(uint256 => struct DarkForestTypes.PlanetEventMetadata[])"
-          },
-          "t_array(t_struct(PlanetEventMetadata)13868_storage)dyn_storage": {
-            "label": "struct DarkForestTypes.PlanetEventMetadata[]"
-          },
-          "t_struct(PlanetEventMetadata)13868_storage": {
-            "label": "struct DarkForestTypes.PlanetEventMetadata",
-            "members": [
-              {
-                "label": "id",
-                "type": "t_uint256"
-              },
-              {
-                "label": "eventType",
-                "type": "t_enum(PlanetEventType)13758"
-              },
-              {
-                "label": "timeTrigger",
-                "type": "t_uint256"
-              },
-              {
-                "label": "timeAdded",
-                "type": "t_uint256"
-              }
-            ]
-          },
-          "t_mapping(t_uint256,t_struct(ArrivalData)14070_storage)": {
-            "label": "mapping(uint256 => struct DarkForestTypes.ArrivalData)"
-          },
-          "t_struct(ArrivalData)14070_storage": {
-            "label": "struct DarkForestTypes.ArrivalData",
-            "members": [
-              {
-                "label": "id",
-                "type": "t_uint256"
-              },
-              {
-                "label": "player",
-                "type": "t_address"
-              },
-              {
-                "label": "fromPlanet",
-                "type": "t_uint256"
-              },
-              {
-                "label": "toPlanet",
-                "type": "t_uint256"
-              },
-              {
-                "label": "popArriving",
-                "type": "t_uint256"
-              },
-              {
-                "label": "silverMoved",
-                "type": "t_uint256"
-              },
-              {
-                "label": "departureTime",
-                "type": "t_uint256"
-              },
-              {
-                "label": "arrivalTime",
-                "type": "t_uint256"
-              },
-              {
-                "label": "arrivalType",
-                "type": "t_enum(ArrivalType)13873"
-              },
-              {
-                "label": "carriedArtifactId",
-                "type": "t_uint256"
-              },
-              {
-                "label": "distance",
-                "type": "t_uint256"
-              }
-            ]
-          },
-          "t_mapping(t_uint256,t_array(t_uint256)dyn_storage)": {
-            "label": "mapping(uint256 => uint256[])"
-          },
-          "t_array(t_array(t_array(t_uint8)5_storage)10_storage)4_storage": {
-            "label": "uint8[5][10][4]"
-          },
-          "t_array(t_array(t_uint8)5_storage)10_storage": {
-            "label": "uint8[5][10]"
-          },
-          "t_array(t_uint8)5_storage": {
-            "label": "uint8[5]"
-          },
-          "t_uint8": {
-            "label": "uint8"
-          },
-          "t_string_storage": {
-            "label": "string"
-          },
-          "t_enum(PlanetType)13756": {
-            "label": "enum DarkForestTypes.PlanetType",
-            "members": [
-              "PLANET",
-              "SILVER_MINE",
-              "RUINS",
-              "TRADING_POST",
-              "SILVER_BANK"
-            ]
-          },
-          "t_enum(SpaceType)13763": {
-            "label": "enum DarkForestTypes.SpaceType",
-            "members": [
-              "NEBULA",
-              "SPACE",
-              "DEEP_SPACE",
-              "DEAD_SPACE"
-            ]
-          },
-          "t_enum(PlanetEventType)13758": {
-            "label": "enum DarkForestTypes.PlanetEventType",
-            "members": [
-              "ARRIVAL"
-            ]
-          },
-          "t_enum(ArrivalType)13873": {
-            "label": "enum DarkForestTypes.ArrivalType",
-            "members": [
-              "Unknown",
-              "Normal",
-              "Photoid",
-              "Wormhole"
-            ]
-          }
-        }
-      }
-    },
-    "4c8fe5765f623e55ae2df880473f1d04be09fc9f4f0a0b4d1f634e84f4b57b4e": {
-      "address": "0xA8B84c94e58F8e2f81D4Cb07861785E90269B22e",
-      "txHash": "0xb994ea22c4d51d6176d10e3fcecbcb12dfb8141cc92d6b1f5d4353674a8ed5fe",
-      "layout": {
-        "storage": [
-          {
-            "contract": "Initializable",
-            "label": "_initialized",
-            "type": "t_bool",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:25"
-          },
-          {
-            "contract": "Initializable",
-            "label": "_initializing",
-            "type": "t_bool",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:30"
-          },
-          {
-            "contract": "DarkForestGetters",
-            "label": "adminAddress",
-            "type": "t_address",
-            "src": "contracts/DarkForestGetters.sol:10"
-          },
-          {
-            "contract": "DarkForestGetters",
-            "label": "coreContract",
-            "type": "t_contract(DarkForestCore)7634",
-            "src": "contracts/DarkForestGetters.sol:11"
-          },
-          {
-            "contract": "DarkForestGetters",
-            "label": "tokensContract",
-            "type": "t_contract(DarkForestTokens)13789",
-            "src": "contracts/DarkForestGetters.sol:12"
-          }
-        ],
-        "types": {
-          "t_address": {
-            "label": "address"
-          },
-          "t_contract(DarkForestCore)7634": {
-            "label": "contract DarkForestCore"
-          },
-          "t_contract(DarkForestTokens)13789": {
-            "label": "contract DarkForestTokens"
-          },
-          "t_bool": {
-            "label": "bool"
-          }
-        }
-      }
-    },
-    "b12742706ebf000d11035e94628a7f9c7b133a2a0bacc3818cf3794ead010b94": {
-      "address": "0xefAb08E839bad60d83B11859250A3EdB7a2ce403",
-      "txHash": "0x0578edd2780fb6ccbabd1d0691e9aed02a6c64db2a56fd70eb9ab55f886d0c5a",
-      "layout": {
-        "storage": [
-          {
-            "contract": "Initializable",
-            "label": "_initialized",
-            "type": "t_bool",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:25"
-          },
-          {
-            "contract": "Initializable",
-            "label": "_initializing",
-            "type": "t_bool",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:30"
-          },
-          {
-            "contract": "DarkForestStorageV1",
-            "label": "s",
-            "type": "t_struct(GameStorage)14302_storage",
-            "src": "contracts/DarkForestStorageV1.sol:9"
-          }
-        ],
-        "types": {
-          "t_struct(GameStorage)14302_storage": {
-            "label": "struct DarkForestTypes.GameStorage",
-            "members": [
-              {
-                "label": "adminAddress",
-                "type": "t_address"
-              },
-              {
-                "label": "whitelist",
-                "type": "t_contract(Whitelist)18439"
-              },
-              {
-                "label": "tokens",
-                "type": "t_contract(DarkForestTokens)13789"
-              },
-              {
-                "label": "paused",
-                "type": "t_bool"
-              },
-              {
-                "label": "ADMIN_CAN_ADD_PLANETS",
-                "type": "t_bool"
-              },
-              {
-                "label": "WORLD_RADIUS_LOCKED",
-                "type": "t_bool"
-              },
-              {
-                "label": "TOKEN_MINT_END_TIMESTAMP",
-                "type": "t_uint256"
-              },
-              {
-                "label": "TARGET4_RADIUS",
-                "type": "t_uint256"
-              },
-              {
-                "label": "snarkConstants",
-                "type": "t_struct(SnarkConstants)13932_storage"
-              },
-              {
-                "label": "gameConstants",
-                "type": "t_struct(GameConstants)13965_storage"
-              },
-              {
-                "label": "planetLevelsCount",
-                "type": "t_uint256"
-              },
-              {
-                "label": "planetLevelThresholds",
-                "type": "t_array(t_uint256)dyn_storage"
-              },
-              {
-                "label": "cumulativeRarities",
-                "type": "t_array(t_uint256)dyn_storage"
-              },
-              {
-                "label": "initializedPlanetCountByLevel",
-                "type": "t_array(t_uint256)dyn_storage"
-              },
-              {
-                "label": "planetDefaultStats",
-                "type": "t_array(t_struct(PlanetDefaultStats)14133_storage)dyn_storage"
-              },
-              {
-                "label": "upgrades",
-                "type": "t_array(t_array(t_struct(Upgrade)14144_storage)4_storage)3_storage"
-              },
-              {
-                "label": "planetIds",
-                "type": "t_array(t_uint256)dyn_storage"
-              },
-              {
-                "label": "revealedPlanetIds",
-                "type": "t_array(t_uint256)dyn_storage"
-              },
-              {
-                "label": "playerIds",
-                "type": "t_array(t_address)dyn_storage"
-              },
-              {
-                "label": "worldRadius",
-                "type": "t_uint256"
-              },
-              {
-                "label": "planetEventsCount",
-                "type": "t_uint256"
-              },
-              {
-                "label": "planets",
-                "type": "t_mapping(t_uint256,t_struct(Planet)13851_storage)"
-              },
-              {
-                "label": "revealedCoords",
-                "type": "t_mapping(t_uint256,t_struct(RevealedCoords)13860_storage)"
-              },
-              {
-                "label": "planetsExtendedInfo",
-                "type": "t_mapping(t_uint256,t_struct(PlanetExtendedInfo)13885_storage)"
-              },
-              {
-                "label": "artifactIdToPlanetId",
-                "type": "t_mapping(t_uint256,t_uint256)"
-              },
-              {
-                "label": "artifactIdToVoyageId",
-                "type": "t_mapping(t_uint256,t_uint256)"
-              },
-              {
-                "label": "players",
-                "type": "t_mapping(t_address,t_struct(Player)13824_storage)"
-              },
-              {
-                "label": "planetEvents",
-                "type": "t_mapping(t_uint256,t_array(t_struct(PlanetEventMetadata)13912_storage)dyn_storage)"
-              },
-              {
-                "label": "planetArrivals",
-                "type": "t_mapping(t_uint256,t_struct(ArrivalData)14114_storage)"
-              },
-              {
-                "label": "planetArtifacts",
-                "type": "t_mapping(t_uint256,t_array(t_uint256)dyn_storage)"
-              }
-            ]
-          },
-          "t_address": {
-            "label": "address"
-          },
-          "t_contract(Whitelist)18439": {
-            "label": "contract Whitelist"
-          },
-          "t_contract(DarkForestTokens)13789": {
-            "label": "contract DarkForestTokens"
-          },
-          "t_bool": {
-            "label": "bool"
-          },
-          "t_uint256": {
-            "label": "uint256"
-          },
-          "t_struct(SnarkConstants)13932_storage": {
-            "label": "struct DarkForestTypes.SnarkConstants",
-            "members": [
-              {
-                "label": "DISABLE_ZK_CHECKS",
-                "type": "t_bool"
-              },
-              {
-                "label": "PLANETHASH_KEY",
-                "type": "t_uint256"
-              },
-              {
-                "label": "SPACETYPE_KEY",
-                "type": "t_uint256"
-              },
-              {
-                "label": "BIOMEBASE_KEY",
-                "type": "t_uint256"
-              },
-              {
-                "label": "PERLIN_MIRROR_X",
-                "type": "t_bool"
-              },
-              {
-                "label": "PERLIN_MIRROR_Y",
-                "type": "t_bool"
-              },
-              {
-                "label": "PERLIN_LENGTH_SCALE",
-                "type": "t_uint256"
-              }
-            ]
-          },
-          "t_struct(GameConstants)13965_storage": {
-            "label": "struct DarkForestTypes.GameConstants",
-            "members": [
-              {
-                "label": "MAX_NATURAL_PLANET_LEVEL",
-                "type": "t_uint256"
-              },
-              {
-                "label": "TIME_FACTOR_HUNDREDTHS",
-                "type": "t_uint256"
-              },
-              {
-                "label": "PERLIN_THRESHOLD_1",
-                "type": "t_uint256"
-              },
-              {
-                "label": "PERLIN_THRESHOLD_2",
-                "type": "t_uint256"
-              },
-              {
-                "label": "PERLIN_THRESHOLD_3",
-                "type": "t_uint256"
-              },
-              {
-                "label": "INIT_PERLIN_MIN",
-                "type": "t_uint256"
-              },
-              {
-                "label": "INIT_PERLIN_MAX",
-                "type": "t_uint256"
-              },
-              {
-                "label": "BIOME_THRESHOLD_1",
-                "type": "t_uint256"
-              },
-              {
-                "label": "BIOME_THRESHOLD_2",
-                "type": "t_uint256"
-              },
-              {
-                "label": "PLANET_RARITY",
-                "type": "t_uint256"
-              },
-              {
-                "label": "PHOTOID_ACTIVATION_DELAY",
-                "type": "t_uint256"
-              },
-              {
-                "label": "LOCATION_REVEAL_COOLDOWN",
-                "type": "t_uint256"
-              },
-              {
-                "label": "PLANET_TYPE_WEIGHTS",
-                "type": "t_array(t_array(t_array(t_uint8)5_storage)10_storage)4_storage"
-              }
-            ]
-          },
-          "t_array(t_uint256)dyn_storage": {
-            "label": "uint256[]"
-          },
-          "t_array(t_struct(PlanetDefaultStats)14133_storage)dyn_storage": {
-            "label": "struct DarkForestTypes.PlanetDefaultStats[]"
-          },
-          "t_struct(PlanetDefaultStats)14133_storage": {
-            "label": "struct DarkForestTypes.PlanetDefaultStats",
-            "members": [
-              {
-                "label": "label",
-                "type": "t_string_storage"
-              },
-              {
-                "label": "populationCap",
-                "type": "t_uint256"
-              },
-              {
-                "label": "populationGrowth",
-                "type": "t_uint256"
-              },
-              {
-                "label": "range",
-                "type": "t_uint256"
-              },
-              {
-                "label": "speed",
-                "type": "t_uint256"
-              },
-              {
-                "label": "defense",
-                "type": "t_uint256"
-              },
-              {
-                "label": "silverGrowth",
-                "type": "t_uint256"
-              },
-              {
-                "label": "silverCap",
-                "type": "t_uint256"
-              },
-              {
-                "label": "barbarianPercentage",
-                "type": "t_uint256"
-              }
-            ]
-          },
-          "t_array(t_array(t_struct(Upgrade)14144_storage)4_storage)3_storage": {
-            "label": "struct DarkForestTypes.Upgrade[4][3]"
-          },
-          "t_array(t_struct(Upgrade)14144_storage)4_storage": {
-            "label": "struct DarkForestTypes.Upgrade[4]"
-          },
-          "t_struct(Upgrade)14144_storage": {
-            "label": "struct DarkForestTypes.Upgrade",
-            "members": [
-              {
-                "label": "popCapMultiplier",
-                "type": "t_uint256"
-              },
-              {
-                "label": "popGroMultiplier",
-                "type": "t_uint256"
-              },
-              {
-                "label": "rangeMultiplier",
-                "type": "t_uint256"
-              },
-              {
-                "label": "speedMultiplier",
-                "type": "t_uint256"
-              },
-              {
-                "label": "defMultiplier",
-                "type": "t_uint256"
-              }
-            ]
-          },
-          "t_array(t_address)dyn_storage": {
-            "label": "address[]"
-          },
-          "t_mapping(t_uint256,t_struct(Planet)13851_storage)": {
-            "label": "mapping(uint256 => struct DarkForestTypes.Planet)"
-          },
-          "t_struct(Planet)13851_storage": {
-            "label": "struct DarkForestTypes.Planet",
-            "members": [
-              {
-                "label": "owner",
-                "type": "t_address"
-              },
-              {
-                "label": "range",
-                "type": "t_uint256"
-              },
-              {
-                "label": "speed",
-                "type": "t_uint256"
-              },
-              {
-                "label": "defense",
-                "type": "t_uint256"
-              },
-              {
-                "label": "population",
-                "type": "t_uint256"
-              },
-              {
-                "label": "populationCap",
-                "type": "t_uint256"
-              },
-              {
-                "label": "populationGrowth",
-                "type": "t_uint256"
-              },
-              {
-                "label": "silverCap",
-                "type": "t_uint256"
-              },
-              {
-                "label": "silverGrowth",
-                "type": "t_uint256"
-              },
-              {
-                "label": "silver",
-                "type": "t_uint256"
-              },
-              {
-                "label": "planetLevel",
-                "type": "t_uint256"
-              },
-              {
-                "label": "planetType",
-                "type": "t_enum(PlanetType)13800"
-              },
-              {
-                "label": "isHomePlanet",
-                "type": "t_bool"
-              }
-            ]
-          },
-          "t_mapping(t_uint256,t_struct(RevealedCoords)13860_storage)": {
-            "label": "mapping(uint256 => struct DarkForestTypes.RevealedCoords)"
-          },
-          "t_struct(RevealedCoords)13860_storage": {
-            "label": "struct DarkForestTypes.RevealedCoords",
-            "members": [
-              {
-                "label": "locationId",
-                "type": "t_uint256"
-              },
-              {
-                "label": "x",
-                "type": "t_uint256"
-              },
-              {
-                "label": "y",
-                "type": "t_uint256"
-              },
-              {
-                "label": "revealer",
-                "type": "t_address"
-              }
-            ]
-          },
-          "t_mapping(t_uint256,t_struct(PlanetExtendedInfo)13885_storage)": {
-            "label": "mapping(uint256 => struct DarkForestTypes.PlanetExtendedInfo)"
-          },
-          "t_struct(PlanetExtendedInfo)13885_storage": {
-            "label": "struct DarkForestTypes.PlanetExtendedInfo",
-            "members": [
-              {
-                "label": "isInitialized",
-                "type": "t_bool"
-              },
-              {
-                "label": "createdAt",
-                "type": "t_uint256"
-              },
-              {
-                "label": "lastUpdated",
-                "type": "t_uint256"
-              },
-              {
-                "label": "perlin",
-                "type": "t_uint256"
-              },
-              {
-                "label": "spaceType",
-                "type": "t_enum(SpaceType)13807"
-              },
-              {
-                "label": "upgradeState0",
-                "type": "t_uint256"
-              },
-              {
-                "label": "upgradeState1",
-                "type": "t_uint256"
-              },
-              {
-                "label": "upgradeState2",
-                "type": "t_uint256"
-              },
-              {
-                "label": "hatLevel",
-                "type": "t_uint256"
-              },
-              {
-                "label": "hasTriedFindingArtifact",
-                "type": "t_bool"
-              },
-              {
-                "label": "prospectedBlockNumber",
-                "type": "t_uint256"
-              },
-              {
-                "label": "destroyed",
-                "type": "t_bool"
-              }
-            ]
-          },
-          "t_mapping(t_uint256,t_uint256)": {
-            "label": "mapping(uint256 => uint256)"
-          },
-          "t_mapping(t_address,t_struct(Player)13824_storage)": {
-            "label": "mapping(address => struct DarkForestTypes.Player)"
-          },
-          "t_struct(Player)13824_storage": {
-            "label": "struct DarkForestTypes.Player",
-            "members": [
-              {
-                "label": "isInitialized",
-                "type": "t_bool"
-              },
-              {
-                "label": "player",
-                "type": "t_address"
-              },
-              {
-                "label": "initTimestamp",
-                "type": "t_uint256"
-              },
-              {
-                "label": "homePlanetId",
-                "type": "t_uint256"
-              },
-              {
-                "label": "lastRevealTimestamp",
-                "type": "t_uint256"
-              },
-              {
-                "label": "withdrawnSilver",
-                "type": "t_uint256"
-              }
-            ]
-          },
-          "t_mapping(t_uint256,t_array(t_struct(PlanetEventMetadata)13912_storage)dyn_storage)": {
-            "label": "mapping(uint256 => struct DarkForestTypes.PlanetEventMetadata[])"
-          },
-          "t_array(t_struct(PlanetEventMetadata)13912_storage)dyn_storage": {
-            "label": "struct DarkForestTypes.PlanetEventMetadata[]"
-          },
-          "t_struct(PlanetEventMetadata)13912_storage": {
-            "label": "struct DarkForestTypes.PlanetEventMetadata",
-            "members": [
-              {
-                "label": "id",
-                "type": "t_uint256"
-              },
-              {
-                "label": "eventType",
-                "type": "t_enum(PlanetEventType)13802"
-              },
-              {
-                "label": "timeTrigger",
-                "type": "t_uint256"
-              },
-              {
-                "label": "timeAdded",
-                "type": "t_uint256"
-              }
-            ]
-          },
-          "t_mapping(t_uint256,t_struct(ArrivalData)14114_storage)": {
-            "label": "mapping(uint256 => struct DarkForestTypes.ArrivalData)"
-          },
-          "t_struct(ArrivalData)14114_storage": {
-            "label": "struct DarkForestTypes.ArrivalData",
-            "members": [
-              {
-                "label": "id",
-                "type": "t_uint256"
-              },
-              {
-                "label": "player",
-                "type": "t_address"
-              },
-              {
-                "label": "fromPlanet",
-                "type": "t_uint256"
-              },
-              {
-                "label": "toPlanet",
-                "type": "t_uint256"
-              },
-              {
-                "label": "popArriving",
-                "type": "t_uint256"
-              },
-              {
-                "label": "silverMoved",
-                "type": "t_uint256"
-              },
-              {
-                "label": "departureTime",
-                "type": "t_uint256"
-              },
-              {
-                "label": "arrivalTime",
-                "type": "t_uint256"
-              },
-              {
-                "label": "arrivalType",
-                "type": "t_enum(ArrivalType)13917"
-              },
-              {
-                "label": "carriedArtifactId",
-                "type": "t_uint256"
-              },
-              {
-                "label": "distance",
-                "type": "t_uint256"
-              }
-            ]
-          },
-          "t_mapping(t_uint256,t_array(t_uint256)dyn_storage)": {
-            "label": "mapping(uint256 => uint256[])"
-          },
-          "t_array(t_array(t_array(t_uint8)5_storage)10_storage)4_storage": {
-            "label": "uint8[5][10][4]"
-          },
-          "t_array(t_array(t_uint8)5_storage)10_storage": {
-            "label": "uint8[5][10]"
-          },
-          "t_array(t_uint8)5_storage": {
-            "label": "uint8[5]"
-          },
-          "t_uint8": {
-            "label": "uint8"
-          },
-          "t_string_storage": {
-            "label": "string"
-          },
-          "t_enum(PlanetType)13800": {
-            "label": "enum DarkForestTypes.PlanetType",
-            "members": [
-              "PLANET",
-              "SILVER_MINE",
-              "RUINS",
-              "TRADING_POST",
-              "SILVER_BANK"
-            ]
-          },
-          "t_enum(SpaceType)13807": {
-            "label": "enum DarkForestTypes.SpaceType",
-            "members": [
-              "NEBULA",
-              "SPACE",
-              "DEEP_SPACE",
-              "DEAD_SPACE"
-            ]
-          },
-          "t_enum(PlanetEventType)13802": {
-            "label": "enum DarkForestTypes.PlanetEventType",
-            "members": [
-              "ARRIVAL"
-            ]
-          },
-          "t_enum(ArrivalType)13917": {
-            "label": "enum DarkForestTypes.ArrivalType",
-            "members": [
-              "Unknown",
-              "Normal",
-              "Photoid",
-              "Wormhole"
-            ]
-          }
-        }
-      }
-    },
-    "90072ad925d306fe3f70dfe25dbd72844136c6f67b6a067cd965d175a9388921": {
-      "address": "0x876BBe879D26525C999B81F0b7937Dfe0FC6f6b6",
-      "txHash": "0xbeb7d3a1475f4b54c7ffe294104711cb2b1a6216d151cf227ca51fbc412efa4a",
-      "layout": {
-        "storage": [
-          {
-            "contract": "Initializable",
-            "label": "_initialized",
-            "type": "t_bool",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:25"
-          },
-          {
-            "contract": "Initializable",
-            "label": "_initializing",
-            "type": "t_bool",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:30"
-          },
-          {
-            "contract": "ContextUpgradeable",
-            "label": "__gap",
-            "type": "t_array(t_uint256)50_storage",
-            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:31"
-          },
-          {
-            "contract": "ERC165Upgradeable",
-            "label": "_supportedInterfaces",
-            "type": "t_mapping(t_bytes4,t_bool)",
-            "src": "@openzeppelin/contracts-upgradeable/introspection/ERC165Upgradeable.sol:23"
-          },
-          {
-            "contract": "ERC165Upgradeable",
-            "label": "__gap",
-            "type": "t_array(t_uint256)49_storage",
-            "src": "@openzeppelin/contracts-upgradeable/introspection/ERC165Upgradeable.sol:59"
-          },
-          {
-            "contract": "ERC721Upgradeable",
-            "label": "_holderTokens",
-            "type": "t_mapping(t_address,t_struct(UintSet)2992_storage)",
-            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:34"
-          },
-          {
-            "contract": "ERC721Upgradeable",
-            "label": "_tokenOwners",
-            "type": "t_struct(UintToAddressMap)2369_storage",
-            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:37"
-          },
-          {
-            "contract": "ERC721Upgradeable",
-            "label": "_tokenApprovals",
-            "type": "t_mapping(t_uint256,t_address)",
-            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:40"
-          },
-          {
-            "contract": "ERC721Upgradeable",
-            "label": "_operatorApprovals",
-            "type": "t_mapping(t_address,t_mapping(t_address,t_bool))",
-            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:43"
-          },
-          {
-            "contract": "ERC721Upgradeable",
-            "label": "_name",
-            "type": "t_string_storage",
-            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:46"
-          },
-          {
-            "contract": "ERC721Upgradeable",
-            "label": "_symbol",
-            "type": "t_string_storage",
-            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:49"
-          },
-          {
-            "contract": "ERC721Upgradeable",
-            "label": "_tokenURIs",
-            "type": "t_mapping(t_uint256,t_string_storage)",
-            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:52"
-          },
-          {
-            "contract": "ERC721Upgradeable",
-            "label": "_baseURI",
-            "type": "t_string_storage",
-            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:55"
-          },
-          {
-            "contract": "ERC721Upgradeable",
-            "label": "__gap",
-            "type": "t_array(t_uint256)41_storage",
-            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:485"
-          },
-          {
-            "contract": "DarkForestTokens",
-            "label": "coreAddress",
-            "type": "t_address",
-            "src": "contracts/DarkForestTokens.sol:9"
-          },
-          {
-            "contract": "DarkForestTokens",
-            "label": "artifacts",
-            "type": "t_mapping(t_uint256,t_struct(Artifact)14217_storage)",
-            "src": "contracts/DarkForestTokens.sol:10"
-          },
-          {
-            "contract": "DarkForestTokens",
-            "label": "adminAddress",
-            "type": "t_address",
-            "src": "contracts/DarkForestTokens.sol:11"
-          }
-        ],
-        "types": {
-          "t_address": {
-            "label": "address"
-          },
-          "t_mapping(t_uint256,t_struct(Artifact)14217_storage)": {
-            "label": "mapping(uint256 => struct DarkForestTypes.Artifact)"
-          },
-          "t_uint256": {
-            "label": "uint256"
-          },
-          "t_struct(Artifact)14217_storage": {
-            "label": "struct DarkForestTypes.Artifact",
-            "members": [
-              {
-                "label": "isInitialized",
-                "type": "t_bool"
-              },
-              {
-                "label": "id",
-                "type": "t_uint256"
-              },
-              {
-                "label": "planetDiscoveredOn",
-                "type": "t_uint256"
-              },
-              {
-                "label": "rarity",
-                "type": "t_enum(ArtifactRarity)14194"
-              },
-              {
-                "label": "planetBiome",
-                "type": "t_enum(Biome)14242"
-              },
-              {
-                "label": "mintedAtTimestamp",
-                "type": "t_uint256"
-              },
-              {
-                "label": "discoverer",
-                "type": "t_address"
-              },
-              {
-                "label": "artifactType",
-                "type": "t_enum(ArtifactType)14187"
-              },
-              {
-                "label": "lastActivated",
-                "type": "t_uint256"
-              },
-              {
-                "label": "lastDeactivated",
-                "type": "t_uint256"
-              },
-              {
-                "label": "wormholeTo",
-                "type": "t_uint256"
-              }
-            ]
-          },
-          "t_bool": {
-            "label": "bool"
-          },
-          "t_enum(ArtifactRarity)14194": {
-            "label": "enum DarkForestTypes.ArtifactRarity",
-            "members": [
-              "Unknown",
-              "Common",
-              "Rare",
-              "Epic",
-              "Legendary",
-              "Mythic"
-            ]
-          },
-          "t_enum(Biome)14242": {
-            "label": "enum DarkForestTypes.Biome",
-            "members": [
-              "Unknown",
-              "Ocean",
-              "Forest",
-              "Grassland",
-              "Tundra",
-              "Swamp",
-              "Desert",
-              "Ice",
-              "Wasteland",
-              "Lava",
-              "Corrupted"
-            ]
-          },
-          "t_enum(ArtifactType)14187": {
-            "label": "enum DarkForestTypes.ArtifactType",
-            "members": [
-              "Unknown",
-              "Monolith",
-              "Colossus",
-              "Spaceship",
-              "Pyramid",
-              "Wormhole",
-              "PlanetaryShield",
-              "PhotoidCannon",
-              "BloomFilter",
-              "BlackDomain"
-            ]
-          },
-          "t_mapping(t_address,t_struct(UintSet)2992_storage)": {
-            "label": "mapping(address => struct EnumerableSetUpgradeable.UintSet)"
-          },
-          "t_struct(UintSet)2992_storage": {
-            "label": "struct EnumerableSetUpgradeable.UintSet",
-            "members": [
-              {
-                "label": "_inner",
-                "type": "t_struct(Set)2606_storage"
-              }
-            ]
-          },
-          "t_struct(Set)2606_storage": {
-            "label": "struct EnumerableSetUpgradeable.Set",
-            "members": [
-              {
-                "label": "_values",
-                "type": "t_array(t_bytes32)dyn_storage"
-              },
-              {
-                "label": "_indexes",
-                "type": "t_mapping(t_bytes32,t_uint256)"
-              }
-            ]
-          },
-          "t_array(t_bytes32)dyn_storage": {
-            "label": "bytes32[]"
-          },
-          "t_bytes32": {
-            "label": "bytes32"
-          },
-          "t_mapping(t_bytes32,t_uint256)": {
-            "label": "mapping(bytes32 => uint256)"
-          },
-          "t_struct(UintToAddressMap)2369_storage": {
-            "label": "struct EnumerableMapUpgradeable.UintToAddressMap",
-            "members": [
-              {
-                "label": "_inner",
-                "type": "t_struct(Map)2051_storage"
-              }
-            ]
-          },
-          "t_struct(Map)2051_storage": {
-            "label": "struct EnumerableMapUpgradeable.Map",
-            "members": [
-              {
-                "label": "_entries",
-                "type": "t_array(t_struct(MapEntry)2043_storage)dyn_storage"
-              },
-              {
-                "label": "_indexes",
-                "type": "t_mapping(t_bytes32,t_uint256)"
-              }
-            ]
-          },
-          "t_array(t_struct(MapEntry)2043_storage)dyn_storage": {
-            "label": "struct EnumerableMapUpgradeable.MapEntry[]"
-          },
-          "t_struct(MapEntry)2043_storage": {
-            "label": "struct EnumerableMapUpgradeable.MapEntry",
-            "members": [
-              {
-                "label": "_key",
-                "type": "t_bytes32"
-              },
-              {
-                "label": "_value",
-                "type": "t_bytes32"
-              }
-            ]
-          },
-          "t_mapping(t_uint256,t_address)": {
-            "label": "mapping(uint256 => address)"
-          },
-          "t_mapping(t_address,t_mapping(t_address,t_bool))": {
-            "label": "mapping(address => mapping(address => bool))"
-          },
-          "t_mapping(t_address,t_bool)": {
-            "label": "mapping(address => bool)"
-          },
-          "t_string_storage": {
-            "label": "string"
-          },
-          "t_mapping(t_uint256,t_string_storage)": {
-            "label": "mapping(uint256 => string)"
-          },
-          "t_array(t_uint256)41_storage": {
-            "label": "uint256[41]"
-          },
-          "t_mapping(t_bytes4,t_bool)": {
-            "label": "mapping(bytes4 => bool)"
-          },
-          "t_bytes4": {
-            "label": "bytes4"
-          },
-          "t_array(t_uint256)49_storage": {
-            "label": "uint256[49]"
-          },
-          "t_array(t_uint256)50_storage": {
-            "label": "uint256[50]"
-          }
-        }
-      }
-    },
-    "cc9c06dddc8f6cc4c5f4a7f6580bddfb6f80bdec9fcec255a3dd1e1c90ee68d9": {
-      "address": "0x526d028c324ce526AF9CF0B12d63A4425dDCE807",
-      "txHash": "0x378d95032ed8037caf5c792dbc6c0d6a5dc4f74d305d9eb9e24f5e118ff49e66",
-      "layout": {
-        "storage": [
-          {
-            "contract": "Initializable",
-            "label": "_initialized",
-            "type": "t_bool",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:25"
-          },
-          {
-            "contract": "Initializable",
-            "label": "_initializing",
-            "type": "t_bool",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:30"
-          },
-          {
-            "contract": "ContextUpgradeable",
-            "label": "__gap",
-            "type": "t_array(t_uint256)50_storage",
-            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:31"
-          },
-          {
-            "contract": "ERC165Upgradeable",
-            "label": "_supportedInterfaces",
-            "type": "t_mapping(t_bytes4,t_bool)",
-            "src": "@openzeppelin/contracts-upgradeable/introspection/ERC165Upgradeable.sol:23"
-          },
-          {
-            "contract": "ERC165Upgradeable",
-            "label": "__gap",
-            "type": "t_array(t_uint256)49_storage",
-            "src": "@openzeppelin/contracts-upgradeable/introspection/ERC165Upgradeable.sol:59"
-          },
-          {
-            "contract": "ERC721Upgradeable",
-            "label": "_holderTokens",
-            "type": "t_mapping(t_address,t_struct(UintSet)2992_storage)",
-            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:34"
-          },
-          {
-            "contract": "ERC721Upgradeable",
-            "label": "_tokenOwners",
-            "type": "t_struct(UintToAddressMap)2369_storage",
-            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:37"
-          },
-          {
-            "contract": "ERC721Upgradeable",
-            "label": "_tokenApprovals",
-            "type": "t_mapping(t_uint256,t_address)",
-            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:40"
-          },
-          {
-            "contract": "ERC721Upgradeable",
-            "label": "_operatorApprovals",
-            "type": "t_mapping(t_address,t_mapping(t_address,t_bool))",
-            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:43"
-          },
-          {
-            "contract": "ERC721Upgradeable",
-            "label": "_name",
-            "type": "t_string_storage",
-            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:46"
-          },
-          {
-            "contract": "ERC721Upgradeable",
-            "label": "_symbol",
-            "type": "t_string_storage",
-            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:49"
-          },
-          {
-            "contract": "ERC721Upgradeable",
-            "label": "_tokenURIs",
-            "type": "t_mapping(t_uint256,t_string_storage)",
-            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:52"
-          },
-          {
-            "contract": "ERC721Upgradeable",
-            "label": "_baseURI",
-            "type": "t_string_storage",
-            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:55"
-          },
-          {
-            "contract": "ERC721Upgradeable",
-            "label": "__gap",
-            "type": "t_array(t_uint256)41_storage",
-            "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:485"
-          },
-          {
-            "contract": "DarkForestTokens",
-            "label": "coreAddress",
-            "type": "t_address",
-            "src": "contracts/DarkForestTokens.sol:9"
-          },
-          {
-            "contract": "DarkForestTokens",
-            "label": "artifacts",
-            "type": "t_mapping(t_uint256,t_struct(Artifact)14209_storage)",
-            "src": "contracts/DarkForestTokens.sol:10"
-          },
-          {
-            "contract": "DarkForestTokens",
-            "label": "adminAddress",
-            "type": "t_address",
-            "src": "contracts/DarkForestTokens.sol:11"
-          }
-        ],
-        "types": {
-          "t_address": {
-            "label": "address"
-          },
-          "t_mapping(t_uint256,t_struct(Artifact)14209_storage)": {
-            "label": "mapping(uint256 => struct DarkForestTypes.Artifact)"
-          },
-          "t_uint256": {
-            "label": "uint256"
-          },
-          "t_struct(Artifact)14209_storage": {
-            "label": "struct DarkForestTypes.Artifact",
-            "members": [
-              {
-                "label": "isInitialized",
-                "type": "t_bool"
-              },
-              {
-                "label": "id",
-                "type": "t_uint256"
-              },
-              {
-                "label": "planetDiscoveredOn",
-                "type": "t_uint256"
-              },
-              {
-                "label": "rarity",
-                "type": "t_enum(ArtifactRarity)14186"
-              },
-              {
-                "label": "planetBiome",
-                "type": "t_enum(Biome)14234"
-              },
-              {
-                "label": "mintedAtTimestamp",
-                "type": "t_uint256"
-              },
-              {
-                "label": "discoverer",
-                "type": "t_address"
-              },
-              {
-                "label": "artifactType",
-                "type": "t_enum(ArtifactType)14179"
-              },
-              {
-                "label": "lastActivated",
-                "type": "t_uint256"
-              },
-              {
-                "label": "lastDeactivated",
-                "type": "t_uint256"
-              },
-              {
-                "label": "wormholeTo",
-                "type": "t_uint256"
-              }
-            ]
-          },
-          "t_bool": {
-            "label": "bool"
-          },
-          "t_enum(ArtifactRarity)14186": {
-            "label": "enum DarkForestTypes.ArtifactRarity",
-            "members": [
-              "Unknown",
-              "Common",
-              "Rare",
-              "Epic",
-              "Legendary",
-              "Mythic"
-            ]
-          },
-          "t_enum(Biome)14234": {
-            "label": "enum DarkForestTypes.Biome",
-            "members": [
-              "Unknown",
-              "Ocean",
-              "Forest",
-              "Grassland",
-              "Tundra",
-              "Swamp",
-              "Desert",
-              "Ice",
-              "Wasteland",
-              "Lava",
-              "Corrupted"
-            ]
-          },
-          "t_enum(ArtifactType)14179": {
-            "label": "enum DarkForestTypes.ArtifactType",
-            "members": [
-              "Unknown",
-              "Monolith",
-              "Colossus",
-              "Spaceship",
-              "Pyramid",
-              "Wormhole",
-              "PlanetaryShield",
-              "PhotoidCannon",
-              "BloomFilter",
-              "BlackDomain"
-            ]
-          },
-          "t_mapping(t_address,t_struct(UintSet)2992_storage)": {
-            "label": "mapping(address => struct EnumerableSetUpgradeable.UintSet)"
-          },
-          "t_struct(UintSet)2992_storage": {
-            "label": "struct EnumerableSetUpgradeable.UintSet",
-            "members": [
-              {
-                "label": "_inner",
-                "type": "t_struct(Set)2606_storage"
-              }
-            ]
-          },
-          "t_struct(Set)2606_storage": {
-            "label": "struct EnumerableSetUpgradeable.Set",
-            "members": [
-              {
-                "label": "_values",
-                "type": "t_array(t_bytes32)dyn_storage"
-              },
-              {
-                "label": "_indexes",
-                "type": "t_mapping(t_bytes32,t_uint256)"
-              }
-            ]
-          },
-          "t_array(t_bytes32)dyn_storage": {
-            "label": "bytes32[]"
-          },
-          "t_bytes32": {
-            "label": "bytes32"
-          },
-          "t_mapping(t_bytes32,t_uint256)": {
-            "label": "mapping(bytes32 => uint256)"
-          },
-          "t_struct(UintToAddressMap)2369_storage": {
-            "label": "struct EnumerableMapUpgradeable.UintToAddressMap",
-            "members": [
-              {
-                "label": "_inner",
-                "type": "t_struct(Map)2051_storage"
-              }
-            ]
-          },
-          "t_struct(Map)2051_storage": {
-            "label": "struct EnumerableMapUpgradeable.Map",
-            "members": [
-              {
-                "label": "_entries",
-                "type": "t_array(t_struct(MapEntry)2043_storage)dyn_storage"
-              },
-              {
-                "label": "_indexes",
-                "type": "t_mapping(t_bytes32,t_uint256)"
-              }
-            ]
-          },
-          "t_array(t_struct(MapEntry)2043_storage)dyn_storage": {
-            "label": "struct EnumerableMapUpgradeable.MapEntry[]"
-          },
-          "t_struct(MapEntry)2043_storage": {
-            "label": "struct EnumerableMapUpgradeable.MapEntry",
-            "members": [
-              {
-                "label": "_key",
-                "type": "t_bytes32"
-              },
-              {
-                "label": "_value",
-                "type": "t_bytes32"
-              }
-            ]
-          },
-          "t_mapping(t_uint256,t_address)": {
-            "label": "mapping(uint256 => address)"
-          },
-          "t_mapping(t_address,t_mapping(t_address,t_bool))": {
-            "label": "mapping(address => mapping(address => bool))"
-          },
-          "t_mapping(t_address,t_bool)": {
-            "label": "mapping(address => bool)"
-          },
-          "t_string_storage": {
-            "label": "string"
-          },
-          "t_mapping(t_uint256,t_string_storage)": {
-            "label": "mapping(uint256 => string)"
-          },
-          "t_array(t_uint256)41_storage": {
-            "label": "uint256[41]"
-          },
-          "t_mapping(t_bytes4,t_bool)": {
-            "label": "mapping(bytes4 => bool)"
-          },
-          "t_bytes4": {
-            "label": "bytes4"
-          },
-          "t_array(t_uint256)49_storage": {
-            "label": "uint256[49]"
-          },
-          "t_array(t_uint256)50_storage": {
-            "label": "uint256[50]"
           }
         }
       }

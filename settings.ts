@@ -40,6 +40,7 @@ export const Contracts = yup
      */
     UTILS_LIBRARY_ADDRESS: yup.string().required(),
     PLANET_LIBRARY_ADDRESS: yup.string().required(),
+    ARTIFACT_UTILS_LIBRARY_ADDRESS: yup.string().required(),
     VERIFIER_LIBRARY_ADDRESS: yup.string().required(),
     INITIALIZE_LIBRARY_ADDRESS: yup.string().required(),
     LAZY_UPDATE_LIBRARY_ADDRESS: yup.string().required(),

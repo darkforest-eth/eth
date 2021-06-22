@@ -12,6 +12,7 @@ import "./DarkForestTokens.sol";
 import "./DarkForestUtils.sol";
 import "./DarkForestPlanet.sol";
 import "./DarkForestInitialize.sol";
+import "./DarkForestArtifactUtils.sol";
 
 // .______       _______     ___       _______  .___  ___.  _______
 // |   _  \     |   ____|   /   \     |       \ |   \/   | |   ____|
@@ -230,8 +231,21 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
     /// Game Mechanics ///
     //////////////////////
 
-    function refreshPlanet(uint256 _location) public onlyWhitelisted notPaused {
-        DarkForestPlanet.refreshPlanet(_location);
+    function refreshPlanet(uint256 location) public onlyWhitelisted notPaused {
+        DarkForestPlanet.refreshPlanet(location);
+    }
+
+    function getRefreshedPlanet(uint256 location, uint256 timestamp)
+        public
+        view
+        returns (
+            DarkForestTypes.Planet memory,
+            DarkForestTypes.PlanetExtendedInfo memory,
+            uint256[12] memory eventsToRemove,
+            uint256[12] memory artifactsToAdd
+        )
+    {
+        return DarkForestPlanet.getRefreshedPlanet(location, timestamp);
     }
 
     function checkRevealProof(
@@ -462,7 +476,7 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         }
 
         uint256 foundArtifactId =
-            DarkForestPlanet.findArtifact(
+            DarkForestArtifactUtils.findArtifact(
                 DarkForestTypes.DFPFindArtifactArgs(planetId, biomebase, address(this))
             );
 
@@ -475,7 +489,7 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         // might be better use of the ERC721 standard - can use safeTransfer then
         refreshPlanet(locationId);
 
-        DarkForestPlanet.depositArtifact(locationId, artifactId, address(this));
+        DarkForestArtifactUtils.depositArtifact(locationId, artifactId, address(this));
 
         emit ArtifactDeposited(msg.sender, artifactId, locationId);
     }
@@ -485,7 +499,7 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
     function withdrawArtifact(uint256 locationId, uint256 artifactId) public notPaused {
         refreshPlanet(locationId);
 
-        DarkForestPlanet.withdrawArtifact(locationId, artifactId);
+        DarkForestArtifactUtils.withdrawArtifact(locationId, artifactId);
 
         emit ArtifactWithdrawn(msg.sender, artifactId, locationId);
     }
@@ -504,7 +518,7 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
             refreshPlanet(wormholeTo);
         }
 
-        DarkForestPlanet.activateArtifact(locationId, artifactId, wormholeTo);
+        DarkForestArtifactUtils.activateArtifact(locationId, artifactId, wormholeTo);
         // event is emitted in the above library function
     }
 
@@ -514,7 +528,7 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
     function deactivateArtifact(uint256 locationId) public notPaused {
         refreshPlanet(locationId);
 
-        DarkForestPlanet.deactivateArtifact(locationId);
+        DarkForestArtifactUtils.deactivateArtifact(locationId);
         // event is emitted in the above library function
     }
 
@@ -524,7 +538,7 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
     // found on this planet.
     function prospectPlanet(uint256 locationId) public notPaused {
         refreshPlanet(locationId);
-        DarkForestPlanet.prospectPlanet(locationId);
+        DarkForestArtifactUtils.prospectPlanet(locationId);
         emit PlanetProspected(msg.sender, locationId);
     }
 

@@ -101,6 +101,7 @@ async function upgradeMulti({}, hre: HardhatRuntimeEnvironment) {
         DarkForestPlanet: libraries.planet.address,
         DarkForestUtils: libraries.utils.address,
         Verifier: libraries.verifier.address,
+        DarkForestArtifactUtils: libraries.artifactUtils.address,
       },
     },
     // Linking external libraries like `DarkForestUtils` is not yet supported, or
@@ -127,6 +128,7 @@ async function upgradeCore({}, hre: HardhatRuntimeEnvironment) {
     PLANET_LIBRARY_ADDRESS,
     INITIALIZE_LIBRARY_ADDRESS,
     VERIFIER_LIBRARY_ADDRESS,
+    ARTIFACT_UTILS_LIBRARY_ADDRESS,
   } = hre.contracts;
 
   await upgradeProxyWithRetry<DarkForestCore>({
@@ -136,6 +138,7 @@ async function upgradeCore({}, hre: HardhatRuntimeEnvironment) {
       libraries: {
         DarkForestInitialize: INITIALIZE_LIBRARY_ADDRESS,
         DarkForestPlanet: PLANET_LIBRARY_ADDRESS,
+        DarkForestArtifactUtils: ARTIFACT_UTILS_LIBRARY_ADDRESS,
         DarkForestUtils: UTILS_LIBRARY_ADDRESS,
         Verifier: VERIFIER_LIBRARY_ADDRESS,
       },

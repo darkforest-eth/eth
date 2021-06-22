@@ -46,20 +46,25 @@ export async function initializeContracts(enableWhitelist?: boolean): Promise<Te
     initializer: false,
   })) as DarkForestTokens;
 
-  const DarkForestLazyUpdateContract = await ethers.getContractFactory('DarkForestLazyUpdate', {
-    libraries: {
-      DarkForestUtils: darkForestUtils.address,
-    },
-  });
+  const DarkForestLazyUpdateContract = await ethers.getContractFactory('DarkForestLazyUpdate');
   const darkForestLazyUpdate = await DarkForestLazyUpdateContract.deploy();
 
   const DarkForestTypesContract = await ethers.getContractFactory('DarkForestTypes');
   await DarkForestTypesContract.deploy();
 
+  const DarkForestArtifactUtils = await ethers.getContractFactory('DarkForestArtifactUtils', {
+    libraries: {
+      DarkForestUtils: darkForestUtils.address,
+    },
+  });
+  const artifactUtils = await DarkForestArtifactUtils.deploy();
+  await artifactUtils.deployTransaction.wait();
+
   const DarkForestPlanet = await ethers.getContractFactory('DarkForestPlanet', {
     libraries: {
       DarkForestLazyUpdate: darkForestLazyUpdate.address,
       DarkForestUtils: darkForestUtils.address,
+      DarkForestArtifactUtils: artifactUtils.address,
     },
   });
   const darkForestPlanet = (await DarkForestPlanet.deploy()) as DarkForestPlanet;
@@ -73,6 +78,7 @@ export async function initializeContracts(enableWhitelist?: boolean): Promise<Te
       DarkForestPlanet: darkForestPlanet.address,
       DarkForestUtils: darkForestUtils.address,
       Verifier: verifier.address,
+      DarkForestArtifactUtils: artifactUtils.address,
     },
   });
 
