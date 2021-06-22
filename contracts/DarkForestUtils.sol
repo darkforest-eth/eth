@@ -344,8 +344,10 @@ library DarkForestUtils {
             ret.popCapMultiplier += 10;
             ret.popGroMultiplier += 10;
         } else if (artifact.planetBiome == DarkForestTypes.Biome.Corrupted) {
-            ret.rangeMultiplier += 10;
-            ret.speedMultiplier += 25;
+            ret.rangeMultiplier += 5;
+            ret.speedMultiplier += 5;
+            ret.popCapMultiplier += 5;
+            ret.popGroMultiplier += 5;
         }
 
         uint256 scale = 1 + (uint256(artifact.rarity) / 2);

@@ -110,6 +110,22 @@ export function toArtifactRarity(rarity: i32): string {
   }
 }
 
+export function artifactRarityToPoints(rarity: string): i32 {
+  if (rarity === 'COMMON') {
+    return 2000;
+  } else if (rarity === 'RARE') {
+    return 10000;
+  } else if (rarity === 'EPIC') {
+    return 200000;
+  } else if (rarity === 'LEGENDARY') {
+    return 3000000;
+  } else if (rarity === 'MYTHIC') {
+    return 20000000;
+  } else {
+    return 0;
+  }
+}
+
 export function toBiome(biome: i32): string {
   if (biome === 1) {
     return 'OCEAN';

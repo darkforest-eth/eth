@@ -69,7 +69,7 @@ library DarkForestArtifactUtils {
         (DarkForestTypes.ArtifactType artifactType, uint256 levelBonus) =
             DarkForestUtils._randomArtifactTypeAndLevelBonus(artifactSeed, biome, info.spaceType);
 
-        DarkForestTypes.DFTCreateArtifactArgs memory args =
+        DarkForestTypes.DFTCreateArtifactArgs memory createArtifactArgs =
             DarkForestTypes.DFTCreateArtifactArgs(
                 artifactSeed,
                 msg.sender,
@@ -80,7 +80,12 @@ library DarkForestArtifactUtils {
                 args.coreAddress
             );
 
-        DarkForestTypes.Artifact memory foundArtifact = s().tokens.createArtifact(args);
+        DarkForestTypes.Artifact memory foundArtifact =
+            s().tokens.createArtifact(createArtifactArgs);
+
+        s().players[msg.sender].totalArtifactPoints += s().gameConstants.ARTIFACT_POINT_VALUES[
+            uint256(foundArtifact.rarity)
+        ];
 
         DarkForestUtils._putArtifactOnPlanet(foundArtifact.id, args.planetId);
 

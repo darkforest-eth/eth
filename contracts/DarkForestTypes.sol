@@ -18,6 +18,7 @@ library DarkForestTypes {
         uint256 homePlanetId;
         uint256 lastRevealTimestamp;
         uint256 withdrawnSilver;
+        uint256 totalArtifactPoints;
     }
 
     struct Planet {
@@ -109,6 +110,7 @@ library DarkForestTypes {
         uint256 PHOTOID_ACTIVATION_DELAY;
         uint256 LOCATION_REVEAL_COOLDOWN;
         uint8[5][10][4] PLANET_TYPE_WEIGHTS; // spaceType (enum 0-3) -> planetLevel (0-7) -> planetType (enum 0-4)
+        uint256[6] ARTIFACT_POINT_VALUES;
     }
 
     struct DFInitArgs {
@@ -138,6 +140,7 @@ library DarkForestTypes {
         uint256 BIOME_THRESHOLD_2;
         uint256 PLANET_RARITY;
         uint8[5][10][4] PLANET_TYPE_WEIGHTS; // spaceType (enum 0-3) -> planetLevel (0-7) -> planetType (enum 0-4)
+        uint256[6] ARTIFACT_POINT_VALUES;
         uint256 PHOTOID_ACTIVATION_DELAY;
     }
 

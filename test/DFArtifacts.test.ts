@@ -36,6 +36,7 @@ describe('DarkForestArtifacts', function () {
   });
 
   it('be able to mint artifact on ruins, activate/buff, deactivate/debuff', async function () {
+    const playerBeforeMint = await world.contracts.core.players(world.user1.address);
     const planetWithArtifact1Id = hexToBigNumber(planetWithArtifact1.hex);
     await conquerUnownedPlanet(world, world.user1Core, asteroid1, planetWithArtifact1);
     await increaseBlockchainTime();
@@ -51,6 +52,14 @@ describe('DarkForestArtifacts', function () {
     );
     expect(artifactsBefore[0].discoverer).to.eq(world.user1.address);
     expect(artifactsBefore.length).to.equal(1);
+
+    // player's score should be increased
+    const playerAfterMint = await world.contracts.core.players(world.user1.address);
+    const artifactPointValues = await world.contracts.core.getArtifactPointValues();
+    expect(
+      playerAfterMint.totalArtifactPoints.toNumber() -
+        playerBeforeMint.totalArtifactPoints.toNumber()
+    ).to.equal(artifactPointValues[artifactsBefore[0].rarity]);
 
     // let's update the planet to be one of the basic artifacts, so that
     // we know it's definitely going to buff the planet in some way. also,

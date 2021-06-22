@@ -24,7 +24,11 @@ import { DarkForestGetters } from '../generated/DarkForestCore/DarkForestGetters
 import { CORE_CONTRACT_ADDRESS, GETTERS_CONTRACT_ADDRESS } from '@darkforest_eth/contracts';
 
 import { Arrival, ArrivalQueue, Meta, Player, Planet, Hat, Artifact } from '../generated/schema';
-import { hexStringToPaddedUnprefixed, toLowercase } from './helpers/converters';
+import {
+  artifactRarityToPoints,
+  hexStringToPaddedUnprefixed,
+  toLowercase,
+} from './helpers/converters';
 import {
   refreshArtifactFromContractData,
   refreshPlanetFromContractData,
@@ -45,7 +49,23 @@ export function handleArtifactFound(event: ArtifactFound): void {
   // instead of adding to artifact refresh queue, which is processed at end of block
   // make a contract call to save the artifact immediately, in case we need to grab
   // it from store in any additional handler in this block
-  refreshTouchedArtifact(event.params.artifactId);
+  let getters = DarkForestGetters.bind(Address.fromString(GETTERS_CONTRACT_ADDRESS));
+  let rawArtifact = getters.bulkGetArtifactsByIds([event.params.artifactId]);
+
+  let artifact = refreshArtifactFromContractData(event.params.artifactId, rawArtifact[0]);
+  artifact.save();
+
+  // also update player's score
+  let playerId = event.params.player.toHexString();
+  let player = Player.load(playerId);
+  if (player) {
+    let scoreToAdd = BigInt.fromI32(artifactRarityToPoints(artifact.rarity));
+    player.totalArtifactPoints = player.totalArtifactPoints.plus(scoreToAdd);
+    player.score = player.score.plus(scoreToAdd);
+  } else {
+    log.error('tried to process artifact score update for unknown player: {}', [playerId]);
+    throw new Error();
+  }
 }
 
 export function handleArtifactDeposited(event: ArtifactDeposited): void {
@@ -118,6 +138,8 @@ export function handlePlayerInitialized(event: PlayerInitialized): void {
   player.initTimestamp = event.block.timestamp.toI32();
   player.homeWorld = locationId;
   player.milliWithdrawnSilver = BigInt.fromI32(0);
+  player.totalArtifactPoints = BigInt.fromI32(0);
+  player.score = BigInt.fromI32(0);
   player.lastRevealTimestamp = 0;
   player.save();
 
@@ -217,6 +239,7 @@ export function handlePlanetSilverWithdrawn(event: PlanetSilverWithdrawn): void 
   let player = Player.load(playerAddress);
   if (player) {
     player.milliWithdrawnSilver = player.milliWithdrawnSilver.plus(event.params.amount);
+    player.score = player.score.plus(event.params.amount.div(BigInt.fromI32(1000)));
     player.save();
   } else {
     log.error('attempting to process silver withdraw for unknown player: {}', [playerAddress]);
@@ -240,6 +263,8 @@ export function handleLocationRevealed(event: LocationRevealed): void {
     player = new Player(revealerAddress);
     player.initTimestamp = event.block.timestamp.toI32();
     player.milliWithdrawnSilver = BigInt.fromI32(0);
+    player.totalArtifactPoints = BigInt.fromI32(0);
+    player.score = BigInt.fromI32(0);
     player.lastRevealTimestamp = 0;
     player.save();
   }
@@ -365,17 +390,6 @@ function refreshTouchedPlanets(meta: Meta): void {
   meta.save();
 }
 
-/**
- * refresh a single artifact from contract data
- */
-function refreshTouchedArtifact(artifactId: BigInt): void {
-  let getters = DarkForestGetters.bind(Address.fromString(GETTERS_CONTRACT_ADDRESS));
-  let rawArtifact = getters.bulkGetArtifactsByIds([artifactId]);
-
-  let artifact = refreshArtifactFromContractData(artifactId, rawArtifact[0]);
-  artifact.save();
-}
-
 function refreshTouchedArtifacts(meta: Meta): void {
   if (meta._currentlyRefreshingArtifacts.length === 0) {
     // save a contract call by just returning
@@ -453,6 +467,8 @@ function getMeta(timestamp: i32, blockNumber: i32): Meta {
     let nullPlayer = new Player('0x0000000000000000000000000000000000000000');
     nullPlayer.initTimestamp = timestamp;
     nullPlayer.milliWithdrawnSilver = BigInt.fromI32(0);
+    nullPlayer.totalArtifactPoints = BigInt.fromI32(0);
+    nullPlayer.score = BigInt.fromI32(0);
     nullPlayer.lastRevealTimestamp = 0;
     nullPlayer.save();
 
@@ -460,6 +476,8 @@ function getMeta(timestamp: i32, blockNumber: i32): Meta {
     let coreContract = new Player(toLowercase(CORE_CONTRACT_ADDRESS));
     coreContract.initTimestamp = timestamp;
     coreContract.milliWithdrawnSilver = BigInt.fromI32(0);
+    coreContract.totalArtifactPoints = BigInt.fromI32(0);
+    coreContract.score = BigInt.fromI32(0);
     coreContract.lastRevealTimestamp = 0;
     coreContract.save();
   }

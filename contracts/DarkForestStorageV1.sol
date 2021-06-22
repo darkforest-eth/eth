@@ -175,6 +175,10 @@ contract DarkForestStorageV1 {
         return s.gameConstants.PLANET_TYPE_WEIGHTS;
     }
 
+    function getArtifactPointValues() public view returns (uint256[6] memory) {
+        return s.gameConstants.ARTIFACT_POINT_VALUES;
+    }
+
     function getDefaultStats() public view returns (DarkForestTypes.PlanetDefaultStats[] memory) {
         return s.planetDefaultStats;
     }

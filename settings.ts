@@ -140,6 +140,10 @@ export const Initializers = yup
           [8, 4, 1, 2, 1],
         ],
       ]),
+    ARTIFACT_POINT_VALUES: yup
+      .array()
+      .length(6)
+      .default([0, 2000, 10000, 200000, 3000000, 20000000]),
   })
   .defined();
 

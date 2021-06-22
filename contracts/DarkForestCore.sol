@@ -103,7 +103,8 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
             PLANET_RARITY: initArgs.PLANET_RARITY,
             PHOTOID_ACTIVATION_DELAY: initArgs.PHOTOID_ACTIVATION_DELAY,
             LOCATION_REVEAL_COOLDOWN: initArgs.LOCATION_REVEAL_COOLDOWN,
-            PLANET_TYPE_WEIGHTS: initArgs.PLANET_TYPE_WEIGHTS
+            PLANET_TYPE_WEIGHTS: initArgs.PLANET_TYPE_WEIGHTS,
+            ARTIFACT_POINT_VALUES: initArgs.ARTIFACT_POINT_VALUES
         });
 
         s.worldRadius = initArgs.INITIAL_WORLD_RADIUS; // will be overridden by TARGET4_RADIUS if !WORLD_RADIUS_LOCKED
@@ -316,6 +317,7 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
             msg.sender,
             block.timestamp,
             _location,
+            0,
             0,
             0
         );

@@ -4,7 +4,7 @@
 [initializers]
 ADMIN_CAN_ADD_PLANETS = true
 WORLD_RADIUS_LOCKED = false
-TOKEN_MINT_END_TIMESTAMP = 2021-06-06T21:00:00-07:00
+TOKEN_MINT_END_TIMESTAMP = 2021-07-01T21:00:00-07:00
 TARGET4_RADIUS = 1600
 INITIAL_WORLD_RADIUS = 8000
 
@@ -12,9 +12,9 @@ INITIAL_WORLD_RADIUS = 8000
 # SNARK keys & Perlin parameters #
 ##################################
 DISABLE_ZK_CHECKS = false
-PLANETHASH_KEY = 420
-SPACETYPE_KEY = 421
-BIOMEBASE_KEY = 422
+PLANETHASH_KEY = 423
+SPACETYPE_KEY = 424
+BIOMEBASE_KEY = 425
 PERLIN_MIRROR_X = false
 PERLIN_MIRROR_Y = false
 PERLIN_LENGTH_SCALE = 16384 # must be a power of two no greater than 16384
@@ -24,11 +24,11 @@ PERLIN_LENGTH_SCALE = 16384 # must be a power of two no greater than 16384
 ######################
 MAX_NATURAL_PLANET_LEVEL = 256
 TIME_FACTOR_HUNDREDTHS = 100 # speedup/slowdown game
-PERLIN_THRESHOLD_1 = 14
-PERLIN_THRESHOLD_2 = 15
-PERLIN_THRESHOLD_3 = 19
-INIT_PERLIN_MIN = 13
-INIT_PERLIN_MAX = 14
+PERLIN_THRESHOLD_1 = 1
+PERLIN_THRESHOLD_2 = 2
+PERLIN_THRESHOLD_3 = 18
+INIT_PERLIN_MIN = 14
+INIT_PERLIN_MAX = 15
 BIOME_THRESHOLD_1 = 15
 BIOME_THRESHOLD_2 = 17
 PLANET_RARITY = 16384
@@ -84,174 +84,10 @@ PLANET_TYPE_WEIGHTS = [
     [7, 4, 2, 2, 1],
   ],
 ]
+ARTIFACT_POINT_VALUES = [
+  0, 2000, 10000, 200000, 3000000, 20000000
+]
 
 ##########################
 # Planets to add to game #
 ##########################
-[[planets]]
-  x = 0
-  y = 0
-  level = 5
-  planetType = 0
-  requireValidLocationId = false
-  revealLocation = true
-
-[[planets]]
-  x = 500
-  y = 0
-  level = 4
-  planetType = 0
-  requireValidLocationId = false
-  revealLocation = true
-
-[[planets]]
-  x = -500
-  y = 0
-  level = 4
-  planetType = 0
-  requireValidLocationId = false
-  revealLocation = true
-
-[[planets]]
-  x = 0
-  y = 700
-  level = 4
-  planetType = 1
-  requireValidLocationId = false
-  revealLocation = true
-
-[[planets]]
-  x = 0
-  y = -700
-  level = 4
-  planetType = 1
-  requireValidLocationId = false
-  revealLocation = true
-
-[[planets]]
-  x = 400
-  y = 300
-  level = 3
-  planetType = 0
-  requireValidLocationId = false
-  revealLocation = true
-
-[[planets]]
-  x = 200
-  y = 300
-  level = 3
-  planetType = 1
-  requireValidLocationId = false
-  revealLocation = true
-
-[[planets]]
-  x = 400
-  y = 800
-  level = 3
-  planetType = 0
-  requireValidLocationId = false
-  revealLocation = true
-
-[[planets]]
-  x = 660
-  y = 640
-  level = 3
-  planetType = 1
-  requireValidLocationId = false
-  revealLocation = true
-
-[[planets]]
-  x = -400
-  y = 300
-  level = 3
-  planetType = 0
-  requireValidLocationId = false
-  revealLocation = true
-
-[[planets]]
-  x = -200
-  y = 300
-  level = 3
-  planetType = 1
-  requireValidLocationId = false
-  revealLocation = true
-
-[[planets]]
-  x = -400
-  y = 800
-  level = 3
-  planetType = 0
-  requireValidLocationId = false
-  revealLocation = true
-
-[[planets]]
-  x = -660
-  y = 640
-  level = 3
-  planetType = 1
-  requireValidLocationId = false
-  revealLocation = true
-
-[[planets]]
-  x = -400
-  y = -300
-  level = 3
-  planetType = 0
-  requireValidLocationId = false
-  revealLocation = true
-
-[[planets]]
-  x = -200
-  y = -300
-  level = 3
-  planetType = 1
-  requireValidLocationId = false
-  revealLocation = true
-
-[[planets]]
-  x = -400
-  y = -800
-  level = 3
-  planetType = 0
-  requireValidLocationId = false
-  revealLocation = true
-
-[[planets]]
-  x = -660
-  y = -640
-  level = 3
-  planetType = 1
-  requireValidLocationId = false
-  revealLocation = true
-
-[[planets]]
-  x = 400
-  y = -300
-  level = 3
-  planetType = 0
-  requireValidLocationId = false
-  revealLocation = true
-
-[[planets]]
-  x = 200
-  y = -300
-  level = 3
-  planetType = 1
-  requireValidLocationId = false
-  revealLocation = true
-
-[[planets]]
-  x = 400
-  y = -800
-  level = 3
-  planetType = 0
-  requireValidLocationId = false
-  revealLocation = true
-
-[[planets]]
-  x = 660
-  y = -640
-  level = 3
-  planetType = 1
-  requireValidLocationId = false
-  revealLocation = true
