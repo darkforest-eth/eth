@@ -62,6 +62,7 @@ export function handleArtifactFound(event: ArtifactFound): void {
     let scoreToAdd = BigInt.fromI32(artifactRarityToPoints(artifact.rarity));
     player.totalArtifactPoints = player.totalArtifactPoints.plus(scoreToAdd);
     player.score = player.score.plus(scoreToAdd);
+    player.save();
   } else {
     log.error('tried to process artifact score update for unknown player: {}', [playerId]);
     throw new Error();
