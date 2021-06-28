@@ -15,6 +15,7 @@ import type {
   DarkForestUtils,
   DarkForestPlanet,
   Verifier,
+  DarkForestArtifactUtils,
 } from '../task-types';
 
 subtask('deploy:getters', 'deploy and return getters')
@@ -143,7 +144,6 @@ async function deployLibraries({}, hre: HardhatRuntimeEnvironment): Promise<Libr
     planet: planet as DarkForestPlanet,
     initialize,
     verifier: verifier as Verifier,
-    // @ts-ignore
     artifactUtils: artifactUtils as DarkForestArtifactUtils,
   };
 }

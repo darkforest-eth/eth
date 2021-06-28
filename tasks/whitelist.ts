@@ -41,7 +41,7 @@ async function whitelistGenerate(args: { number: number }, hre: HardhatRuntimeEn
     const hashes: string[] = keys.map((x) => hre.ethers.utils.id(x));
 
     try {
-      const akReceipt = await whitelist.addKeys(hashes);
+      const akReceipt = await whitelist.addKeys(hashes, { gasPrice: '5000000000' }); // 5gwei
       await akReceipt.wait();
 
       allKeys = allKeys.concat(keys);

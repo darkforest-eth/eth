@@ -207,6 +207,10 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         msg.sender.transfer(address(this).balance);
     }
 
+    function setTokenMintEndTime(uint256 newTokenMintEndTime) public onlyAdmin {
+        s.TOKEN_MINT_END_TIMESTAMP = newTokenMintEndTime;
+    }
+
     function createPlanet(DarkForestTypes.AdminCreatePlanetArgs memory args) public onlyAdmin {
         require(s.ADMIN_CAN_ADD_PLANETS, "admin can no longer add planets");
         if (args.requireValidLocationId) {

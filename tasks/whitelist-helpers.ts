@@ -2,7 +2,7 @@
 import _ from 'lodash';
 
 // the gas per tx can only do so many at a time
-export const keysPerTx = 30;
+export const keysPerTx = 400;
 
 export const KEY_SYMBOLS: string[] = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 export const KEY_PART_LEN = 5;

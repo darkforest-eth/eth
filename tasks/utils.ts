@@ -23,6 +23,7 @@ async function getCore({}, hre: HardhatRuntimeEnvironment): Promise<DarkForestCo
     PLANET_LIBRARY_ADDRESS,
     UTILS_LIBRARY_ADDRESS,
     VERIFIER_LIBRARY_ADDRESS,
+    ARTIFACT_UTILS_LIBRARY_ADDRESS,
   } = hre.contracts;
 
   const [deployer] = await hre.ethers.getSigners();
@@ -32,6 +33,7 @@ async function getCore({}, hre: HardhatRuntimeEnvironment): Promise<DarkForestCo
       DarkForestPlanet: PLANET_LIBRARY_ADDRESS,
       DarkForestUtils: UTILS_LIBRARY_ADDRESS,
       Verifier: VERIFIER_LIBRARY_ADDRESS,
+      DarkForestArtifactUtils: ARTIFACT_UTILS_LIBRARY_ADDRESS,
     },
   });
 

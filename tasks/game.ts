@@ -69,6 +69,24 @@ async function gameSetTarget4RadiusConstant(
   await ct4rcReceipt.wait();
 }
 
+task('game:setTokenMintEnd', 'change the token mint end timestamp')
+  .addPositionalParam(
+    'tokenend',
+    'the timestamp (seconds since epoch) of the token mint endtime',
+    undefined,
+    types.int
+  )
+  .setAction(setTokenMintEnd);
+
+async function setTokenMintEnd(args: { tokenend: number }, hre: HardhatRuntimeEnvironment) {
+  await hre.run('utils:assertChainId');
+
+  const darkForest: DarkForestCore = await hre.run('utils:getCore');
+
+  const setRadiusReceipt = await darkForest.setTokenMintEndTime(args.tokenend);
+  await setRadiusReceipt.wait();
+}
+
 task(
   'game:createPlanets',
   'creates a planet as admin. only works when zk checks are enabled (using regular mimc fn)'
