@@ -3,7 +3,7 @@ import { FactoryOptions, HardhatRuntimeEnvironment } from 'hardhat/types';
 import type { LibraryContracts } from '../task-types';
 import { DeployOptions } from '@openzeppelin/hardhat-upgrades/dist/deploy-proxy';
 import { Signer, Contract } from 'ethers';
-import { TransactionMinedTimeout } from '@openzeppelin/upgrades-core';
+import { TransactionMinedTimeout, getImplementationAddress } from '@openzeppelin/upgrades-core';
 
 import type {
   DarkForestCore,
@@ -215,6 +215,24 @@ async function upgradeGpt({}, hre: HardhatRuntimeEnvironment) {
     retries: 5,
     hre,
   });
+}
+
+task('getImplementationAddress', 'gets the implementation address of the given proxy contrat')
+  .addPositionalParam('contractAddress')
+  .setAction(getImplementationAddressTask);
+
+async function getImplementationAddressTask(
+  { contractAddress }: { contractAddress: string },
+  hre: HardhatRuntimeEnvironment
+) {
+  const implementationAddress = await getImplementationAddress(
+    hre.ethers.provider,
+    contractAddress
+  );
+
+  console.log(`implementation address: ` + implementationAddress);
+
+  return implementationAddress;
 }
 
 task('upgrade:whitelist', 'upgrade Whitelist contract (only)').setAction(upgradeWhitelist);
