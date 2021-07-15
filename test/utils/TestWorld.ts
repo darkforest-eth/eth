@@ -6,6 +6,7 @@ import {
   Whitelist,
 } from '@darkforest_eth/contracts/typechain';
 import { initializeContracts, TestContracts } from './TestContracts';
+import { BigNumber } from 'ethers';
 
 const { utils } = ethers;
 
@@ -22,8 +23,22 @@ export interface World {
   user2GPTCredit: DarkForestGPTCredit;
 }
 
+export interface Player {
+  isInitialized: boolean;
+  player: string;
+  initTimestamp: BigNumber;
+  homePlanetId: BigNumber;
+  lastRevealTimestamp: BigNumber;
+  withdrawnSilver: BigNumber;
+  totalArtifactPoints: BigNumber;
+}
+
 export interface InitializeWorldArgs {
   enableWhitelist?: boolean;
+}
+
+export function defaultWorldFixture(): Promise<World> {
+  return initializeWorld();
 }
 
 export async function initializeWorld(args?: InitializeWorldArgs): Promise<World> {

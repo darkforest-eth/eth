@@ -1,68 +1,66 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
-import { BN_ZERO, hexToBigNumber, makeInitArgs } from './utils/TestUtils';
-import { asteroid1 } from './utils/WorldConstants';
-import { initializeWorld, World } from './utils/TestWorld';
+import { BN_ZERO, makeInitArgs, fixtureLoader } from './utils/TestUtils';
+import { SPAWN_PLANET_1 } from './utils/WorldConstants';
+import { World, defaultWorldFixture } from './utils/TestWorld';
 
 describe('DarkForestHat', function () {
   let world: World;
 
-  beforeEach(async function () {
-    world = await initializeWorld();
+  async function worldFixture() {
+    const world = await fixtureLoader(defaultWorldFixture);
+    await world.user1Core.initializePlayer(...makeInitArgs(SPAWN_PLANET_1));
+    return world;
+  }
 
-    await world.user1Core.initializePlayer(...makeInitArgs(asteroid1));
+  beforeEach('load fixture', async function () {
+    world = await fixtureLoader(worldFixture);
   });
 
   it('should buy hats', async function () {
-    const planetId = hexToBigNumber(asteroid1.hex);
-
-    let planetExtendedInfo = await world.contracts.core.planetsExtendedInfo(planetId);
+    let planetExtendedInfo = await world.contracts.core.planetsExtendedInfo(SPAWN_PLANET_1.id);
     expect(planetExtendedInfo.hatLevel.toNumber()).to.be.equal(0);
 
-    await world.user1Core.buyHat(planetId, {
+    await world.user1Core.buyHat(SPAWN_PLANET_1.id, {
       value: '1000000000000000000',
     });
-    await world.user1Core.buyHat(planetId, {
+    await world.user1Core.buyHat(SPAWN_PLANET_1.id, {
       value: '2000000000000000000',
     });
 
-    planetExtendedInfo = await world.contracts.core.planetsExtendedInfo(planetId);
+    planetExtendedInfo = await world.contracts.core.planetsExtendedInfo(SPAWN_PLANET_1.id);
 
     expect(planetExtendedInfo.hatLevel.toNumber()).to.be.equal(2);
   });
 
   it('should only allow owner to buy hat', async function () {
-    const planetId = hexToBigNumber(asteroid1.hex);
-
-    const planetExtendedInfo = await world.contracts.core.planetsExtendedInfo(planetId);
+    const planetExtendedInfo = await world.contracts.core.planetsExtendedInfo(SPAWN_PLANET_1.id);
     expect(planetExtendedInfo.hatLevel.toNumber()).to.be.equal(0);
 
     await expect(
-      world.user2Core.buyHat(planetId, {
+      world.user2Core.buyHat(SPAWN_PLANET_1.id, {
         value: '1000000000000000000',
       })
     ).to.be.revertedWith('Only owner can buy hat for planet');
   });
 
   it('should not buy hat with insufficient value', async function () {
-    const planetId = hexToBigNumber(asteroid1.hex);
-    const planetExtendedInfo = await world.contracts.core.planetsExtendedInfo(planetId);
+    const planetExtendedInfo = await world.contracts.core.planetsExtendedInfo(SPAWN_PLANET_1.id);
 
     expect(planetExtendedInfo.hatLevel.toNumber()).to.be.equal(0);
 
-    await world.user1Core.buyHat(planetId, {
+    await world.user1Core.buyHat(SPAWN_PLANET_1.id, {
       value: '1000000000000000000',
     });
     await expect(
-      world.user1Core.buyHat(planetId, {
+      world.user1Core.buyHat(SPAWN_PLANET_1.id, {
         value: '1500000000000000000',
       })
     ).to.be.revertedWith('Wrong value sent');
   });
 
   it('should allow admin to withdraw all funds', async function () {
-    const planetId = hexToBigNumber(asteroid1.hex);
-    await world.user1Core.buyHat(planetId, {
+    await world.user1Core.buyHat(SPAWN_PLANET_1.id, {
       value: '1000000000000000000',
     });
 
@@ -72,9 +70,7 @@ describe('DarkForestHat', function () {
   });
 
   it('should not allow non-admin to withdraw funds', async function () {
-    const planetId = hexToBigNumber(asteroid1.hex);
-
-    await world.user1Core.buyHat(planetId, {
+    await world.user1Core.buyHat(SPAWN_PLANET_1.id, {
       value: '1000000000000000000',
     });
 

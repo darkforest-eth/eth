@@ -2,37 +2,40 @@ import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import {
   ZERO_ADDRESS,
-  hexToBigNumber,
   makeInitArgs,
   makeMoveArgs,
   increaseBlockchainTime,
+  fixtureLoader,
 } from './utils/TestUtils';
 import {
-  asteroid1,
+  SPAWN_PLANET_1,
   SMALL_INTERVAL,
-  asteroid2,
-  silverStar2,
+  SPAWN_PLANET_2,
+  LVL1_ASTEROID_2,
   TOLERANCE,
-  silverStar1,
-  star4,
+  LVL1_ASTEROID_1,
+  LVL1_PLANET_NEBULA,
   LARGE_INTERVAL,
 } from './utils/WorldConstants';
-import { initializeWorld, World } from './utils/TestWorld';
+import { World, defaultWorldFixture } from './utils/TestWorld';
 
 const { BigNumber: BN } = ethers;
 
 describe('DarkForestRefresh', function () {
   let world: World;
 
-  beforeEach(async function () {
-    world = await initializeWorld();
-    const initArgs = makeInitArgs(asteroid1);
+  async function worldFixture() {
+    const world = await fixtureLoader(defaultWorldFixture);
+    await world.user1Core.initializePlayer(...makeInitArgs(SPAWN_PLANET_1));
+    return world;
+  }
 
-    await world.user1Core.initializePlayer(...initArgs);
+  beforeEach('load fixture', async function () {
+    world = await fixtureLoader(worldFixture);
   });
 
   it('should increase population over time', async function () {
-    const planetId = hexToBigNumber(asteroid1.hex);
+    const planetId = SPAWN_PLANET_1.id;
 
     const startPlanet = await world.contracts.core.planets(planetId);
     const startPlanetExtendedInfo = await world.contracts.core.planetsExtendedInfo(planetId);
@@ -65,15 +68,15 @@ describe('DarkForestRefresh', function () {
   });
 
   it('should decrease population over time of overpopulated', async function () {
-    const planetId1 = hexToBigNumber(asteroid1.hex);
+    const planetId1 = SPAWN_PLANET_1.id;
 
     await increaseBlockchainTime();
 
-    await world.user1Core.move(...makeMoveArgs(asteroid1, asteroid2, 0, 50000, 0));
+    await world.user1Core.move(...makeMoveArgs(SPAWN_PLANET_1, SPAWN_PLANET_2, 0, 50000, 0));
 
     await increaseBlockchainTime();
 
-    await world.user1Core.move(...makeMoveArgs(asteroid2, asteroid1, 0, 99000, 0));
+    await world.user1Core.move(...makeMoveArgs(SPAWN_PLANET_2, SPAWN_PLANET_1, 0, 99000, 0));
 
     await world.contracts.core.refreshPlanet(planetId1);
 
@@ -96,12 +99,12 @@ describe('DarkForestRefresh', function () {
   });
 
   it('should increase silver of 50%pop silver-producing planet', async function () {
-    const silverStarId = hexToBigNumber(silverStar2.hex);
+    const silverStarId = LVL1_ASTEROID_2.id;
 
     // conquer silver planet
     for (let i = 0; i < 2; i++) {
       await increaseBlockchainTime();
-      await world.user1Core.move(...makeMoveArgs(asteroid1, silverStar2, 0, 90001, 0));
+      await world.user1Core.move(...makeMoveArgs(SPAWN_PLANET_1, LVL1_ASTEROID_2, 0, 90001, 0));
     }
 
     // after a long time, silver star is full of silver and pop
@@ -112,7 +115,13 @@ describe('DarkForestRefresh', function () {
     const silverStarPopCap = silverStarPlanet.populationCap;
     const silverStarResCap = silverStarPlanet.silverCap;
     await world.user1Core.move(
-      ...makeMoveArgs(silverStar2, asteroid1, 0, silverStarPopCap.toNumber() / 2, silverStarResCap)
+      ...makeMoveArgs(
+        LVL1_ASTEROID_2,
+        SPAWN_PLANET_1,
+        0,
+        silverStarPopCap.toNumber() / 2,
+        silverStarResCap
+      )
     );
 
     // test that over SMALL_INTERVAL seconds it produces the correct amt of silver
@@ -131,7 +140,7 @@ describe('DarkForestRefresh', function () {
   });
 
   it('should not increase silver of non-silver-producing planet', async function () {
-    const planetId = hexToBigNumber(asteroid1.hex);
+    const planetId = SPAWN_PLANET_1.id;
     await increaseBlockchainTime(SMALL_INTERVAL);
     await world.contracts.core.refreshPlanet(planetId);
     const planet = await world.contracts.core.planets(planetId);
@@ -139,19 +148,19 @@ describe('DarkForestRefresh', function () {
   });
 
   it('should not increase silver of full silver planet', async function () {
-    const silverStarId2 = hexToBigNumber(silverStar2.hex);
+    const silverStarId2 = LVL1_ASTEROID_2.id;
 
     // conquer and fill both silver planets
     await increaseBlockchainTime();
-    await world.user1Core.move(...makeMoveArgs(asteroid1, silverStar1, 0, 90000, 0));
+    await world.user1Core.move(...makeMoveArgs(SPAWN_PLANET_1, LVL1_ASTEROID_1, 0, 90000, 0));
 
     await increaseBlockchainTime();
-    await world.user1Core.move(...makeMoveArgs(asteroid1, silverStar2, 0, 90000, 0));
+    await world.user1Core.move(...makeMoveArgs(SPAWN_PLANET_1, LVL1_ASTEROID_2, 0, 90000, 0));
 
     await increaseBlockchainTime();
 
     // make planet 2's silver > cap
-    await world.user1Core.move(...makeMoveArgs(silverStar1, silverStar2, 0, 90000, 1000));
+    await world.user1Core.move(...makeMoveArgs(LVL1_ASTEROID_1, LVL1_ASTEROID_2, 0, 90000, 1000));
 
     await world.contracts.core.refreshPlanet(silverStarId2);
     let silverStarPlanet2 = await world.contracts.core.planets(silverStarId2);
@@ -168,9 +177,9 @@ describe('DarkForestRefresh', function () {
   });
 
   it('should not increase pop or silver of barbarian-owned planet', async function () {
-    const star2Id = hexToBigNumber(star4.hex);
+    const star2Id = LVL1_PLANET_NEBULA.id;
 
-    await world.user1Core.move(...makeMoveArgs(asteroid1, star4, 0, 20000, 0));
+    await world.user1Core.move(...makeMoveArgs(SPAWN_PLANET_1, LVL1_PLANET_NEBULA, 0, 20000, 0));
     await increaseBlockchainTime();
 
     await world.contracts.core.refreshPlanet(star2Id);
@@ -191,7 +200,7 @@ describe('DarkForestRefresh', function () {
   });
 
   it('should revert if planet is not initialiazed', async function () {
-    const uninitializedPlanet = hexToBigNumber(asteroid2.hex);
+    const uninitializedPlanet = SPAWN_PLANET_2.id;
 
     await expect(world.user1Core.refreshPlanet(uninitializedPlanet)).to.be.revertedWith(
       'Planet has not been initialized'

@@ -13,6 +13,7 @@ import type {
 import '../tasks/deploy-more';
 import * as prettier from 'prettier';
 import * as settings from '../settings';
+import { tscompile } from '../utils/tscompile';
 
 task('deploy', 'deploy all contracts')
   .addOptionalParam('whitelist', 'override the whitelist', true, types.boolean)
@@ -150,13 +151,8 @@ async function deploySave(
 ) {
   const isDev = hre.network.name === 'localhost';
 
-  const contractsFile = path.join(hre.packageDirs['@darkforest_eth/contracts'], 'index.ts');
-
-  const options = prettier.resolveConfig.sync(contractsFile);
-
   // Save the addresses of the deployed contracts to the `@darkforest_eth/contracts` package
-  const addrFileContents = prettier.format(
-    `
+  const tsContents = `
   /**
    * This package contains deployed contract addresses, ABIs, and Typechain types
    * for the Dark Forest game.
@@ -246,9 +242,26 @@ async function deploySave(
    * The address for the DarkForestGPTCredit contract.
    */
   export const GPT_CREDIT_CONTRACT_ADDRESS = '${args.gptCreditAddress}';
-  `,
-    { ...options, parser: 'babel-ts' }
-  );
+  `;
 
-  fs.writeFileSync(contractsFile, addrFileContents);
+  const { jsContents, dtsContents } = tscompile(tsContents);
+
+  const contractsFileTS = path.join(hre.packageDirs['@darkforest_eth/contracts'], 'index.ts');
+  const contractsFileJS = path.join(hre.packageDirs['@darkforest_eth/contracts'], 'index.js');
+  const contractsFileDTS = path.join(hre.packageDirs['@darkforest_eth/contracts'], 'index.d.ts');
+
+  const options = prettier.resolveConfig.sync(contractsFileTS);
+
+  fs.writeFileSync(
+    contractsFileTS,
+    prettier.format(tsContents, { ...options, parser: 'babel-ts' })
+  );
+  fs.writeFileSync(
+    contractsFileJS,
+    prettier.format(jsContents, { ...options, parser: 'babel-ts' })
+  );
+  fs.writeFileSync(
+    contractsFileDTS,
+    prettier.format(dtsContents, { ...options, parser: 'babel-ts' })
+  );
 }

@@ -1,13 +1,13 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
-import { BN_ZERO } from './utils/TestUtils';
-import { initializeWorld, World } from './utils/TestWorld';
+import { BN_ZERO, fixtureLoader } from './utils/TestUtils';
+import { World, defaultWorldFixture } from './utils/TestWorld';
 
 describe('DarkForestGPTCredit', function () {
   let world: World;
 
-  beforeEach(async function () {
-    world = await initializeWorld({ enableWhitelist: true });
+  beforeEach('load fixture', async function () {
+    world = await fixtureLoader(defaultWorldFixture);
   });
 
   it('should allow player to buy credits for ether/xdai', async function () {

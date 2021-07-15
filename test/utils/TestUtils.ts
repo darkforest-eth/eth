@@ -1,10 +1,11 @@
 import { BigNumberish, BigNumber } from 'ethers';
-import { ethers } from 'hardhat';
+import { ethers, waffle } from 'hardhat';
 import { DarkForestCore, DarkForestGetters } from '@darkforest_eth/contracts/typechain';
 import { World } from './TestWorld';
-import { LARGE_INTERVAL, planetWithArtifact1, initializers, TestLocation } from './WorldConstants';
+import { LARGE_INTERVAL, ARTIFACT_PLANET_1, initializers } from './WorldConstants';
+import { TestLocation } from './TestLocation';
 
-const { BigNumber: BN, constants } = ethers;
+const { constants } = ethers;
 
 const {
   PLANETHASH_KEY,
@@ -18,8 +19,10 @@ const {
 export const ZERO_ADDRESS = constants.AddressZero;
 export const BN_ZERO = constants.Zero;
 
+export const fixtureLoader = waffle.createFixtureLoader();
+
 export function hexToBigNumber(hex: string): BigNumber {
-  return BN.from(`0x${hex}`);
+  return BigNumber.from(`0x${hex}`);
 }
 
 export function makeRevealArgs(
@@ -50,7 +53,7 @@ export function makeRevealArgs(
     ],
     [BN_ZERO, BN_ZERO],
     [
-      hexToBigNumber(planetLoc.hex),
+      planetLoc.id,
       planetLoc.perlin,
       x,
       y,
@@ -88,7 +91,7 @@ export function makeInitArgs(
     ],
     [BN_ZERO, BN_ZERO],
     [
-      hexToBigNumber(planetLoc.hex),
+      planetLoc.id,
       planetLoc.perlin,
       planetLoc.distFromOrigin + 1,
       PLANETHASH_KEY,
@@ -135,8 +138,8 @@ export function makeMoveArgs(
     ],
     [0, 0],
     [
-      hexToBigNumber(oldLoc.hex),
-      hexToBigNumber(newLoc.hex),
+      oldLoc.id,
+      newLoc.id,
       newLoc.perlin,
       newLoc.distFromOrigin + 1,
       maxDist,
@@ -168,7 +171,7 @@ export function makeFindArtifactArgs(
     ],
     [5, 6],
     [
-      hexToBigNumber(location.hex),
+      location.id,
       1,
       PLANETHASH_KEY,
       BIOMEBASE_KEY,
@@ -206,21 +209,19 @@ export async function conquerUnownedPlanet(
   from: TestLocation,
   to: TestLocation
 ) {
-  const fromId = hexToBigNumber(from.hex);
-  const toId = hexToBigNumber(to.hex);
-  const fromData = await world.contracts.core.planets(fromId);
-  let toData = await world.contracts.core.planets(toId);
+  const fromData = await world.contracts.core.planets(from.id);
+  let toData = await world.contracts.core.planets(to.id);
   if (toData.owner !== ZERO_ADDRESS) {
     throw new Error('called conquerUnownedPlanet to conquer owned planet');
   }
   const attackEnergyCost = fromData.populationCap.toNumber() * 0.9;
   await increaseBlockchainTime();
   await (await signer.move(...makeMoveArgs(from, to, 0, attackEnergyCost, 0))).wait(); // creates planet in contract
-  toData = await world.contracts.core.planets(toId);
+  toData = await world.contracts.core.planets(to.id);
   const toPlanetStartingPop = toData.population.toNumber(); // move hasn't yet been applied
 
-  await (await signer.refreshPlanet(toId)).wait(); // applies move, since 0 moveDist
-  toData = await world.contracts.core.planets(toId);
+  await (await signer.refreshPlanet(to.id)).wait(); // applies move, since 0 moveDist
+  toData = await world.contracts.core.planets(to.id);
 
   if (toData.owner === ZERO_ADDRESS) {
     // send additional attacks if not yet conquered
@@ -240,11 +241,8 @@ export async function feedSilverToCap(
   silverMine: TestLocation,
   to: TestLocation
 ) {
-  const silverMineId = hexToBigNumber(silverMine.hex);
-  const toId = hexToBigNumber(to.hex);
-
-  const silverMineData = await world.contracts.core.planets(silverMineId);
-  const toData = await world.contracts.core.planets(toId);
+  const silverMineData = await world.contracts.core.planets(silverMine.id);
+  const toData = await world.contracts.core.planets(to.id);
   const attackEnergyCost = silverMineData.populationCap.toNumber() * 0.1;
   const silverMineSilverCap = silverMineData.silverCap.toNumber();
   const toSilverCap = toData.silverCap.toNumber();
@@ -257,10 +255,9 @@ export async function feedSilverToCap(
 
 // returns the ID of the artifact minted
 export async function user1MintArtifactPlanet(user1Core: DarkForestCore) {
-  const planetWithArtifact1Id = hexToBigNumber(planetWithArtifact1.hex);
-  await user1Core.prospectPlanet(planetWithArtifact1Id);
+  await user1Core.prospectPlanet(ARTIFACT_PLANET_1.id);
   await increaseBlockchainTime();
-  const findArtifactTx = await user1Core.findArtifact(...makeFindArtifactArgs(planetWithArtifact1));
+  const findArtifactTx = await user1Core.findArtifact(...makeFindArtifactArgs(ARTIFACT_PLANET_1));
   const findArtifactReceipt = await findArtifactTx.wait();
   // 0th event is erc721 transfer (i think); 1st event is UpdateArtifact, 2nd argument of this event is artifactId
   const artifactId = findArtifactReceipt.events?.[1].args?.[1];
