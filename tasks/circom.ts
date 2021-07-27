@@ -1,8 +1,8 @@
-import { HardhatRuntimeEnvironment } from 'hardhat/types';
-import * as path from 'path';
 import * as fs from 'fs/promises';
 import { TASK_CIRCOM_TEMPLATE, ZkeyFastFile } from 'hardhat-circom';
 import { subtask } from 'hardhat/config';
+import { HardhatRuntimeEnvironment } from 'hardhat/types';
+import * as path from 'path';
 
 subtask(TASK_CIRCOM_TEMPLATE, 'replace hardhat-circom templating with custom').setAction(
   circomTemplate

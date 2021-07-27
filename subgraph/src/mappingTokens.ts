@@ -1,10 +1,9 @@
+import { GETTERS_CONTRACT_ADDRESS } from '@darkforest_eth/contracts';
 import { Address } from '@graphprotocol/graph-ts';
-
 import { DarkForestGetters } from '../generated/DarkForestCore/DarkForestGetters';
 import { Transfer } from '../generated/DarkForestTokens/DarkForestTokens';
-import { refreshArtifactFromContractData } from './helpers/decoders';
-import { GETTERS_CONTRACT_ADDRESS } from '@darkforest_eth/contracts';
 import { Artifact } from '../generated/schema';
+import { refreshArtifactFromContractData } from './helpers/decoders';
 
 export function handleTransfer(event: Transfer): void {
   let artifact = Artifact.load(event.params.tokenId.toHexString());

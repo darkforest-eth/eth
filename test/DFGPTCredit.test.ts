@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { BN_ZERO, fixtureLoader } from './utils/TestUtils';
-import { World, defaultWorldFixture } from './utils/TestWorld';
+import { defaultWorldFixture, World } from './utils/TestWorld';
 
 describe('DarkForestGPTCredit', function () {
   let world: World;

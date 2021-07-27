@@ -1,12 +1,12 @@
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address';
-import { ethers } from 'hardhat';
 import {
   DarkForestCore,
   DarkForestGPTCredit,
   Whitelist,
 } from '@darkforest_eth/contracts/typechain';
-import { initializeContracts, TestContracts } from './TestContracts';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address';
 import { BigNumber } from 'ethers';
+import { ethers } from 'hardhat';
+import { initializeContracts, TestContracts } from './TestContracts';
 
 const { utils } = ethers;
 

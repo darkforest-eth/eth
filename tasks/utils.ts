@@ -1,6 +1,6 @@
-import { DarkForestCore, Whitelist, DarkForestTokens, DarkForestGPTCredit } from '../task-types';
-import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import { subtask } from 'hardhat/config';
+import { HardhatRuntimeEnvironment } from 'hardhat/types';
+import { DarkForestCore, DarkForestGPTCredit, DarkForestTokens, Whitelist } from '../task-types';
 
 subtask('utils:assertChainId', 'Assert proper network is selectaed').setAction(assertChainId);
 

@@ -270,12 +270,12 @@ library DarkForestPlanet {
             _planet.silverCap *= 2;
         }
 
-        // initial population (barbarians) and silver
+        // initial population (pirates) and silver
         _planet.population = SafeMathUpgradeable.div(
             SafeMathUpgradeable.mul(_planet.populationCap, _planetDefaultStats.barbarianPercentage),
             100
         );
-        // barbarians adjusted for def debuffs, and buffed in space/deepspace
+        // pirates adjusted for def debuffs, and buffed in space/deepspace
         if (deadSpace) {
             _planet.population *= 20;
         } else if (deepSpace) {

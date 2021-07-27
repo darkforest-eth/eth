@@ -1,23 +1,23 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import {
-  ZERO_ADDRESS,
+  fixtureLoader,
+  increaseBlockchainTime,
   makeInitArgs,
   makeMoveArgs,
-  increaseBlockchainTime,
-  fixtureLoader,
+  ZERO_ADDRESS,
 } from './utils/TestUtils';
+import { defaultWorldFixture, World } from './utils/TestWorld';
 import {
-  SPAWN_PLANET_1,
-  SMALL_INTERVAL,
-  SPAWN_PLANET_2,
-  LVL1_ASTEROID_2,
-  TOLERANCE,
-  LVL1_ASTEROID_1,
-  LVL1_PLANET_NEBULA,
   LARGE_INTERVAL,
+  LVL1_ASTEROID_1,
+  LVL1_ASTEROID_2,
+  LVL1_PLANET_NEBULA,
+  SMALL_INTERVAL,
+  SPAWN_PLANET_1,
+  SPAWN_PLANET_2,
+  TOLERANCE,
 } from './utils/WorldConstants';
-import { World, defaultWorldFixture } from './utils/TestWorld';
 
 const { BigNumber: BN } = ethers;
 

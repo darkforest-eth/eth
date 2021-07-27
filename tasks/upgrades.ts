@@ -1,15 +1,14 @@
+import { DeployOptions } from '@openzeppelin/hardhat-upgrades/dist/deploy-proxy';
+import { getImplementationAddress, TransactionMinedTimeout } from '@openzeppelin/upgrades-core';
+import { Contract, Signer } from 'ethers';
 import { task } from 'hardhat/config';
 import { FactoryOptions, HardhatRuntimeEnvironment } from 'hardhat/types';
-import type { LibraryContracts } from '../task-types';
-import { DeployOptions } from '@openzeppelin/hardhat-upgrades/dist/deploy-proxy';
-import { Signer, Contract } from 'ethers';
-import { TransactionMinedTimeout, getImplementationAddress } from '@openzeppelin/upgrades-core';
-
 import type {
   DarkForestCore,
-  DarkForestTokens,
   DarkForestGetters,
   DarkForestGPTCredit,
+  DarkForestTokens,
+  LibraryContracts,
   Whitelist,
 } from '../task-types';
 

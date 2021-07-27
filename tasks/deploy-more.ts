@@ -1,21 +1,20 @@
-import { types, subtask } from 'hardhat/config';
-import { FactoryOptions, HardhatRuntimeEnvironment } from 'hardhat/types';
 import { DeployOptions } from '@openzeppelin/hardhat-upgrades/dist/deploy-proxy';
-import { Signer, Contract } from 'ethers';
 import { TransactionMinedTimeout } from '@openzeppelin/upgrades-core';
-
+import { Contract, Signer } from 'ethers';
+import { subtask, types } from 'hardhat/config';
+import { FactoryOptions, HardhatRuntimeEnvironment } from 'hardhat/types';
 import type {
-  LibraryContracts,
+  DarkForestArtifactUtils,
   DarkForestCore,
   DarkForestCoreReturn,
-  DarkForestTokens,
   DarkForestGetters,
   DarkForestGPTCredit,
-  Whitelist,
-  DarkForestUtils,
   DarkForestPlanet,
+  DarkForestTokens,
+  DarkForestUtils,
+  LibraryContracts,
   Verifier,
-  DarkForestArtifactUtils,
+  Whitelist,
 } from '../task-types';
 
 subtask('deploy:getters', 'deploy and return getters')

@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
-import { makeInitArgs, fixtureLoader } from './utils/TestUtils';
-import { SPAWN_PLANET_1 } from './utils/WorldConstants';
+import { fixtureLoader, makeInitArgs } from './utils/TestUtils';
 import { initializeWorld, World } from './utils/TestWorld';
+import { SPAWN_PLANET_1 } from './utils/WorldConstants';
 
 const { utils } = ethers;
 

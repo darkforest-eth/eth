@@ -3,21 +3,21 @@ import { ethers } from 'hardhat';
 import {
   conquerUnownedPlanet,
   feedSilverToCap,
+  fixtureLoader,
   increaseBlockchainTime,
   makeInitArgs,
-  fixtureLoader,
 } from './utils/TestUtils';
+import { defaultWorldFixture, World } from './utils/TestWorld';
 import {
-  SPAWN_PLANET_1,
-  LVL1_PLANET_NEBULA,
+  ARTIFACT_PLANET_1,
   LVL1_ASTEROID_2,
   LVL1_PLANET_DEEP_SPACE,
-  LVL3_SPACETIME_1,
-  ARTIFACT_PLANET_1,
+  LVL1_PLANET_NEBULA,
   LVL1_QUASAR,
   LVL2_PLANET_DEAD_SPACE,
+  LVL3_SPACETIME_1,
+  SPAWN_PLANET_1,
 } from './utils/WorldConstants';
-import { World, defaultWorldFixture } from './utils/TestWorld';
 
 const { BigNumber: BN } = ethers;
 

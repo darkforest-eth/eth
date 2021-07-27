@@ -2,24 +2,24 @@ import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import {
   conquerUnownedPlanet,
+  fixtureLoader,
   increaseBlockchainTime,
   makeInitArgs,
   makeMoveArgs,
-  fixtureLoader,
 } from './utils/TestUtils';
+import { defaultWorldFixture, World } from './utils/TestWorld';
 import {
-  SPAWN_PLANET_1,
-  SPAWN_PLANET_2,
-  SMALL_INTERVAL,
+  LVL0_PLANET_OUT_OF_BOUNDS,
+  LVL1_ASTEROID_1,
+  LVL1_ASTEROID_2,
+  LVL1_PLANET_NEBULA,
+  LVL1_QUASAR,
   LVL2_PLANET_SPACE,
   LVL4_UNOWNED_DEEP_SPACE,
-  LVL1_ASTEROID_2,
-  LVL1_ASTEROID_1,
-  LVL1_PLANET_NEBULA,
-  LVL0_PLANET_OUT_OF_BOUNDS,
-  LVL1_QUASAR,
+  SMALL_INTERVAL,
+  SPAWN_PLANET_1,
+  SPAWN_PLANET_2,
 } from './utils/WorldConstants';
-import { World, defaultWorldFixture } from './utils/TestWorld';
 
 const { BigNumber: BN } = ethers;
 
@@ -170,7 +170,7 @@ describe('DarkForestMove', function () {
       expect(planets.population).to.be.above(popArrivingTotal);
     });
 
-    it('should init high level planet with barbarians', async function () {
+    it('should init high level planet with pirates', async function () {
       const toId = LVL2_PLANET_SPACE.id;
       const dist = 100;
       const shipsSent = 50000;

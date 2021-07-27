@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
-import { BN_ZERO, makeInitArgs, fixtureLoader } from './utils/TestUtils';
+import { BN_ZERO, fixtureLoader, makeInitArgs } from './utils/TestUtils';
+import { defaultWorldFixture, World } from './utils/TestWorld';
 import { SPAWN_PLANET_1 } from './utils/WorldConstants';
-import { World, defaultWorldFixture } from './utils/TestWorld';
 
 describe('DarkForestHat', function () {
   let world: World;

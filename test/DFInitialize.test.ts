@@ -1,16 +1,16 @@
 import { expect } from 'chai';
-import { makeInitArgs, makeRevealArgs, ZERO_ADDRESS, fixtureLoader } from './utils/TestUtils';
+import { fixtureLoader, makeInitArgs, makeRevealArgs, ZERO_ADDRESS } from './utils/TestUtils';
+import { defaultWorldFixture, World } from './utils/TestWorld';
 import {
   ADMIN_PLANET,
   ADMIN_PLANET_CLOAKED,
-  SPAWN_PLANET_1,
-  SPAWN_PLANET_2,
-  LVL0_PLANET_DEEP_SPACE,
   INVALID_PLANET,
+  LVL0_PLANET_DEEP_SPACE,
   LVL0_PLANET_OUT_OF_BOUNDS,
   LVL1_PLANET_NEBULA,
+  SPAWN_PLANET_1,
+  SPAWN_PLANET_2,
 } from './utils/WorldConstants';
-import { World, defaultWorldFixture } from './utils/TestWorld';
 
 describe('DarkForestInit', function () {
   let world: World;

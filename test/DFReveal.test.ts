@@ -1,12 +1,12 @@
 import { expect } from 'chai';
 import {
+  fixtureLoader,
   increaseBlockchainTime,
   makeInitArgs,
   makeRevealArgs,
-  fixtureLoader,
 } from './utils/TestUtils';
-import { SPAWN_PLANET_1, SPAWN_PLANET_2, INVALID_PLANET } from './utils/WorldConstants';
-import { World, defaultWorldFixture } from './utils/TestWorld';
+import { defaultWorldFixture, World } from './utils/TestWorld';
+import { INVALID_PLANET, SPAWN_PLANET_1, SPAWN_PLANET_2 } from './utils/WorldConstants';
 
 describe('DarkForestReveal', function () {
   let world: World;

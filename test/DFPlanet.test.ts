@@ -2,36 +2,36 @@ import { expect } from 'chai';
 import {
   conquerUnownedPlanet,
   feedSilverToCap,
+  fixtureLoader,
   increaseBlockchainTime,
   makeInitArgs,
   makeMoveArgs,
-  fixtureLoader,
 } from './utils/TestUtils';
+import { defaultWorldFixture, World } from './utils/TestWorld';
 import {
-  SPAWN_PLANET_1,
-  SPAWN_PLANET_2,
-  LVL0_PLANET_POPCAP_BOOSTED,
-  LVL0_PLANET_DEEP_SPACE,
+  ARTIFACT_PLANET_1,
   LVL0_PLANET_DEAD_SPACE,
-  MAX_PLANET_NEBULA,
-  MAX_PLANET_SPACE,
-  MAX_PLANET_DEEP_SPACE,
-  MAX_PLANET_DEAD_SPACE,
-  LVL3_UNOWNED_NEBULA,
-  LVL3_UNOWNED_SPACE,
-  LVL3_UNOWNED_DEEP_SPACE,
-  LVL1_PLANET_NEBULA,
-  LVL1_PLANET_SPACE,
+  LVL0_PLANET_DEEP_SPACE,
+  LVL0_PLANET_POPCAP_BOOSTED,
   LVL1_ASTEROID_1,
   LVL1_ASTEROID_2,
   LVL1_ASTEROID_DEEP_SPACE,
   LVL1_ASTEROID_NEBULA,
-  LVL1_QUASAR,
   LVL1_ASTEROID_NO_PRODUCE,
-  ARTIFACT_PLANET_1,
+  LVL1_PLANET_NEBULA,
+  LVL1_PLANET_SPACE,
+  LVL1_QUASAR,
   LVL3_SPACETIME_1,
+  LVL3_UNOWNED_DEEP_SPACE,
+  LVL3_UNOWNED_NEBULA,
+  LVL3_UNOWNED_SPACE,
+  MAX_PLANET_DEAD_SPACE,
+  MAX_PLANET_DEEP_SPACE,
+  MAX_PLANET_NEBULA,
+  MAX_PLANET_SPACE,
+  SPAWN_PLANET_1,
+  SPAWN_PLANET_2,
 } from './utils/WorldConstants';
-import { World, defaultWorldFixture } from './utils/TestWorld';
 
 describe('DarkForestPlanet', function () {
   // Bump the time out so that the test doesn't timeout during
@@ -150,7 +150,7 @@ describe('DarkForestPlanet', function () {
     expect(Math.floor(nebulaPlanet.defense.toNumber() * 0.5)).to.equal(
       regularPlanet.defense.toNumber()
     );
-    // barbarians
+    // pirates
     expect(Math.floor(nebulaPlanet.population.toNumber() * 4 * 1.25)).to.equal(
       regularPlanet.population.toNumber()
     );

@@ -1,9 +1,8 @@
-import { generateKey, generateKeys, keysPerTx } from './whitelist-helpers';
-import { task, types, subtask } from 'hardhat/config';
+import * as fs from 'fs';
+import { subtask, task, types } from 'hardhat/config';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import type { Whitelist } from '../task-types';
-
-import * as fs from 'fs';
+import { generateKey, generateKeys, keysPerTx } from './whitelist-helpers';
 
 task('whitelist:changeDrip', 'change the faucet amount for whitelisted players')
   .addPositionalParam('value', 'drip value (in ether or xDAI)', undefined, types.float)

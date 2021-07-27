@@ -1,17 +1,17 @@
-import { HardhatRuntimeEnvironment } from 'hardhat/types';
-import { task, types } from 'hardhat/config';
-import { DarkForestCore } from '../task-types';
+import { fakeHash, mimcHash, modPBigInt, perlin } from '@darkforest_eth/hashing';
 import {
-  fakeProof,
   buildContractCallArgs,
+  fakeProof,
+  RevealSnarkContractCallArgs,
   revealSnarkWasmPath,
   revealSnarkZkeyPath,
   SnarkJSProofAndSignals,
-  RevealSnarkContractCallArgs,
 } from '@darkforest_eth/snarks';
-import { mimcHash, perlin, fakeHash, modPBigInt } from '@darkforest_eth/hashing';
+import { task, types } from 'hardhat/config';
+import { HardhatRuntimeEnvironment } from 'hardhat/types';
 // @ts-ignore
 import * as snarkjs from 'snarkjs';
+import { DarkForestCore } from '../task-types';
 
 task('game:pause', 'pause the game').setAction(gamePause);
 

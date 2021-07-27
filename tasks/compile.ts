@@ -1,11 +1,11 @@
+import * as fs from 'fs/promises';
+import { task } from 'hardhat/config';
 import {
   HardhatArguments,
   HardhatRuntimeEnvironment,
   RunSuperFunction,
   TaskArguments,
 } from 'hardhat/types';
-import { task } from 'hardhat/config';
-import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as prettier from 'prettier';
 

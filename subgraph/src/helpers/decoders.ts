@@ -1,4 +1,12 @@
-import { log, BigInt } from '@graphprotocol/graph-ts';
+import { BigInt } from '@graphprotocol/graph-ts';
+import {
+  DarkForestCore__planetArrivalsResultValue0Struct,
+  DarkForestCore__planetsExtendedInfoResultValue0Struct,
+  DarkForestCore__planetsResultValue0Struct,
+  DarkForestCore__revealedCoordsResultValue0Struct,
+} from '../../generated/DarkForestCore/DarkForestCore';
+import { DarkForestGetters__bulkGetArtifactsByIdsResultRetStruct } from '../../generated/DarkForestCore/DarkForestGetters';
+import { Arrival, Artifact, Planet } from '../../generated/schema';
 import {
   bjjFieldElementToSignedInt,
   hexStringToPaddedUnprefixed,
@@ -14,16 +22,6 @@ import {
   toPlanetType,
   toSpaceType,
 } from './converters';
-
-import { Arrival, Artifact, Planet } from '../../generated/schema';
-
-import {
-  DarkForestCore__planetArrivalsResultValue0Struct,
-  DarkForestCore__planetsExtendedInfoResultValue0Struct,
-  DarkForestCore__planetsResultValue0Struct,
-  DarkForestCore__revealedCoordsResultValue0Struct,
-} from '../../generated/DarkForestCore/DarkForestCore';
-import { DarkForestGetters__bulkGetArtifactsByIdsResultRetStruct } from '../../generated/DarkForestCore/DarkForestGetters';
 
 export function refreshPlanetFromContractData(
   locationDec: BigInt,

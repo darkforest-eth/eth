@@ -1,12 +1,12 @@
 import {
   DarkForestCore,
-  DarkForestTokens,
+  DarkForestGetters,
+  DarkForestGPTCredit,
   DarkForestPlanet,
+  DarkForestTokens,
   DarkForestUtils,
   Verifier,
   Whitelist,
-  DarkForestGetters,
-  DarkForestGPTCredit,
 } from '@darkforest_eth/contracts/typechain';
 import { ethers, upgrades } from 'hardhat';
 import { initializers } from './WorldConstants';

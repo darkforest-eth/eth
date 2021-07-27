@@ -1,12 +1,12 @@
-import { task, subtask, types } from 'hardhat/config';
-import type { HardhatRuntimeEnvironment, HardhatArguments } from 'hardhat/types';
-import * as util from 'util';
-import * as path from 'path';
+import Docker, { Container, ContainerCreateOptions, HealthConfig } from 'dockerode';
 import * as fs from 'fs/promises';
+import { subtask, task, types } from 'hardhat/config';
 import { HardhatPluginError } from 'hardhat/plugins';
+import type { HardhatArguments, HardhatRuntimeEnvironment } from 'hardhat/types';
+import * as path from 'path';
+import * as util from 'util';
 
 const exec = util.promisify(require('child_process').exec);
-import Docker, { HealthConfig, Container, ContainerCreateOptions } from 'dockerode';
 
 export const PLUGIN_NAME = 'hardhat-subgraph';
 export const TASK_SUBGRAPH_DEPLOY = 'subgraph:deploy';

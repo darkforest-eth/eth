@@ -1,9 +1,9 @@
-import { BigNumberish, BigNumber } from 'ethers';
-import { ethers, waffle } from 'hardhat';
 import { DarkForestCore, DarkForestGetters } from '@darkforest_eth/contracts/typechain';
-import { World } from './TestWorld';
-import { LARGE_INTERVAL, ARTIFACT_PLANET_1, initializers } from './WorldConstants';
+import { BigNumber, BigNumberish } from 'ethers';
+import { ethers, waffle } from 'hardhat';
 import { TestLocation } from './TestLocation';
+import { World } from './TestWorld';
+import { ARTIFACT_PLANET_1, initializers, LARGE_INTERVAL } from './WorldConstants';
 
 const { constants } = ethers;
 

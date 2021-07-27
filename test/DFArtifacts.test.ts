@@ -1,33 +1,33 @@
 import { expect } from 'chai';
+import { TestLocation } from './utils/TestLocation';
 import {
-  SPAWN_PLANET_1,
-  SPAWN_PLANET_2,
-  LVL0_PLANET,
+  conquerUnownedPlanet,
+  fixtureLoader,
+  getArtifactsOwnedBy,
+  getCurrentTime,
+  getStatSum,
+  hexToBigNumber,
+  increaseBlockchainTime,
+  makeFindArtifactArgs,
+  makeInitArgs,
+  makeMoveArgs,
+  user1MintArtifactPlanet,
+} from './utils/TestUtils';
+import { defaultWorldFixture, Player, World } from './utils/TestWorld';
+import {
   ARTIFACT_PLANET_1,
   ARTIFACT_PLANET_2,
+  LVL0_PLANET,
   LVL3_SPACETIME_1,
   LVL3_SPACETIME_2,
-  LVL6_SPACETIME,
   LVL3_SPACETIME_3,
   LVL3_UNOWNED_NEBULA,
   LVL4_UNOWNED_DEEP_SPACE,
+  LVL6_SPACETIME,
   SPACE_PERLIN,
+  SPAWN_PLANET_1,
+  SPAWN_PLANET_2,
 } from './utils/WorldConstants';
-import {
-  hexToBigNumber,
-  makeMoveArgs,
-  makeInitArgs,
-  increaseBlockchainTime,
-  makeFindArtifactArgs,
-  getArtifactsOwnedBy,
-  getStatSum,
-  user1MintArtifactPlanet,
-  conquerUnownedPlanet,
-  getCurrentTime,
-  fixtureLoader,
-} from './utils/TestUtils';
-import { World, Player, defaultWorldFixture } from './utils/TestWorld';
-import { TestLocation } from './utils/TestLocation';
 
 describe('DarkForestArtifacts', function () {
   let world: World;

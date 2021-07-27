@@ -1,13 +1,12 @@
-import * as path from 'path';
-import * as yup from 'yup';
-import chalk from 'chalk';
-import dedent from 'ts-dedent';
-import { cosmiconfigSync } from 'cosmiconfig';
 import toml from '@iarna/toml';
-import resolvePackage from 'resolve-package-path';
-
+import chalk from 'chalk';
+import { cosmiconfigSync } from 'cosmiconfig';
 // HRE stuff
 import 'hardhat/types/runtime';
+import * as path from 'path';
+import resolvePackage from 'resolve-package-path';
+import dedent from 'ts-dedent';
+import * as yup from 'yup';
 
 declare module 'hardhat/types/runtime' {
   interface HardhatRuntimeEnvironment {

@@ -1,18 +1,18 @@
+import * as fs from 'fs';
 import { subtask, task, types } from 'hardhat/config';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
-import * as fs from 'fs';
 import * as path from 'path';
-import type {
-  LibraryContracts,
-  DarkForestCoreReturn,
-  DarkForestTokens,
-  DarkForestGPTCredit,
-  Whitelist,
-  DarkForestGetters,
-} from '../task-types';
-import '../tasks/deploy-more';
 import * as prettier from 'prettier';
 import * as settings from '../settings';
+import type {
+  DarkForestCoreReturn,
+  DarkForestGetters,
+  DarkForestGPTCredit,
+  DarkForestTokens,
+  LibraryContracts,
+  Whitelist,
+} from '../task-types';
+import '../tasks/deploy-more';
 import { tscompile } from '../utils/tscompile';
 
 task('deploy', 'deploy all contracts')
@@ -127,11 +127,14 @@ async function deploy(
     value: hre.ethers.utils.parseEther(args.fund.toString()),
   });
 
+  const whitelistBalance = await hre.ethers.provider.getBalance(whitelist.address);
+
   if (args.subgraph) {
     await hre.run('subgraph:deploy', { name: args.subgraph });
   }
 
-  console.log(`Sent ${args.fund} to whitelist contract to fund drips`);
+  console.log(`Sent ${args.fund} to whitelist contract (${whitelist.address}) to fund drips`);
+  console.log(`Whitelist balance ${whitelistBalance}`);
   console.log('Deployed successfully. Godspeed cadet.');
 }
 
