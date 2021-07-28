@@ -226,24 +226,30 @@ export function resolvePackageDir(pkg: string) {
   return path.dirname(contractsPkg);
 }
 
-// Config file loading stuff
-const explorer = cosmiconfigSync('darkforest', {
-  cache: true,
-  searchPlaces: ['darkforest.toml'],
-  loaders: {
-    '.toml': (filename, content) => {
-      try {
-        return toml.parse(content);
-      } catch (err) {
-        console.error(chalk.red(`Error parsing ${path.basename(filename)}`));
-        console.error(chalk.yellow(err.message));
-        process.exit(1);
-      }
-    },
-  },
-});
+function tomlLoader(filename: string, content: string) {
+  try {
+    return toml.parse(content);
+  } catch (err) {
+    console.error(chalk.red(`Error parsing ${path.basename(filename)}`));
+    console.error(chalk.yellow(err.message));
+    process.exit(1);
+  }
+}
 
-export function load(): { [key: string]: unknown } {
+const explorers: { [key: string]: ReturnType<typeof cosmiconfigSync> } = {};
+
+export function load(network: string): { [key: string]: unknown } {
+  let explorer = explorers[network];
+  if (!explorer) {
+    // Config file loading stuff, cache it based on network key
+    explorer = explorers[network] = cosmiconfigSync('darkforest', {
+      cache: true,
+      searchPlaces: [`darkforest.${network}.toml`, 'darkforest.toml'],
+      loaders: {
+        '.toml': tomlLoader,
+      },
+    });
+  }
   const result = explorer.search();
   if (result) {
     return result.config;
