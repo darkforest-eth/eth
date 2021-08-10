@@ -10,6 +10,7 @@ import type {
   DarkForestGetters,
   DarkForestGPTCredit,
   DarkForestPlanet,
+  DarkForestScoringRound3,
   DarkForestTokens,
   DarkForestUtils,
   LibraryContracts,
@@ -80,6 +81,32 @@ async function deployGPTCredits(
     contractName: 'DarkForestGPTCredit',
     signerOrOptions: {},
     contractArgs: [args.controllerWalletAddress],
+    deployOptions: {},
+    retries: 5,
+    hre,
+  });
+}
+
+subtask('deploy:score', 'deploy and return Scoring Contract')
+  .addParam('coreAddress', '', undefined, types.string)
+  .addParam('roundName', '', undefined, types.string)
+  .addParam('roundEnd', '', undefined, types.int)
+  .addParam('claimPlanetCooldown', '', undefined, types.int)
+  .setAction(deployScoreContract);
+
+async function deployScoreContract(
+  args: {
+    coreAddress: string;
+    roundName: string;
+    roundEnd: number;
+    claimPlanetCooldown: number;
+  },
+  hre: HardhatRuntimeEnvironment
+): Promise<DarkForestScoringRound3> {
+  return deployProxyWithRetry<DarkForestScoringRound3>({
+    contractName: 'DarkForestScoringRound3',
+    signerOrOptions: {},
+    contractArgs: [args.coreAddress, args.roundName, args.roundEnd, args.claimPlanetCooldown],
     deployOptions: {},
     retries: 5,
     hre,

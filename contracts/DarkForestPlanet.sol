@@ -116,7 +116,6 @@ library DarkForestPlanet {
             );
         }
         require(s().revealedCoords[location].locationId == 0, "Location already revealed");
-
         s().revealedPlanetIds.push(location);
         s().revealedCoords[location] = DarkForestTypes.RevealedCoords({
             locationId: location,
@@ -261,7 +260,8 @@ library DarkForestPlanet {
             _planet.silverCap *= 2;
             _planet.defense /= 2;
         } else if (args.planetType == DarkForestTypes.PlanetType.SILVER_BANK) {
-            _planet.speed /= 2;
+            // Follow up that this is what Brian meant by range
+            // _planet.speed /= 2;
             _planet.silverCap *= 10;
             _planet.populationGrowth = 0;
             _planet.populationCap *= 5;
@@ -275,6 +275,7 @@ library DarkForestPlanet {
             SafeMathUpgradeable.mul(_planet.populationCap, _planetDefaultStats.barbarianPercentage),
             100
         );
+
         // pirates adjusted for def debuffs, and buffed in space/deepspace
         if (deadSpace) {
             _planet.population *= 20;
@@ -283,7 +284,11 @@ library DarkForestPlanet {
         } else if (mediumSpace) {
             _planet.population *= 4;
         }
+        if (args.planetType == DarkForestTypes.PlanetType.SILVER_BANK) {
+            _planet.population /= 2;
+        }
 
+        // Adjust silver cap for mine
         if (args.planetType == DarkForestTypes.PlanetType.SILVER_MINE) {
             _planet.silver = _planet.silverCap / 2;
         }
@@ -366,6 +371,13 @@ library DarkForestPlanet {
     ) public view returns (bool) {
         require(!s().players[msg.sender].isInitialized, "Player is already initialized");
         require(_radius <= s().worldRadius, "Init radius is bigger than the current world radius");
+
+        require(
+            (_radius**2 * 314) / 100 + s().gameConstants.SPAWN_RIM_AREA >=
+                (s().worldRadius**2 * 314) / 100,
+            "Player can only spawn at the universe rim"
+        );
+
         require(
             _perlin >= s().gameConstants.INIT_PERLIN_MIN,
             "Init not allowed in perlin value less than INIT_PERLIN_MIN"
@@ -562,6 +574,5 @@ library DarkForestPlanet {
         );
 
         planet.silver -= silverToWithdraw;
-        s().players[msg.sender].withdrawnSilver += silverToWithdraw;
     }
 }

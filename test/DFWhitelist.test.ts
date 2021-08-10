@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { fixtureLoader, makeInitArgs } from './utils/TestUtils';
-import { initializeWorld, World } from './utils/TestWorld';
+import { whilelistWorldFixture, World } from './utils/TestWorld';
 import { SPAWN_PLANET_1 } from './utils/WorldConstants';
 
 const { utils } = ethers;
@@ -10,7 +10,7 @@ describe('DarkForestWhitelist', function () {
   let world: World;
 
   async function worldFixture() {
-    const world = await initializeWorld({ enableWhitelist: true });
+    const world = await fixtureLoader(whilelistWorldFixture);
     await world.contracts.whitelist.addKeys([
       utils.id('XXXXX-XXXXX-XXXXX-XXXXX-XXXXX'),
       utils.id('XXXXX-XXXXX-XXXXX-XXXXX-XXXX0'),

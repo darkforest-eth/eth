@@ -179,6 +179,10 @@ contract DarkForestStorageV1 {
         return s.gameConstants.ARTIFACT_POINT_VALUES;
     }
 
+    function getRevealCooldown() public view returns (uint256) {
+        return s.gameConstants.LOCATION_REVEAL_COOLDOWN;
+    }
+
     function getDefaultStats() public view returns (DarkForestTypes.PlanetDefaultStats[] memory) {
         return s.planetDefaultStats;
     }

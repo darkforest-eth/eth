@@ -299,9 +299,7 @@ describe('DarkForestPlanet', function () {
     expect(Math.floor(regularPlanet.silverCap.toNumber() * 10)).to.be.equal(
       quasarPlanet.silverCap.toNumber()
     );
-    expect(Math.floor(regularPlanet.speed.toNumber() / 2)).to.be.equal(
-      quasarPlanet.speed.toNumber()
-    );
+    expect(Math.floor(regularPlanet.speed.toNumber())).to.be.equal(quasarPlanet.speed.toNumber());
     expect(Math.floor(quasarPlanet.populationGrowth.toNumber())).to.be.equal(0);
     expect(Math.floor(regularPlanet.populationCap.toNumber() * 5)).to.be.equal(
       quasarPlanet.populationCap.toNumber()
@@ -325,50 +323,5 @@ describe('DarkForestPlanet', function () {
     expect(regularPlanet.silverCap.toNumber() * 2).to.be.equal(
       tradingPostPlanet.silverCap.toNumber()
     );
-  });
-
-  it('allows player to withdraw silver from trading posts', async function () {
-    const withdrawnAmount = (await world.contracts.core.planets(LVL3_SPACETIME_1.id)).silverCap;
-
-    await expect(world.user1Core.withdrawSilver(LVL3_SPACETIME_1.id, withdrawnAmount))
-      .to.emit(world.contracts.core, 'PlanetSilverWithdrawn')
-      .withArgs(world.user1.address, LVL3_SPACETIME_1.id, withdrawnAmount);
-
-    expect((await world.contracts.core.players(world.user1.address)).withdrawnSilver).to.equal(
-      withdrawnAmount
-    );
-  });
-
-  it("doesn't allow player to withdraw more silver than planet has", async function () {
-    const withdrawnAmount = (await world.contracts.core.planets(LVL3_SPACETIME_1.id)).silverCap.add(
-      1000
-    );
-
-    await expect(
-      world.user1Core.withdrawSilver(LVL3_SPACETIME_1.id, withdrawnAmount)
-    ).to.be.revertedWith('tried to withdraw more silver than exists on planet');
-
-    expect((await world.contracts.core.players(world.user1.address)).withdrawnSilver).to.equal(0);
-  });
-
-  it("doesn't allow player to withdraw silver from non-trading post", async function () {
-    const withdrawnAmount = (await world.contracts.core.planets(LVL1_ASTEROID_1.id)).silverCap;
-
-    await expect(
-      world.user1Core.withdrawSilver(LVL1_ASTEROID_1.id, withdrawnAmount)
-    ).to.be.revertedWith('can only withdraw silver from trading posts');
-
-    expect((await world.contracts.core.players(world.user1.address)).withdrawnSilver).to.equal(0);
-  });
-
-  it("doesn't allow player to withdraw silver from planet that is not theirs", async function () {
-    const withdrawnAmount = (await world.contracts.core.planets(LVL3_SPACETIME_1.id)).silverCap;
-
-    await expect(
-      world.user2Core.withdrawSilver(LVL3_SPACETIME_1.id, withdrawnAmount)
-    ).to.be.revertedWith('you must own this planet');
-
-    expect((await world.contracts.core.players(world.user1.address)).withdrawnSilver).to.equal(0);
-    expect((await world.contracts.core.players(world.user2.address)).withdrawnSilver).to.equal(0);
   });
 });

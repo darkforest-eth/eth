@@ -3,13 +3,15 @@ import {
   DarkForestGetters,
   DarkForestGPTCredit,
   DarkForestPlanet,
+  DarkForestScoringRound3,
   DarkForestTokens,
   DarkForestUtils,
   Verifier,
   Whitelist,
 } from '@darkforest_eth/contracts/typechain';
 import { ethers, upgrades } from 'hardhat';
-import { initializers } from './WorldConstants';
+import * as yup from 'yup';
+import * as settings from '../../settings';
 
 export interface TestContracts {
   whitelist: Whitelist;
@@ -20,9 +22,18 @@ export interface TestContracts {
   core: DarkForestCore;
   getters: DarkForestGetters;
   gptCredits: DarkForestGPTCredit;
+  scoring: DarkForestScoringRound3;
 }
 
-export async function initializeContracts(enableWhitelist?: boolean): Promise<TestContracts> {
+export interface InitializeContractArgs {
+  initializers: yup.Asserts<typeof settings.Initializers>;
+  enableWhitelist?: boolean;
+}
+
+export async function initializeContracts({
+  enableWhitelist,
+  initializers,
+}: InitializeContractArgs): Promise<TestContracts> {
   // silence all the linking warnings, ideally remove this someday
   upgrades.silenceWarnings();
 
@@ -57,6 +68,7 @@ export async function initializeContracts(enableWhitelist?: boolean): Promise<Te
       DarkForestUtils: darkForestUtils.address,
     },
   });
+
   const artifactUtils = await DarkForestArtifactUtils.deploy();
   await artifactUtils.deployTransaction.wait();
 
@@ -109,6 +121,15 @@ export async function initializeContracts(enableWhitelist?: boolean): Promise<Te
     deployer.address,
   ])) as DarkForestGPTCredit;
 
+  const DarkForestScoringRound3Factory = await ethers.getContractFactory('DarkForestScoringRound3');
+
+  const darkForestScoringContract = (await upgrades.deployProxy(DarkForestScoringRound3Factory, [
+    darkForestCore.address,
+    initializers.ROUND_NAME,
+    initializers.ROUND_END,
+    initializers.CLAIM_PLANET_COOLDOWN,
+  ])) as DarkForestScoringRound3;
+
   return {
     whitelist,
     tokens: darkForestTokens,
@@ -118,5 +139,6 @@ export async function initializeContracts(enableWhitelist?: boolean): Promise<Te
     core: darkForestCore,
     getters: darkForestGetters,
     gptCredits: darkForestGPTCredit,
+    scoring: darkForestScoringContract,
   };
 }

@@ -17,8 +17,6 @@ library DarkForestTypes {
         uint256 initTimestamp;
         uint256 homePlanetId;
         uint256 lastRevealTimestamp;
-        uint256 withdrawnSilver;
-        uint256 totalArtifactPoints;
     }
 
     struct Planet {
@@ -104,6 +102,7 @@ library DarkForestTypes {
         uint256 PERLIN_THRESHOLD_3;
         uint256 INIT_PERLIN_MIN;
         uint256 INIT_PERLIN_MAX;
+        uint256 SPAWN_RIM_AREA;
         uint256 BIOME_THRESHOLD_1;
         uint256 BIOME_THRESHOLD_2;
         uint256 PLANET_RARITY;
@@ -136,6 +135,7 @@ library DarkForestTypes {
         uint256 PERLIN_THRESHOLD_3;
         uint256 INIT_PERLIN_MIN;
         uint256 INIT_PERLIN_MAX;
+        uint256 SPAWN_RIM_AREA;
         uint256 BIOME_THRESHOLD_1;
         uint256 BIOME_THRESHOLD_2;
         uint256 PLANET_RARITY;

@@ -1,3 +1,4 @@
+import { SCORING_CONTRACT_ADDRESS } from '@darkforest_eth/contracts';
 import { DeployOptions } from '@openzeppelin/hardhat-upgrades/dist/deploy-proxy';
 import { getImplementationAddress, TransactionMinedTimeout } from '@openzeppelin/upgrades-core';
 import { Contract, Signer } from 'ethers';
@@ -87,6 +88,7 @@ async function upgradeMulti({}, hre: HardhatRuntimeEnvironment) {
     gettersAddress: GETTERS_CONTRACT_ADDRESS,
     whitelistAddress: WHITELIST_CONTRACT_ADDRESS,
     gptCreditAddress: GPT_CREDIT_CONTRACT_ADDRESS,
+    scoringAddress: SCORING_CONTRACT_ADDRESS,
   });
 
   console.log('upgraded DarkForestGetters');

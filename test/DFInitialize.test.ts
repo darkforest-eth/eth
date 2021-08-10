@@ -5,6 +5,8 @@ import {
   ADMIN_PLANET,
   ADMIN_PLANET_CLOAKED,
   INVALID_PLANET,
+  INVALID_TOO_CLOSE_SPAWN,
+  INVALID_TOO_FAR_SPAWN,
   LVL0_PLANET_DEEP_SPACE,
   LVL0_PLANET_OUT_OF_BOUNDS,
   LVL1_PLANET_NEBULA,
@@ -66,16 +68,39 @@ describe('DarkForestInit', function () {
 
   it('rejects player trying to init out of bounds', async function () {
     await expect(
-      world.user1Core.initializePlayer(...makeInitArgs(LVL0_PLANET_OUT_OF_BOUNDS))
+      world.user1Core.initializePlayer(
+        ...makeInitArgs(LVL0_PLANET_OUT_OF_BOUNDS, INVALID_TOO_FAR_SPAWN)
+      )
     ).to.be.revertedWith('Init radius is bigger than the current world radius');
   });
 
-  it('rejects player trying to initialize in deep space', async function () {
+  it('rejects player trying to initialize out of init perlin bounds', async function () {
     await expect(
       world.user1Core.initializePlayer(...makeInitArgs(LVL0_PLANET_DEEP_SPACE))
     ).to.be.revertedWith(
       'Init not allowed in perlin value greater than or equal to the INIT_PERLIN_MAX'
     );
+  });
+
+  it('rejects player trying to initialize inside the valid spawn ring', async function () {
+    await expect(
+      world.user1Core.initializePlayer(...makeInitArgs(SPAWN_PLANET_1, INVALID_TOO_CLOSE_SPAWN))
+    ).to.be.revertedWith('Player can only spawn at the universe rim');
+  });
+
+  it('changes the spawn radius as the world grows', async function () {
+    await expect(world.user1Core.initializePlayer(...makeInitArgs(SPAWN_PLANET_1)))
+      .to.emit(world.contracts.core, 'PlayerInitialized')
+      .withArgs(world.user1.address, SPAWN_PLANET_1.id.toString());
+
+    const tx = await world.contracts.core.adminSetWorldRadius(INVALID_TOO_FAR_SPAWN);
+    await tx.wait();
+
+    await expect(
+      world.user2Core.initializePlayer(...makeInitArgs(SPAWN_PLANET_2, INVALID_TOO_FAR_SPAWN))
+    )
+      .to.emit(world.contracts.core, 'PlayerInitialized')
+      .withArgs(world.user2.address, SPAWN_PLANET_2.id.toString());
   });
 
   it('allows initialization while paused', async function () {
@@ -158,7 +183,6 @@ describe('DarkForestInit', function () {
       requireValidLocationId: false,
     });
   });
-
   it('allows admin to create a planet whose location is revealed', async function () {
     const perlin = 20;
     const level = 5;

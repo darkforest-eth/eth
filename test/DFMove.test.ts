@@ -1,3 +1,4 @@
+import { BigNumber } from '@ethersproject/bignumber';
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import {
@@ -7,7 +8,7 @@ import {
   makeInitArgs,
   makeMoveArgs,
 } from './utils/TestUtils';
-import { defaultWorldFixture, World } from './utils/TestWorld';
+import { defaultWorldFixture, growingWorldFixture, World } from './utils/TestWorld';
 import {
   LVL0_PLANET_OUT_OF_BOUNDS,
   LVL1_ASTEROID_1,
@@ -182,10 +183,21 @@ describe('DarkForestMove', function () {
 
       expect((await world.contracts.core.planets(toId)).population).to.be.above(0);
     });
+  });
+
+  describe('in a growing universe', async function () {
+    let initialRadius: BigNumber;
+
+    before(async function () {
+      world = await fixtureLoader(growingWorldFixture);
+      initialRadius = await world.contracts.core.worldRadius();
+      const initArgs = makeInitArgs(SPAWN_PLANET_2, initialRadius.toNumber());
+
+      await world.user1Core.initializePlayer(...initArgs);
+      await increaseBlockchainTime();
+    });
 
     it('should expand world radius when init high level planet', async function () {
-      await world.contracts.core.changeTarget4RadiusConstant(1); // basically no min radius
-      const initialRadius = await world.contracts.core.worldRadius();
       const dist = 100;
       const shipsSent = 40000;
       const silverSent = 0;

@@ -83,10 +83,6 @@ library DarkForestArtifactUtils {
         DarkForestTypes.Artifact memory foundArtifact =
             s().tokens.createArtifact(createArtifactArgs);
 
-        s().players[msg.sender].totalArtifactPoints += s().gameConstants.ARTIFACT_POINT_VALUES[
-            uint256(foundArtifact.rarity)
-        ];
-
         DarkForestUtils._putArtifactOnPlanet(foundArtifact.id, args.planetId);
 
         info.hasTriedFindingArtifact = true;

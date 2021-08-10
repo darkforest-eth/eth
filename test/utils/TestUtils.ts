@@ -1,4 +1,5 @@
 import { DarkForestCore, DarkForestGetters } from '@darkforest_eth/contracts/typechain';
+import { modPBigInt } from '@darkforest_eth/hashing';
 import { BigNumber, BigNumberish } from 'ethers';
 import { ethers, waffle } from 'hardhat';
 import { TestLocation } from './TestLocation';
@@ -55,8 +56,8 @@ export function makeRevealArgs(
     [
       planetLoc.id,
       planetLoc.perlin,
-      x,
-      y,
+      modPBigInt(x).toString(),
+      modPBigInt(y).toString(),
       PLANETHASH_KEY,
       SPACETYPE_KEY,
       PERLIN_LENGTH_SCALE,
@@ -67,7 +68,8 @@ export function makeRevealArgs(
 }
 
 export function makeInitArgs(
-  planetLoc: TestLocation
+  planetLoc: TestLocation,
+  spawnRadius: number = initializers.INITIAL_WORLD_RADIUS
 ): [
   [BigNumberish, BigNumberish],
   [[BigNumberish, BigNumberish], [BigNumberish, BigNumberish]],
@@ -93,7 +95,7 @@ export function makeInitArgs(
     [
       planetLoc.id,
       planetLoc.perlin,
-      planetLoc.distFromOrigin + 1,
+      spawnRadius,
       PLANETHASH_KEY,
       SPACETYPE_KEY,
       PERLIN_LENGTH_SCALE,

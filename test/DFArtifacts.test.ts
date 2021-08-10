@@ -13,7 +13,7 @@ import {
   makeMoveArgs,
   user1MintArtifactPlanet,
 } from './utils/TestUtils';
-import { defaultWorldFixture, Player, World } from './utils/TestWorld';
+import { defaultWorldFixture, World } from './utils/TestWorld';
 import {
   ARTIFACT_PLANET_1,
   ARTIFACT_PLANET_2,
@@ -31,7 +31,6 @@ import {
 
 describe('DarkForestArtifacts', function () {
   let world: World;
-  let player1: Player;
 
   async function worldFixture() {
     const world = await fixtureLoader(defaultWorldFixture);
@@ -39,8 +38,6 @@ describe('DarkForestArtifacts', function () {
     // Initialize player
     await world.user1Core.initializePlayer(...makeInitArgs(SPAWN_PLANET_1));
     await world.user2Core.initializePlayer(...makeInitArgs(SPAWN_PLANET_2));
-
-    const player1 = await world.contracts.core.players(world.user1.address);
 
     // Conquer initial planets
     //// Player 1
@@ -50,11 +47,11 @@ describe('DarkForestArtifacts', function () {
     await conquerUnownedPlanet(world, world.user2Core, SPAWN_PLANET_2, LVL3_SPACETIME_2);
     await increaseBlockchainTime();
 
-    return [world, player1] as [World, Player];
+    return world;
   }
 
   beforeEach('load fixture', async function () {
-    [world, player1] = await fixtureLoader(worldFixture);
+    world = await fixtureLoader(worldFixture);
   });
 
   it('be able to mint artifact on ruins, activate/buff, deactivate/debuff', async function () {
@@ -75,13 +72,6 @@ describe('DarkForestArtifacts', function () {
     );
     expect(artifactsBefore[0].discoverer).to.eq(world.user1.address);
     expect(artifactsBefore.length).to.equal(1);
-
-    // player's score should be increased
-    const playerAfterMint = await world.contracts.core.players(world.user1.address);
-    const artifactPointValues = await world.contracts.core.getArtifactPointValues();
-    expect(
-      playerAfterMint.totalArtifactPoints.toNumber() - player1.totalArtifactPoints.toNumber()
-    ).to.equal(artifactPointValues[artifactsBefore[0].rarity]);
 
     // let's update the planet to be one of the basic artifacts, so that
     // we know it's definitely going to buff the planet in some way. also,

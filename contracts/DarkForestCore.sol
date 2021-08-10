@@ -98,6 +98,7 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
             PERLIN_THRESHOLD_3: initArgs.PERLIN_THRESHOLD_3,
             INIT_PERLIN_MIN: initArgs.INIT_PERLIN_MIN,
             INIT_PERLIN_MAX: initArgs.INIT_PERLIN_MAX,
+            SPAWN_RIM_AREA: initArgs.SPAWN_RIM_AREA,
             BIOME_THRESHOLD_1: initArgs.BIOME_THRESHOLD_1,
             BIOME_THRESHOLD_2: initArgs.BIOME_THRESHOLD_2,
             PLANET_RARITY: initArgs.PLANET_RARITY,
@@ -139,6 +140,11 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
             s.whitelist.isWhitelisted(msg.sender) || msg.sender == s.adminAddress,
             "Player is not whitelisted"
         );
+        _;
+    }
+
+    modifier disabled() {
+        require(false, "This functionality is disabled for the current round.");
         _;
     }
 
@@ -236,7 +242,7 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
     /// Game Mechanics ///
     //////////////////////
 
-    function refreshPlanet(uint256 location) public onlyWhitelisted notPaused {
+    function refreshPlanet(uint256 location) public notPaused {
         DarkForestPlanet.refreshPlanet(location);
     }
 
@@ -313,7 +319,6 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         );
 
         require(DarkForestPlanet.checkPlayerInit(_location, _perlin, _radius));
-
         // Initialize player data
         s.playerIds.push(msg.sender);
         s.players[msg.sender] = DarkForestTypes.Player(
@@ -321,8 +326,6 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
             msg.sender,
             block.timestamp,
             _location,
-            0,
-            0,
             0
         );
 
@@ -417,7 +420,7 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         return (_location, _branch);
     }
 
-    function transferOwnership(uint256 _location, address _player) public notPaused {
+    function transferOwnership(uint256 _location, address _player) public notPaused disabled {
         require(
             s.planetsExtendedInfo[_location].isInitialized == true,
             "Planet is not initialized"

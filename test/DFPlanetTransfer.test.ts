@@ -11,7 +11,8 @@ import { LVL0_PLANET_POPCAP_BOOSTED, SPAWN_PLANET_1, SPAWN_PLANET_2 } from './ut
 
 const { BigNumber: BN } = ethers;
 
-describe('DarkForestTransferOwnership', function () {
+// Only the admin can transfer planets during Round 3, so we skip these
+describe.skip('DarkForestTransferOwnership', function () {
   describe('transfering, moving, transfering back, moving again', function () {
     let world: World;
 
@@ -31,7 +32,6 @@ describe('DarkForestTransferOwnership', function () {
         )
       ).to.be.revertedWith('Only owner account can perform operation on planets');
     });
-
     it('transfer to user 2, emits event on planet ownership transfer', async function () {
       const planet = SPAWN_PLANET_1.id;
 

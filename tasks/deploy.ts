@@ -8,6 +8,7 @@ import type {
   DarkForestCoreReturn,
   DarkForestGetters,
   DarkForestGPTCredit,
+  DarkForestScoringRound3,
   DarkForestTokens,
   LibraryContracts,
   Whitelist,
@@ -106,6 +107,14 @@ async function deploy(
   });
   const gptCreditAddress = gpt3Credit.address;
 
+  const darkForestScoringReturn: DarkForestScoringRound3 = await hre.run('deploy:score', {
+    coreAddress,
+    roundName: hre.initializers.ROUND_NAME,
+    roundEnd: hre.initializers.ROUND_END,
+    claimPlanetCooldown: hre.initializers.CLAIM_PLANET_COOLDOWN,
+  });
+  const scoringAddress = darkForestScoringReturn.address;
+
   await hre.run('deploy:save', {
     coreBlockNumber: darkForestCoreReturn.blockNumber,
     libraries,
@@ -114,6 +123,7 @@ async function deploy(
     gettersAddress,
     whitelistAddress,
     gptCreditAddress,
+    scoringAddress,
   });
 
   // give all contract administration over to an admin adress if was provided
@@ -149,6 +159,7 @@ async function deploySave(
     gettersAddress: string;
     whitelistAddress: string;
     gptCreditAddress: string;
+    scoringAddress: string;
   },
   hre: HardhatRuntimeEnvironment
 ) {
@@ -245,6 +256,10 @@ async function deploySave(
    * The address for the DarkForestGPTCredit contract.
    */
   export const GPT_CREDIT_CONTRACT_ADDRESS = '${args.gptCreditAddress}';
+  /**
+   * The address for the DarkForestScoring contract.
+   */
+  export const SCORING_CONTRACT_ADDRESS = '${args.scoringAddress}';
   `;
 
   const { jsContents, dtsContents } = tscompile(tsContents);

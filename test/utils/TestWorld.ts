@@ -1,14 +1,16 @@
 import {
   DarkForestCore,
   DarkForestGPTCredit,
+  DarkForestScoringRound3,
   Whitelist,
 } from '@darkforest_eth/contracts/typechain';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address';
-import { BigNumber } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 import { ethers } from 'hardhat';
+import * as yup from 'yup';
+import * as settings from '../../settings';
 import { initializeContracts, TestContracts } from './TestContracts';
-
-const { utils } = ethers;
+import { initializers, target4Initializers } from './WorldConstants';
 
 export interface World {
   contracts: TestContracts;
@@ -21,6 +23,7 @@ export interface World {
   user2Whitelist: Whitelist;
   user1GPTCredit: DarkForestGPTCredit;
   user2GPTCredit: DarkForestGPTCredit;
+  user1Scoring: DarkForestScoringRound3;
 }
 
 export interface Player {
@@ -29,27 +32,37 @@ export interface Player {
   initTimestamp: BigNumber;
   homePlanetId: BigNumber;
   lastRevealTimestamp: BigNumber;
-  withdrawnSilver: BigNumber;
-  totalArtifactPoints: BigNumber;
+  score: BigNumber;
 }
 
 export interface InitializeWorldArgs {
-  enableWhitelist?: boolean;
+  initializers: yup.Asserts<typeof settings.Initializers>;
+  enableWhitelist: boolean;
 }
 
 export function defaultWorldFixture(): Promise<World> {
-  return initializeWorld();
+  return initializeWorld({
+    initializers,
+    enableWhitelist: false,
+  });
 }
 
-export async function initializeWorld(args?: InitializeWorldArgs): Promise<World> {
-  args = Object.assign(
-    {
-      enableWhitelist: false,
-    },
-    args
-  );
+export function growingWorldFixture(): Promise<World> {
+  return initializeWorld({
+    initializers: target4Initializers,
+    enableWhitelist: false,
+  });
+}
 
-  const contracts = await initializeContracts(args.enableWhitelist as boolean);
+export function whilelistWorldFixture(): Promise<World> {
+  return initializeWorld({
+    initializers,
+    enableWhitelist: true,
+  });
+}
+
+export async function initializeWorld(args: InitializeWorldArgs): Promise<World> {
+  const contracts = await initializeContracts(args);
   const [deployer, user1, user2] = await ethers.getSigners();
 
   await deployer.sendTransaction({
@@ -70,5 +83,6 @@ export async function initializeWorld(args?: InitializeWorldArgs): Promise<World
     user2Whitelist: contracts.whitelist.connect(user2),
     user1GPTCredit: contracts.gptCredits.connect(user1),
     user2GPTCredit: contracts.gptCredits.connect(user2),
+    user1Scoring: contracts.scoring.connect(user1),
   };
 }

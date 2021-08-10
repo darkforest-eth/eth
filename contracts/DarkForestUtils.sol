@@ -143,11 +143,12 @@ library DarkForestUtils {
 
     function _getRadius() public view returns (uint256) {
         uint256 nPlayers = s().playerIds.length;
-        uint256 target4RadiusConstant = s().TARGET4_RADIUS;
-        uint256 target4 = s().initializedPlanetCountByLevel[4] + 20 * nPlayers;
-        if (target4 < target4RadiusConstant) {
-            target4 = target4RadiusConstant;
-        }
+
+        // TODO: SPECIAL FOR ROUND 3. Revert this change for future rounds
+        // in round 3, the universe starts at ~300k radius, and expands by a
+        // fixed amount for every player who joins the game.
+        uint256 target4 = s().TARGET4_RADIUS + 40 * nPlayers;
+
         uint256 targetRadiusSquared4 = (target4 * s().cumulativeRarities[4] * 100) / 314;
         uint256 r4 =
             ABDKMath64x64.toUInt(ABDKMath64x64.sqrt(ABDKMath64x64.fromUInt(targetRadiusSquared4)));
@@ -183,17 +184,19 @@ library DarkForestUtils {
         } else if (lastByteOfSeed < 231) {
             artifactType = DarkForestTypes.ArtifactType.BlackDomain;
         } else {
-            if (biome == DarkForestTypes.Biome.Ice) {
-                artifactType = DarkForestTypes.ArtifactType.PlanetaryShield;
-            } else if (biome == DarkForestTypes.Biome.Lava) {
-                artifactType = DarkForestTypes.ArtifactType.PhotoidCannon;
-            } else if (biome == DarkForestTypes.Biome.Wasteland) {
-                artifactType = DarkForestTypes.ArtifactType.BloomFilter;
-            } else if (biome == DarkForestTypes.Biome.Corrupted) {
-                artifactType = DarkForestTypes.ArtifactType.BlackDomain;
-            } else {
-                artifactType = DarkForestTypes.ArtifactType.Wormhole;
-            }
+            // Commented out for v6 Round 3
+            // if (biome == DarkForestTypes.Biome.Ice) {
+            //     artifactType = DarkForestTypes.ArtifactType.PlanetaryShield;
+            // } else if (biome == DarkForestTypes.Biome.Lava) {
+            //     artifactType = DarkForestTypes.ArtifactType.PhotoidCannon;
+            // } else if (biome == DarkForestTypes.Biome.Wasteland) {
+            //     artifactType = DarkForestTypes.ArtifactType.BloomFilter;
+            // } else if (biome == DarkForestTypes.Biome.Corrupted) {
+            //     artifactType = DarkForestTypes.ArtifactType.BlackDomain;
+            // } else {
+            //     artifactType = DarkForestTypes.ArtifactType.Wormhole;
+            // }
+            artifactType = DarkForestTypes.ArtifactType.PhotoidCannon;
         }
 
         uint256 bonus = 0;
@@ -241,8 +244,8 @@ library DarkForestUtils {
         returns (DarkForestTypes.Upgrade memory)
     {
         if (artifact.artifactType == DarkForestTypes.ArtifactType.PhotoidCannon) {
-            uint256[6] memory range = [uint256(100), 200, 400, 600, 800, 1000];
-            uint256[6] memory speedBoosts = [uint256(100), 1000, 2000, 3000, 4000, 5000];
+            uint256[6] memory range = [uint256(100), 200, 200, 200, 200, 200];
+            uint256[6] memory speedBoosts = [uint256(100), 500, 1000, 1500, 2000, 2500];
             return
                 DarkForestTypes.Upgrade({
                     popCapMultiplier: 100,

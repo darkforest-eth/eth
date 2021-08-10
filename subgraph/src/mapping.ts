@@ -56,7 +56,6 @@ export function handleArtifactFound(event: ArtifactFound): void {
   let player = Player.load(playerId);
   if (player) {
     let scoreToAdd = BigInt.fromI32(artifactRarityToPoints(artifact.rarity));
-    player.totalArtifactPoints = player.totalArtifactPoints.plus(scoreToAdd);
     player.score = player.score.plus(scoreToAdd);
     player.save();
   } else {
@@ -134,8 +133,7 @@ export function handlePlayerInitialized(event: PlayerInitialized): void {
   let player = new Player(event.params.player.toHexString());
   player.initTimestamp = event.block.timestamp.toI32();
   player.homeWorld = locationId;
-  player.milliWithdrawnSilver = BigInt.fromI32(0);
-  player.totalArtifactPoints = BigInt.fromI32(0);
+  player.milliScore = BigInt.fromI32(0);
   player.score = BigInt.fromI32(0);
   player.lastRevealTimestamp = 0;
   player.save();
@@ -235,7 +233,7 @@ export function handlePlanetSilverWithdrawn(event: PlanetSilverWithdrawn): void 
   let playerAddress = event.params.player.toHexString();
   let player = Player.load(playerAddress);
   if (player) {
-    player.milliWithdrawnSilver = player.milliWithdrawnSilver.plus(event.params.amount);
+    player.milliScore = player.milliScore.plus(event.params.amount);
     player.score = player.score.plus(event.params.amount.div(BigInt.fromI32(1000)));
     player.save();
   } else {
@@ -259,8 +257,7 @@ export function handleLocationRevealed(event: LocationRevealed): void {
     // revealed by admin, who is not included as a player
     player = new Player(revealerAddress);
     player.initTimestamp = event.block.timestamp.toI32();
-    player.milliWithdrawnSilver = BigInt.fromI32(0);
-    player.totalArtifactPoints = BigInt.fromI32(0);
+    player.milliScore = BigInt.fromI32(0);
     player.score = BigInt.fromI32(0);
     player.lastRevealTimestamp = 0;
     player.save();
@@ -463,8 +460,7 @@ function getMeta(timestamp: i32, blockNumber: i32): Meta {
     // add the null player, representing barbarian-owned planets
     let nullPlayer = new Player('0x0000000000000000000000000000000000000000');
     nullPlayer.initTimestamp = timestamp;
-    nullPlayer.milliWithdrawnSilver = BigInt.fromI32(0);
-    nullPlayer.totalArtifactPoints = BigInt.fromI32(0);
+    nullPlayer.milliScore = BigInt.fromI32(0);
     nullPlayer.score = BigInt.fromI32(0);
     nullPlayer.lastRevealTimestamp = 0;
     nullPlayer.save();
@@ -472,8 +468,7 @@ function getMeta(timestamp: i32, blockNumber: i32): Meta {
     // add the core contract into Player store, because it can own artifacts
     let coreContract = new Player(toLowercase(CORE_CONTRACT_ADDRESS));
     coreContract.initTimestamp = timestamp;
-    coreContract.milliWithdrawnSilver = BigInt.fromI32(0);
-    coreContract.totalArtifactPoints = BigInt.fromI32(0);
+    coreContract.milliScore = BigInt.fromI32(0);
     coreContract.score = BigInt.fromI32(0);
     coreContract.lastRevealTimestamp = 0;
     coreContract.save();

@@ -4,17 +4,19 @@
 [initializers]
 ADMIN_CAN_ADD_PLANETS = true
 WORLD_RADIUS_LOCKED = false
-TOKEN_MINT_END_TIMESTAMP = 2022-07-07T21:00:00-07:00
-TARGET4_RADIUS = 1600
+TOKEN_MINT_END_TIMESTAMP = 2021-08-22T09:00:00-07:00
+TARGET4_RADIUS = 69420 # ROUND 3: 69420 ~ radius of 304k
 INITIAL_WORLD_RADIUS = 8000
+ROUND_NAME = "Round 3"
+ROUND_END = 2021-08-12T09:00:00-07:00
 
 ##################################
 # SNARK keys & Perlin parameters #
 ##################################
-DISABLE_ZK_CHECKS = true
-PLANETHASH_KEY = 430
-SPACETYPE_KEY = 431
-BIOMEBASE_KEY = 432
+DISABLE_ZK_CHECKS = false
+PLANETHASH_KEY = 433
+SPACETYPE_KEY = 434
+BIOMEBASE_KEY = 435
 PERLIN_MIRROR_X = false
 PERLIN_MIRROR_Y = false
 PERLIN_LENGTH_SCALE = 16384 # must be a power of two no greater than 16384
@@ -23,17 +25,19 @@ PERLIN_LENGTH_SCALE = 16384 # must be a power of two no greater than 16384
 # Game configuration #
 ######################
 MAX_NATURAL_PLANET_LEVEL = 256
-TIME_FACTOR_HUNDREDTHS = 5000 # speedup/slowdown game
+TIME_FACTOR_HUNDREDTHS = 100 # speedup/slowdown game
 PERLIN_THRESHOLD_1 = 1
 PERLIN_THRESHOLD_2 = 2
 PERLIN_THRESHOLD_3 = 18
-INIT_PERLIN_MIN = 14
-INIT_PERLIN_MAX = 15
+INIT_PERLIN_MIN = 1
+INIT_PERLIN_MAX = 31
+SPAWN_RIM_AREA = 7234560000 # 3.14 * 48k * 48k
 BIOME_THRESHOLD_1 = 15
 BIOME_THRESHOLD_2 = 17
 PLANET_RARITY = 16384
 PHOTOID_ACTIVATION_DELAY = 14400 # seconds
 LOCATION_REVEAL_COOLDOWN = 86400 # seconds
+CLAIM_PLANET_COOLDOWN = 10800 # seconds
 PLANET_TYPE_WEIGHTS = [
   [
     [1, 0, 0, 0, 0],
@@ -84,10 +88,15 @@ PLANET_TYPE_WEIGHTS = [
     [7, 4, 2, 2, 1],
   ],
 ]
-ARTIFACT_POINT_VALUES = [
-  0, 5000, 20000, 240000, 3000000, 20000000
-]
+
 
 ##########################
 # Planets to add to game #
 ##########################
+[[planets]]
+  x = 0
+  y = 0
+  level = 9
+  planetType = 0
+  requireValidLocationId = false
+  revealLocation = true
