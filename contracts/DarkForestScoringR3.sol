@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.7.6;
 pragma experimental ABIEncoderV2;
-import "hardhat/console.sol";
 
+import "hardhat/console.sol";
 import "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "./DarkForestCore.sol";
@@ -15,9 +15,10 @@ import "./ABDKMath64x64.sol";
  * ordered by their closest claimed planet.
  */
 contract DarkForestScoringRound3 is OwnableUpgradeable, DarkForestScoreMap {
-    DarkForestCore coreContract;
     uint256 roundEnd;
     string roundName;
+
+    // this is set via CLAIM_PLANET_COOLDOWN in darkforest.toml. Measured in seconds.
     uint256 CLAIM_PLANET_COOLDOWN;
 
     mapping(address => uint256) lastClaimTimestamp;
@@ -33,12 +34,16 @@ contract DarkForestScoringRound3 is OwnableUpgradeable, DarkForestScoreMap {
         uint256 _roundEnd,
         uint256 claimPlanetCooldown
     ) public initializer {
+        __Ownable_init();
         coreContract = DarkForestCore(_coreContractAddress);
         roundEnd = _roundEnd;
         roundName = _roundName;
         CLAIM_PLANET_COOLDOWN = claimPlanetCooldown;
     }
 
+    /**
+     * Gets the amount of time in seconds between each time that a player is allowed to claim a planet.
+     */
     function gameConstants() public view returns (uint256) {
         return CLAIM_PLANET_COOLDOWN;
     }
@@ -58,6 +63,9 @@ contract DarkForestScoringRound3 is OwnableUpgradeable, DarkForestScoreMap {
         }
     }
 
+    /**
+     * Returns the last time that the given player claimed a planet.
+     */
     function getLastClaimTimestamp(address player) public view returns (uint256) {
         return lastClaimTimestamp[player];
     }
@@ -83,9 +91,10 @@ contract DarkForestScoringRound3 is OwnableUpgradeable, DarkForestScoreMap {
         return distance;
     }
 
-    // `x`, `y` are in `{0, 1, 2, ..., LOCATION_ID_UB - 1}`
-    // by convention, if a number `n` is greater than `LOCATION_ID_UB / 2`, it is considered a negative number whose "actual" value is `n - LOCATION_ID_UB`
-    // this code snippet calculates the absolute value of `x` or `y` (given the above convention)
+    // `x`, `y` are in `{0, 1, 2, ..., LOCATION_ID_UB - 1}` by convention, if a number `n` is
+    // greater than `LOCATION_ID_UB / 2`, it is considered a negative number whose "actual" value is
+    // `n - LOCATION_ID_UB` this code snippet calculates the absolute value of `x` or `y` (given the
+    // above convention)
     function getAbsoluteModP(uint256 n) private pure returns (uint256) {
         uint256 LOCATION_ID_UB =
             21888242871839275222246405745257275088548364400416034343698204186575808495617;
@@ -101,12 +110,10 @@ contract DarkForestScoringRound3 is OwnableUpgradeable, DarkForestScoreMap {
         roundEnd = _roundEnd;
     }
 
-    /**
-     * In dark forest v0.6 r3, players can claim planets that own.
-     * This will reveal a planets a coordinates to all other players.
-     * A Player's score is determined by taking the distance of their closest planet from the center of the universe.
-     * A planet can be claimed multiple times, but only the last player to claim a planet can use it as part of their score.
-     */
+    //  In dark forest v0.6 r3, players can claim planets that own. This will reveal a planets a
+    //  coordinates to all other players. A Player's score is determined by taking the distance of
+    //  their closest planet from the center of the universe. A planet can be claimed multiple
+    //  times, but only the last player to claim a planet can use it as part of their score.
     function claim(
         uint256[2] memory _a,
         uint256[2][2] memory _b,

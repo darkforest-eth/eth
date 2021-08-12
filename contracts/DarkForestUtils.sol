@@ -392,7 +392,6 @@ library DarkForestUtils {
     // if the given artifact is not on the given planet, reverts
     // if the given artifact is currently activated, reverts
     function _takeArtifactOffPlanet(uint256 artifactId, uint256 locationId) public {
-        s().artifactIdToPlanetId[artifactId] = 0;
         uint256 artifactsOnThisPlanet = s().planetArtifacts[locationId].length;
         bool hadTheArtifact = false;
 
@@ -416,6 +415,7 @@ library DarkForestUtils {
         }
 
         require(hadTheArtifact, "this artifact was not present on this planet");
+        s().artifactIdToPlanetId[artifactId] = 0;
         s().planetArtifacts[locationId].pop();
     }
 

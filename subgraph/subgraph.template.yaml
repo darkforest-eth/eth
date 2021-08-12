@@ -1,6 +1,6 @@
 specVersion: 0.0.2
 description: Dark Forest, the world's first decentralized real-time strategy game. Built on Ethereum with zkSNARKs
-repository: https://github.com/jacobrosenthal/darkforest-graph
+repository: https://github.com/darkforest-eth/eth
 schema:
   file: ./schema.graphql
 dataSources:

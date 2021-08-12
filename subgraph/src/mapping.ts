@@ -75,6 +75,18 @@ export function handleArtifactWithdrawn(event: ArtifactWithdrawn): void {
   let meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
   addToPlanetRefreshQueue(meta, event.params.loc);
   addToArtifactRefreshQueue(meta, event.params.artifactId);
+
+  let artifactId = hexStringToPaddedUnprefixed(event.params.artifactId.toHexString());
+  let artifact = Artifact.load(artifactId);
+  if (artifact) {
+    // synthetic field, not updated on refresh so done here
+    artifact.onPlanet = null;
+    artifact.save();
+  } else {
+    log.error('attempting to withdraw unknown artifactid: {}', [artifactId]);
+    throw new Error();
+  }
+
   meta.save();
 }
 

@@ -7,6 +7,7 @@ import {
   revealSnarkZkeyPath,
   SnarkJSProofAndSignals,
 } from '@darkforest_eth/snarks';
+import { BigNumber } from '@ethersproject/bignumber';
 import { task, types } from 'hardhat/config';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 // @ts-ignore
@@ -87,9 +88,27 @@ async function setTokenMintEnd(args: { tokenend: number }, hre: HardhatRuntimeEn
   await setRadiusReceipt.wait();
 }
 
+// 0d0847138e379ddf66742eb0d25b21f87b6295444dd74309e22973fab695140c
+
+task('game:setPlanetOwner', 'sets the owner of the given planet to be the given address')
+  .addPositionalParam('planetId', 'non-0x-prefixed planet locationId', undefined, types.string)
+  .addPositionalParam('address', '0x-prefixed address of a player', undefined, types.string)
+  .setAction(setPlanetOwner);
+
+async function setPlanetOwner(
+  { planetId, address }: { planetId: string; address: string },
+  hre: HardhatRuntimeEnvironment
+) {
+  await hre.run('utils:assertChainId');
+  const darkForest: DarkForestCore = await hre.run('utils:getCore');
+
+  const setOwnerReciept = await darkForest.setOwner(BigNumber.from('0x' + planetId), address);
+  await setOwnerReciept.wait();
+}
+
 task(
   'game:createPlanets',
-  'creates a planet as admin. only works when zk checks are enabled (using regular mimc fn)'
+  'creates the planets defined in the darkforest.toml [[planets]] key. Only works when zk checks are enabled (using regular mimc fn)'
 ).setAction(createPlanets);
 
 async function createPlanets({}, hre: HardhatRuntimeEnvironment) {

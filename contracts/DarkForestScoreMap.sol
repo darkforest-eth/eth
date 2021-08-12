@@ -1,9 +1,17 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.7.6;
 pragma experimental ABIEncoderV2;
+
 import "hardhat/console.sol";
+import "./DarkForestCore.sol";
 
 contract DarkForestScoreMap {
+    // We keep a reference to the game contract so that we can ask it questions about the game's state.
+    DarkForestCore coreContract;
+
+    /**
+     * Each time someone claims a planet, we insert an instance of this struct into `claimedCoords`
+     */
     struct ClaimedCoords {
         uint256 locationId;
         uint256 x;
@@ -12,6 +20,7 @@ contract DarkForestScoreMap {
         uint256 score;
         uint256 claimedAt;
     }
+
     /**
      * Map from player address to the list of planets they have claimed.
      */
@@ -36,7 +45,10 @@ contract DarkForestScoreMap {
 
         for (uint256 i = 0; i < planetIds.length; i++) {
             ClaimedCoords memory claimed = claimedCoords[planetIds[i]];
-            if (bestScore > claimed.score) {
+            if (
+                bestScore > claimed.score &&
+                !coreContract.planetsExtendedInfo(planetIds[i]).destroyed
+            ) {
                 bestScore = claimed.score;
             }
         }
@@ -44,6 +56,9 @@ contract DarkForestScoreMap {
         return bestScore;
     }
 
+    /**
+     * If this planet has been claimed, gets information about the circumstances of that claim.
+     */
     function getClaimedCoords(uint256 locationId) public view returns (ClaimedCoords memory) {
         return claimedCoords[locationId];
     }
@@ -63,7 +78,6 @@ contract DarkForestScoreMap {
         uint256[] storage playerClaims = claimedPlanetsOwners[player];
         uint256[] storage oldPlayerClaimed = claimedPlanetsOwners[oldClaim.claimer];
 
-        // if uninitialized set claimedCoords to
         if (claimedCoords[planetId].claimer == address(0)) {
             claimedIds.push(planetId);
             playerClaims.push(planetId);
@@ -92,10 +106,18 @@ contract DarkForestScoreMap {
         return oldClaim.claimer;
     }
 
+    /**
+     * Returns the total amount of planets that have been claimed. A planet does not get counted
+     * more than once if it's been claimed by multiple people.
+     */
     function getNClaimedPlanets() public view returns (uint256) {
         return claimedIds.length;
     }
 
+    /**
+     * API for loading a sublist of the set of claimed planets, so that clients can download this
+     * info without DDOSing xDai.
+     */
     function bulkGetClaimedPlanetIds(uint256 startIdx, uint256 endIdx)
         public
         view
@@ -108,6 +130,10 @@ contract DarkForestScoreMap {
         }
     }
 
+    /**
+     * API for loading a sublist of the set of claimed planets, so that clients can download this
+     * info without DDOSing xDai.
+     */
     function bulkGetClaimedCoordsByIds(uint256[] calldata ids)
         public
         view

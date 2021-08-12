@@ -146,7 +146,7 @@ export const Initializers = yup
       .array()
       .length(6)
       .default([0, 2000, 10000, 200000, 3000000, 20000000]),
-    ROUND_NAME: yup.string(),
+    ROUND_NAME: yup.string().required(),
     ROUND_END: dateInSeconds().required(),
   })
   .defined();

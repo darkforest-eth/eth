@@ -260,7 +260,7 @@ library DarkForestPlanet {
             _planet.silverCap *= 2;
             _planet.defense /= 2;
         } else if (args.planetType == DarkForestTypes.PlanetType.SILVER_BANK) {
-            // Follow up that this is what Brian meant by range
+            // TODO: Enabled for future rounds
             // _planet.speed /= 2;
             _planet.silverCap *= 10;
             _planet.populationGrowth = 0;

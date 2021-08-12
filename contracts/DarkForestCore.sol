@@ -196,6 +196,10 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         s.paused = false;
     }
 
+    function setOwner(uint256 planetId, address newOwner) public onlyAdmin {
+        s.planets[planetId].owner = newOwner;
+    }
+
     function changeTarget4RadiusConstant(uint256 _newConstant) public onlyAdmin {
         s.TARGET4_RADIUS = _newConstant;
         _updateWorldRadius();

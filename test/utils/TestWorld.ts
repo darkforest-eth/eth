@@ -24,6 +24,7 @@ export interface World {
   user1GPTCredit: DarkForestGPTCredit;
   user2GPTCredit: DarkForestGPTCredit;
   user1Scoring: DarkForestScoringRound3;
+  user2Scoring: DarkForestScoringRound3;
 }
 
 export interface Player {
@@ -84,5 +85,6 @@ export async function initializeWorld(args: InitializeWorldArgs): Promise<World>
     user1GPTCredit: contracts.gptCredits.connect(user1),
     user2GPTCredit: contracts.gptCredits.connect(user2),
     user1Scoring: contracts.scoring.connect(user1),
+    user2Scoring: contracts.scoring.connect(user2),
   };
 }

@@ -184,6 +184,9 @@ export function makeFindArtifactArgs(
   ];
 }
 
+/**
+ * interval is measured in seconds
+ */
 export async function increaseBlockchainTime(interval = LARGE_INTERVAL) {
   await ethers.provider.send('evm_increaseTime', [interval]);
   await ethers.provider.send('evm_mine', []);
@@ -204,7 +207,7 @@ export function getStatSum(planet: any) {
 
 // conquers an untouched planet `to` by repeatedly sending attacks from `from`
 // assumes that `to` is owned by `signer` and that `from` is an unowned planet
-// throws if `from` is owned
+// throws if `to` is owned
 export async function conquerUnownedPlanet(
   world: World,
   signer: DarkForestCore,
