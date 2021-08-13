@@ -129,6 +129,7 @@ async function deploy(
   // give all contract administration over to an admin adress if was provided
   if (hre.ADMIN_PUBLIC_ADDRESS) {
     await hre.upgrades.admin.transferProxyAdminOwnership(hre.ADMIN_PUBLIC_ADDRESS);
+    console.log('transfered all contracts');
   }
 
   // Note Ive seen `ProviderError: Internal error` when not enough money...
@@ -136,14 +137,14 @@ async function deploy(
     to: whitelist.address,
     value: hre.ethers.utils.parseEther(args.fund.toString()),
   });
-
-  const whitelistBalance = await hre.ethers.provider.getBalance(whitelist.address);
+  console.log(`Sent ${args.fund} to whitelist contract (${whitelist.address}) to fund drips`);
 
   if (args.subgraph) {
     await hre.run('subgraph:deploy', { name: args.subgraph });
+    console.log('deployed subgraph');
   }
 
-  console.log(`Sent ${args.fund} to whitelist contract (${whitelist.address}) to fund drips`);
+  const whitelistBalance = await hre.ethers.provider.getBalance(whitelist.address);
   console.log(`Whitelist balance ${whitelistBalance}`);
   console.log('Deployed successfully. Godspeed cadet.');
 }
