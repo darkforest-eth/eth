@@ -14,9 +14,9 @@ ROUND_END = 2021-08-22T16:00:00.000Z # Sun Aug 22 2021 12:00:00 EST
 # SNARK keys & Perlin parameters #
 ##################################
 DISABLE_ZK_CHECKS = false
-PLANETHASH_KEY = 433
-SPACETYPE_KEY = 434
-BIOMEBASE_KEY = 435
+PLANETHASH_KEY = 1729
+SPACETYPE_KEY = 1730
+BIOMEBASE_KEY = 1731
 PERLIN_MIRROR_X = false
 PERLIN_MIRROR_Y = false
 PERLIN_LENGTH_SCALE = 16384 # must be a power of two no greater than 16384
