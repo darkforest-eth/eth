@@ -15,11 +15,8 @@ import "./ABDKMath64x64.sol";
  * ordered by their closest claimed planet.
  */
 contract DarkForestScoringRound3 is OwnableUpgradeable, DarkForestScoreMap {
-    uint256 roundEnd;
-    string roundName;
-
-    // this is set via CLAIM_PLANET_COOLDOWN in darkforest.toml. Measured in seconds.
-    uint256 CLAIM_PLANET_COOLDOWN;
+    uint256 public roundEnd;
+    GameConstants public gameConstants;
 
     mapping(address => uint256) lastClaimTimestamp;
     struct LastClaimedStruct {
@@ -37,15 +34,11 @@ contract DarkForestScoringRound3 is OwnableUpgradeable, DarkForestScoreMap {
         __Ownable_init();
         coreContract = DarkForestCore(_coreContractAddress);
         roundEnd = _roundEnd;
-        roundName = _roundName;
-        CLAIM_PLANET_COOLDOWN = claimPlanetCooldown;
-    }
 
-    /**
-     * Gets the amount of time in seconds between each time that a player is allowed to claim a planet.
-     */
-    function gameConstants() public view returns (uint256) {
-        return CLAIM_PLANET_COOLDOWN;
+        gameConstants = GameConstants({
+            ROUND_NAME: _roundName,
+            CLAIM_PLANET_COOLDOWN_SECONDS: claimPlanetCooldown
+        });
     }
 
     function bulkGetLastClaimTimestamp(uint256 startIdx, uint256 endIdx)
@@ -122,7 +115,8 @@ contract DarkForestScoringRound3 is OwnableUpgradeable, DarkForestScoreMap {
     ) public {
         require(block.timestamp < roundEnd, "Cannot claim planets after the round has ended");
         require(
-            block.timestamp - lastClaimTimestamp[msg.sender] > CLAIM_PLANET_COOLDOWN,
+            block.timestamp - lastClaimTimestamp[msg.sender] >
+                gameConstants.CLAIM_PLANET_COOLDOWN_SECONDS,
             "wait for cooldown before revealing again"
         );
         require(
@@ -151,5 +145,10 @@ contract DarkForestScoringRound3 is OwnableUpgradeable, DarkForestScoreMap {
                 y
             );
         emit LocationClaimed(msg.sender, previousClaimer, _input[0]);
+    }
+
+    struct GameConstants {
+        string ROUND_NAME;
+        uint256 CLAIM_PLANET_COOLDOWN_SECONDS;
     }
 }

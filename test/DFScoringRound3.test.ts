@@ -110,7 +110,9 @@ describe('DarkForestScoringRound3', function () {
   });
 
   it("player can't claim location of second planet without waiting for cooldown", async function () {
-    const CLAIM_COOLDOWN = (await world.user1Scoring.gameConstants()).toNumber();
+    const CLAIM_COOLDOWN = (
+      await world.user1Scoring.gameConstants()
+    ).CLAIM_PLANET_COOLDOWN_SECONDS.toNumber();
 
     const x1 = 30;
     const y1 = 40;
@@ -140,7 +142,9 @@ describe('DarkForestScoringRound3', function () {
   });
 
   it('can claim same location twice', async function () {
-    const CLAIM_COOLDOWN = (await world.user1Scoring.gameConstants()).toNumber();
+    const CLAIM_COOLDOWN = (
+      await world.user1Scoring.gameConstants()
+    ).CLAIM_PLANET_COOLDOWN_SECONDS.toNumber();
 
     const x = 30;
     const y = 40;
