@@ -1,15 +1,15 @@
 {
   "name": "eth",
-  "version": "6.5.4",
+  "version": "6.5.5",
   "private": true,
   "license": "GPL-3.0",
   "author": "Clown Town Labs Inc. <brian@clowntown.dev>",
   "main": "index.js",
   "devDependencies": {
-    "@darkforest_eth/contracts": "6.5.4",
-    "@darkforest_eth/hashing": "6.5.4",
-    "@darkforest_eth/snarks": "6.5.4",
-    "@darkforest_eth/types": "6.5.4",
+    "@darkforest_eth/contracts": "6.5.5",
+    "@darkforest_eth/hashing": "6.5.5",
+    "@darkforest_eth/snarks": "6.5.5",
+    "@darkforest_eth/types": "6.5.5",
     "@graphprotocol/graph-cli": "0.20.0",
     "@graphprotocol/graph-ts": "0.20.0",
     "@iarna/toml": "^2.2.5",
@@ -48,7 +48,7 @@
     "yup": "^0.32.9"
   },
   "engines": {
-    "node": ">=14 <16"
+    "node": ">=14"
   },
   "scripts": {
     "prepare": "yarn run compile",
