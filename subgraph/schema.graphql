@@ -11,8 +11,6 @@ type Player @entity {
   sentVoyages: [Arrival!]! @derivedFrom(field: "player")
   "NOTE: Does not reflect current ownership"
   artifactsDiscovered: [Artifact!]! @derivedFrom(field: "discoverer")
-  "NOTE: Does not reflect deposited artifacts now 'owned' by the game contract"
-  artifactsWithdrawn: [Artifact!]! @derivedFrom(field: "owner")
 }
 
 type Planet @entity {
@@ -189,7 +187,8 @@ type Artifact @entity {
   "Modifier applied to natural planet variable. Less than 100 is negative"
   defenseMultiplier: Int!
 
-  owner: Player!
+  "Note: Eth address not Player because could be sent to non game address"
+  ownerAddress: ID!
   onPlanet: Planet
   onVoyage: Arrival
 }

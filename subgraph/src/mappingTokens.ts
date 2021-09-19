@@ -8,7 +8,7 @@ import { refreshArtifactFromContractData } from './helpers/decoders';
 export function handleTransfer(event: Transfer): void {
   let artifact = Artifact.load(event.params.tokenId.toHexString());
   if (artifact !== null) {
-    artifact.owner = event.params.to.toHexString();
+    artifact.ownerAddress = event.params.to.toHexString();
     artifact.save();
   } else {
     // artifact was just minted, so it's not in store yet

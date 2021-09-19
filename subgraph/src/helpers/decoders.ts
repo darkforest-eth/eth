@@ -149,7 +149,7 @@ export function refreshArtifactFromContractData(
   artifact.speedMultiplier = rawArtifact.upgrade.speedMultiplier.toI32();
   artifact.defenseMultiplier = rawArtifact.upgrade.defMultiplier.toI32();
 
-  artifact.owner = rawArtifact.owner.toHexString();
+  artifact.ownerAddress = rawArtifact.owner.toHexString();
 
   if (rawArtifact.locationId.equals(BigInt.fromI32(0))) {
     artifact.onPlanet = null;
