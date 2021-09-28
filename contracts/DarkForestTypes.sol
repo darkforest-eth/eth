@@ -17,6 +17,7 @@ library DarkForestTypes {
         uint256 initTimestamp;
         uint256 homePlanetId;
         uint256 lastRevealTimestamp;
+        uint256 score; // temporary for round 4
     }
 
     struct Planet {

@@ -330,6 +330,7 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
             msg.sender,
             block.timestamp,
             _location,
+            0,
             0
         );
 

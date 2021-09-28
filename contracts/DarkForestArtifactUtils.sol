@@ -86,6 +86,9 @@ library DarkForestArtifactUtils {
         DarkForestUtils._putArtifactOnPlanet(foundArtifact.id, args.planetId);
 
         info.hasTriedFindingArtifact = true;
+        s().players[msg.sender].score += s().gameConstants.ARTIFACT_POINT_VALUES[
+            uint256(foundArtifact.rarity)
+        ];
 
         artifactId = foundArtifact.id;
     }

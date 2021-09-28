@@ -9,6 +9,7 @@ import { lazyObject } from 'hardhat/plugins';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import * as path from 'path';
 import * as settings from './settings';
+import './tasks/artifact';
 import './tasks/circom';
 import './tasks/compile';
 import './tasks/debug';

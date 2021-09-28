@@ -113,7 +113,7 @@ export async function initializeContracts({
     { unsafeAllowLinkedLibraries: true }
   )) as DarkForestGetters;
 
-  await darkForestTokens.initialize(darkForestCore.address, deployer.address);
+  await darkForestTokens.initialize(darkForestCore.address, deployer.address, 'TESTROUND');
 
   const DarkForestGPTCreditContractFactory = await ethers.getContractFactory('DarkForestGPTCredit');
 

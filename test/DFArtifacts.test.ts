@@ -126,7 +126,7 @@ describe('DarkForestArtifacts', function () {
     const artifactsOnPlanet = await world.contracts.core.planetArtifacts(ARTIFACT_PLANET_1.id);
     const tokenUri = await world.contracts.tokens.tokenURI(artifactsOnPlanet[0]);
 
-    expect(tokenUri).to.eq('https://api.zkga.me/token-uri/artifact/' + artifactsOnPlanet);
+    expect(tokenUri).to.eq('https://nft.zkga.me/token-uri/artifact/TESTROUND/' + artifactsOnPlanet);
   });
 
   it("should not be able to deposit an artifact you don't own", async function () {

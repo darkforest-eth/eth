@@ -8,7 +8,6 @@ import type {
   DarkForestCoreReturn,
   DarkForestGetters,
   DarkForestGPTCredit,
-  DarkForestScoringRound3,
   DarkForestTokens,
   LibraryContracts,
   Whitelist,
@@ -90,7 +89,11 @@ async function deploy(
   console.log('DarkForestCore deployed to:', coreAddress);
 
   // late initlialize tokens now that we have corecontract address
-  const dftReceipt = await darkForestTokens.initialize(coreAddress, controllerWalletAddress);
+  const dftReceipt = await darkForestTokens.initialize(
+    coreAddress,
+    controllerWalletAddress,
+    encodeURI(hre.initializers.ROUND_NAME)
+  );
   await dftReceipt.wait();
 
   const darkForestGetters: DarkForestGetters = await hre.run('deploy:getters', {
@@ -107,14 +110,7 @@ async function deploy(
   });
   const gptCreditAddress = gpt3Credit.address;
 
-  const darkForestScoringReturn: DarkForestScoringRound3 = await hre.run('deploy:score', {
-    coreAddress,
-    roundName: hre.initializers.ROUND_NAME,
-    roundEnd: hre.initializers.ROUND_END,
-    claimPlanetCooldown: hre.initializers.CLAIM_PLANET_COOLDOWN,
-  });
-  const scoringAddress = darkForestScoringReturn.address;
-
+  const scoringAddress = '';
   await hre.run('deploy:save', {
     coreBlockNumber: darkForestCoreReturn.blockNumber,
     libraries,

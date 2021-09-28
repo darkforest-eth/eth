@@ -51,7 +51,7 @@ export const Contracts = yup
     GETTERS_CONTRACT_ADDRESS: yup.string().required(),
     WHITELIST_CONTRACT_ADDRESS: yup.string().required(),
     GPT_CREDIT_CONTRACT_ADDRESS: yup.string().required(),
-    SCORING_CONTRACT_ADDRESS: yup.string().required(),
+    SCORING_CONTRACT_ADDRESS: yup.string(),
   })
   .defined();
 
@@ -86,7 +86,7 @@ export const Initializers = yup
     BIOME_THRESHOLD_2: yup.number().default(17),
     PLANET_RARITY: yup.number().default(16384),
     PHOTOID_ACTIVATION_DELAY: yup.number().default(60 * 60 * 12),
-    SPAWN_RIM_AREA: yup.number().default(1000000000000),
+    SPAWN_RIM_AREA: yup.mixed().default(0),
     LOCATION_REVEAL_COOLDOWN: yup.number().default(60 * 60 * 24),
     CLAIM_PLANET_COOLDOWN: yup.number().default(60 * 60 * 3),
     PLANET_TYPE_WEIGHTS: yup

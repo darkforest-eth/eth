@@ -372,11 +372,13 @@ library DarkForestPlanet {
         require(!s().players[msg.sender].isInitialized, "Player is already initialized");
         require(_radius <= s().worldRadius, "Init radius is bigger than the current world radius");
 
-        require(
-            (_radius**2 * 314) / 100 + s().gameConstants.SPAWN_RIM_AREA >=
-                (s().worldRadius**2 * 314) / 100,
-            "Player can only spawn at the universe rim"
-        );
+        if (s().gameConstants.SPAWN_RIM_AREA != 0) {
+            require(
+                (_radius**2 * 314) / 100 + s().gameConstants.SPAWN_RIM_AREA >=
+                    (s().worldRadius**2 * 314) / 100,
+                "Player can only spawn at the universe rim"
+            );
+        }
 
         require(
             _perlin >= s().gameConstants.INIT_PERLIN_MIN,
@@ -574,5 +576,10 @@ library DarkForestPlanet {
         );
 
         planet.silver -= silverToWithdraw;
+
+        // Energy and Silver are not stored as floats in the smart contracts,
+        // so any of those values coming from the contracts need to be divided by
+        // `CONTRACT_PRECISION` to get their true integer value.
+        s().players[msg.sender].score += silverToWithdraw / 1000;
     }
 }

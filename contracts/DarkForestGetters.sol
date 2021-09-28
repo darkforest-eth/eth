@@ -323,4 +323,39 @@ contract DarkForestGetters is Initializable {
             });
         }
     }
+
+    /**
+     * Get a group or artifacts based on their index, fetch all between startIdx & endIdx. indexs are assigned to artifacts based on the order in which they are minted.
+     * index 0 would be the first Artifact minted, etc.
+     * @param startIdx index of the first element to get
+     * @param endIdx index of the last element to get
+     */
+    function bulkGetArtifacts(uint256 startIdx, uint256 endIdx)
+        public
+        view
+        returns (DarkForestTypes.ArtifactWithMetadata[] memory ret)
+    {
+        ret = new DarkForestTypes.ArtifactWithMetadata[](endIdx - startIdx);
+
+        for (uint256 i = startIdx; i < endIdx; i++) {
+            DarkForestTypes.Artifact memory artifact = tokensContract.getArtifactAtIndex(i);
+            address owner = address(0);
+
+            try tokensContract.ownerOf(artifact.id) returns (address addr) {
+                owner = addr;
+            } catch Error(string memory) {
+                // artifact is probably burned or owned by 0x0, so owner is 0x0
+            } catch (bytes memory) {
+                // this shouldn't happen
+            }
+            ret[i - startIdx] = DarkForestTypes.ArtifactWithMetadata({
+                artifact: artifact,
+                upgrade: DarkForestUtils._getUpgradeForArtifact(artifact),
+                timeDelayedUpgrade: DarkForestUtils.timeDelayUpgrade(artifact),
+                owner: owner,
+                locationId: coreContract.artifactIdToPlanetId(artifact.id),
+                voyageId: coreContract.artifactIdToVoyageId(artifact.id)
+            });
+        }
+    }
 }

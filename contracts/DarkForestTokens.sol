@@ -23,10 +23,16 @@ contract DarkForestTokens is ERC721Upgradeable {
         _;
     }
 
-    function initialize(address _coreAddress, address _adminAddress) public initializer {
+    function initialize(
+        address _coreAddress,
+        address _adminAddress,
+        string memory _roundName
+    ) public initializer {
         coreAddress = _coreAddress;
         adminAddress = _adminAddress;
-        _setBaseURI("https://api.zkga.me/token-uri/artifact/");
+        _setBaseURI(
+            string(abi.encodePacked("https://nft.zkga.me/token-uri/artifact/", _roundName, "/"))
+        );
     }
 
     function changeAdmin(address _newAdminAddress) public onlyAdmin {
@@ -64,6 +70,10 @@ contract DarkForestTokens is ERC721Upgradeable {
 
     function getArtifact(uint256 tokenId) public view returns (DarkForestTypes.Artifact memory) {
         return artifacts[tokenId];
+    }
+
+    function getArtifactAtIndex(uint256 idx) public view returns (DarkForestTypes.Artifact memory) {
+        return artifacts[tokenByIndex(idx)];
     }
 
     function getPlayerArtifactIds(address playerId) public view returns (uint256[] memory) {
