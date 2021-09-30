@@ -4,7 +4,6 @@ type Player @entity {
   initTimestamp: Int!
   "allows null because 0x0000000000000000000000000000000000000000 has no homeWorld"
   homeWorld: Planet
-  milliScore: BigInt!
   score: BigInt!
   lastRevealTimestamp: Int!
   planets: [Planet!]! @derivedFrom(field: "owner")
