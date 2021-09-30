@@ -1,36 +1,37 @@
+/* eslint-disable eqeqeq */
 import { BigInt } from '@graphprotocol/graph-ts';
 
 // byte 9: energy cap bonus if byte is < 16
 export function isEnergyCapBoosted(locationId: string): boolean {
-  return locationId.charAt(18) === '0';
+  return locationId.charAt(18) == '0';
 }
 
 // byte 10: energy grow bonus if byte is < 16
 export function isEnergyGrowthBoosted(locationId: string): boolean {
-  return locationId.charAt(20) === '0';
+  return locationId.charAt(20) == '0';
 }
 
 // byte 11: range bonus if byte is < 16
 export function isRangeBoosted(locationId: string): boolean {
-  return locationId.charAt(22) === '0';
+  return locationId.charAt(22) == '0';
 }
 
 // byte 12: speed bonus if byte is < 16
 export function isSpeedBoosted(locationId: string): boolean {
-  return locationId.charAt(24) === '0';
+  return locationId.charAt(24) == '0';
 }
 
 // byte 13: defense bonus if byte is < 16
 export function isDefenseBoosted(locationId: string): boolean {
-  return locationId.charAt(26) === '0';
+  return locationId.charAt(26) == '0';
 }
 
 // BigInt does not get 0 padded by toHexString plus gets a 0x prefix...
 export function hexStringToPaddedUnprefixed(prefixed: string): string {
   // strip 0x
-  let stripped = prefixed.substring(2, prefixed.length);
+  const stripped = prefixed.substring(2, prefixed.length);
   // pad to 64
-  let padded = stripped.padStart(64, '0');
+  const padded = stripped.padStart(64, '0');
   return padded;
 }
 
@@ -153,7 +154,7 @@ export function toBiome(biome: i32): string {
 }
 
 export function bjjFieldElementToSignedInt(n: BigInt): i32 {
-  let p = BigInt.fromString(
+  const p = BigInt.fromString(
     '21888242871839275222246405745257275088548364400416034343698204186575808495617'
   );
   // check if n > 2^31
@@ -164,7 +165,7 @@ export function bjjFieldElementToSignedInt(n: BigInt): i32 {
 }
 
 export function toLowercase(str: string): string {
-  let uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   let ret = '';
   for (let i = 0; i < str.length; i++) {
     if (uppercase.includes(str.charAt(i))) {

@@ -13,7 +13,7 @@ dataSources:
       startBlock: #{{{START_BLOCK}}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
         - Player
@@ -68,7 +68,7 @@ dataSources:
       startBlock: #{{{START_BLOCK}}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
         - Artifact

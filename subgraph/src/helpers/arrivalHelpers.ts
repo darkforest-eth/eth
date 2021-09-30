@@ -1,3 +1,4 @@
+/* eslint-disable eqeqeq */
 import { BigDecimal, BigInt } from '@graphprotocol/graph-ts';
 import { Arrival, Planet } from '../../generated/schema';
 
@@ -18,8 +19,7 @@ function getSilverOverTime(planet: Planet, startTimeS: i32, endTimeS: i32): BigI
     return planet.milliSilverCap;
   }
 
-  let timeElapsed = endTimeS - startTimeS;
-  let newMilliSilver = BigInt.fromI32(endTimeS - startTimeS)
+  const newMilliSilver = BigInt.fromI32(endTimeS - startTimeS)
     .times(planet.milliSilverGrowth)
     .plus(planet.milliSilverLazy);
   if (newMilliSilver.gt(planet.milliSilverCap)) {
@@ -49,7 +49,7 @@ function getEnergyAtTime(planet: Planet, atTimeS: i32): BigInt {
   let timeElapsed = BigInt.fromI32(atTimeS - planet.lastUpdated);
 
   // see v0.6 spec for notes on error bounds and why we pick this cap
-  let timeElapsedCap = BigInt.fromI32(56 / 4)
+  const timeElapsedCap = BigInt.fromI32(56 / 4)
     .times(planet.milliEnergyCap)
     .div(planet.milliEnergyGrowth);
   if (timeElapsed.gt(timeElapsedCap)) {
@@ -58,17 +58,17 @@ function getEnergyAtTime(planet: Planet, atTimeS: i32): BigInt {
 
   // milliEnergyCap can exceed the i32 maximum by a factor of up to 1000,
   // so we divide by 1000, convert to i32, convert to f64, then multiply by 1000
-  let exponent =
+  const exponent =
     (-4.0 * f64(planet.milliEnergyGrowth.toI32()) * f64(timeElapsed.toI32())) /
     f64(planet.milliEnergyCap.div(BigInt.fromI32(1000)).toI32()) /
     1000.0;
-  let exponentiated: f64 = Math.exp(exponent);
+  const exponentiated: f64 = Math.exp(exponent);
   // @ts-ignore: ts linter will complain about f64.toString(), but this is fine for AS compiler
-  let exponentiatedBD = BigDecimal.fromString(exponentiated.toString());
+  const exponentiatedBD = BigDecimal.fromString(exponentiated.toString());
 
-  let milliEnergyBD = new BigDecimal(planet.milliEnergyLazy);
-  let milliEnergyCapBD = new BigDecimal(planet.milliEnergyCap);
-  let denominator = exponentiatedBD
+  const milliEnergyBD = new BigDecimal(planet.milliEnergyLazy);
+  const milliEnergyCapBD = new BigDecimal(planet.milliEnergyCap);
+  const denominator = exponentiatedBD
     .times(milliEnergyCapBD.div(milliEnergyBD).minus(BigDecimal.fromString('1')))
     .plus(BigDecimal.fromString('1'));
 
@@ -93,14 +93,15 @@ export function arrive(toPlanet: Planet, arrival: Arrival): Planet {
   }
 
   // apply energy
-  let shipsMoved = arrival.milliEnergyArriving;
+  const shipsMoved = arrival.milliEnergyArriving;
 
   if (arrival.player !== toPlanet.owner) {
     // attacking enemy - includes emptyAddress
-    let effectiveEnergy = shipsMoved
+    const effectiveEnergy = shipsMoved
       .times(BigInt.fromI32(100))
       .div(BigInt.fromI32(toPlanet.defense));
-    if (arrival.arrivalType === 'WORMHOLE') {
+
+    if (arrival.arrivalType == 'WORMHOLE') {
       // if this is a wormhole arrival to a planet that isn't owned by the initiator of
       // the move, then don't move any energy
     } else if (toPlanet.milliEnergyLazy > effectiveEnergy) {
@@ -109,7 +110,7 @@ export function arrive(toPlanet: Planet, arrival: Arrival): Planet {
     } else {
       // conquers planet
       toPlanet.owner = arrival.player;
-      let effectiveDefendingEnergy = toPlanet.milliEnergyLazy
+      const effectiveDefendingEnergy = toPlanet.milliEnergyLazy
         .times(BigInt.fromI32(toPlanet.defense))
         .div(BigInt.fromI32(100));
       toPlanet.milliEnergyLazy = shipsMoved.minus(effectiveDefendingEnergy);

@@ -17,6 +17,7 @@ typechain
 subgraph/build/*
 subgraph/generated/*
 subgraph/subgraph.yaml
+subgraph/packages/*
 
 # Local development version of darkforest.toml
 darkforest.localhost.toml

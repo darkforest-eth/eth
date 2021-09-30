@@ -26,13 +26,11 @@ contract DarkForestTokens is ERC721Upgradeable {
     function initialize(
         address _coreAddress,
         address _adminAddress,
-        string memory _roundName
+        string memory _baseURI
     ) public initializer {
         coreAddress = _coreAddress;
         adminAddress = _adminAddress;
-        _setBaseURI(
-            string(abi.encodePacked("https://nft.zkga.me/token-uri/artifact/", _roundName, "/"))
-        );
+        _setBaseURI(_baseURI);
     }
 
     function changeAdmin(address _newAdminAddress) public onlyAdmin {

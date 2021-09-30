@@ -92,7 +92,11 @@ async function deploy(
   const dftReceipt = await darkForestTokens.initialize(
     coreAddress,
     controllerWalletAddress,
-    encodeURI(hre.initializers.ROUND_NAME)
+    `${
+      isDev
+        ? 'https://nft-test.zkga.me/token-uri/artifact/'
+        : 'https://nft.zkga.me/token-uri/artifact/'
+    }${hre.network.config?.chainId || 'unknown'}-${darkForestTokens.address}/`
   );
   await dftReceipt.wait();
 

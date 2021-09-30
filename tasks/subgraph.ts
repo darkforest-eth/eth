@@ -82,7 +82,7 @@ async function subgraphDeploy(args: { name: string }, hre: HardhatRuntimeEnviron
   });
 
   await exec(
-    `npx graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 ${args.name}`,
+    `npx graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 -l df ${args.name} `,
     {
       cwd: subgraphPath,
       env: { ...process.env },
@@ -274,7 +274,7 @@ const compose: DFContainerCreateOptions[] = [
   {
     name: 'thegraph_graph-node',
     stdout: true,
-    Image: 'graphprotocol/graph-node:bf1bd38', // as of 5/21, `latest` tagged container is broken
+    Image: 'graphprotocol/graph-node:latest',
     HostConfig: {
       PortBindings: {
         '8000/tcp': [{ HostPort: '8000' }],

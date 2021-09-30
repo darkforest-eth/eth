@@ -1,11 +1,12 @@
+/* eslint-disable eqeqeq */
 import { BigInt } from '@graphprotocol/graph-ts';
 import {
-  DarkForestCore__planetArrivalsResultValue0Struct,
-  DarkForestCore__planetsExtendedInfoResultValue0Struct,
-  DarkForestCore__planetsResultValue0Struct,
-  DarkForestCore__revealedCoordsResultValue0Struct,
-} from '../../generated/DarkForestCore/DarkForestCore';
-import { DarkForestGetters__bulkGetArtifactsByIdsResultRetStruct } from '../../generated/DarkForestCore/DarkForestGetters';
+  DarkForestGetters__bulkGetArtifactsByIdsResultRetStruct,
+  DarkForestGetters__bulkGetPlanetsDataByIdsResultRetInfoStruct,
+  DarkForestGetters__bulkGetPlanetsDataByIdsResultRetPlanetStruct,
+  DarkForestGetters__bulkGetPlanetsDataByIdsResultRetRevealedCoordsStruct,
+  DarkForestGetters__bulkGetVoyagesByIdsResultRetStruct,
+} from '../../generated/DarkForestCore/DarkForestGetters';
 import { Arrival, Artifact, Planet } from '../../generated/schema';
 import {
   bjjFieldElementToSignedInt,
@@ -25,13 +26,14 @@ import {
 
 export function refreshPlanetFromContractData(
   locationDec: BigInt,
-  rawPlanet: DarkForestCore__planetsResultValue0Struct,
-  rawInfo: DarkForestCore__planetsExtendedInfoResultValue0Struct,
-  rawRevealedCoords: DarkForestCore__revealedCoordsResultValue0Struct
+  rawPlanet: DarkForestGetters__bulkGetPlanetsDataByIdsResultRetPlanetStruct,
+  rawInfo: DarkForestGetters__bulkGetPlanetsDataByIdsResultRetInfoStruct,
+  rawRevealedCoords: DarkForestGetters__bulkGetPlanetsDataByIdsResultRetRevealedCoordsStruct
 ): Planet {
-  let locationId = hexStringToPaddedUnprefixed(locationDec.toHexString());
+  const locationId = hexStringToPaddedUnprefixed(locationDec.toHexString());
 
-  let planet = Planet.load(locationId) || new Planet(locationId);
+  let planet = Planet.load(locationId);
+  if (!planet) planet = new Planet(locationId);
 
   planet.locationDec = locationDec;
   planet.owner = rawPlanet.owner.toHexString(); // addresses gets 0x prefixed and 0 padded in toHexString
@@ -80,16 +82,17 @@ export function refreshPlanetFromContractData(
   } // no else clause, because can't set prospectedBlockNumber to null
   // and also because once prospectedBlockNumber is set to nonnull for first time, it's never changed
 
-  return planet as Planet;
+  return planet;
 }
 
 export function refreshVoyageFromContractData(
   voyageIdDec: BigInt,
-  rawVoyage: DarkForestCore__planetArrivalsResultValue0Struct
+  rawVoyage: DarkForestGetters__bulkGetVoyagesByIdsResultRetStruct
 ): Arrival {
-  let voyageId = voyageIdDec.toString(); // ts linter complains about i32.toString()
+  const voyageId = voyageIdDec.toString(); // ts linter complains about i32.toString()
 
-  let voyage = Arrival.load(voyageId) || new Arrival(voyageId);
+  let voyage = Arrival.load(voyageId);
+  if (!voyage) voyage = new Arrival(voyageId);
 
   voyage.arrivalId = voyageIdDec.toI32();
   voyage.player = rawVoyage.player.toHexString();
@@ -108,16 +111,17 @@ export function refreshVoyageFromContractData(
     voyage.carriedArtifact = hexStringToPaddedUnprefixed(rawVoyage.carriedArtifactId.toHexString());
   }
 
-  return voyage as Arrival;
+  return voyage;
 }
 
 export function refreshArtifactFromContractData(
   artifactIdDec: BigInt,
   rawArtifact: DarkForestGetters__bulkGetArtifactsByIdsResultRetStruct
 ): Artifact {
-  let artifactId = hexStringToPaddedUnprefixed(artifactIdDec.toHexString());
+  const artifactId = hexStringToPaddedUnprefixed(artifactIdDec.toHexString());
 
-  let artifact = Artifact.load(artifactId) || new Artifact(artifactId);
+  let artifact = Artifact.load(artifactId);
+  if (!artifact) artifact = new Artifact(artifactId);
 
   artifact.idDec = artifactIdDec;
   if (rawArtifact.artifact.planetDiscoveredOn.equals(BigInt.fromI32(0))) {
@@ -163,5 +167,5 @@ export function refreshArtifactFromContractData(
     artifact.onVoyage = rawArtifact.voyageId.toString();
   }
 
-  return artifact as Artifact;
+  return artifact;
 }

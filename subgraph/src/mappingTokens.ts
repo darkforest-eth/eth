@@ -1,3 +1,4 @@
+/* eslint-disable eqeqeq */
 import { GETTERS_CONTRACT_ADDRESS } from '@darkforest_eth/contracts';
 import { Address } from '@graphprotocol/graph-ts';
 import { DarkForestGetters } from '../generated/DarkForestCore/DarkForestGetters';
@@ -13,8 +14,8 @@ export function handleTransfer(event: Transfer): void {
   } else {
     // artifact was just minted, so it's not in store yet
     // note that a _mint does emit a Transfer ERC721 event
-    let getters = DarkForestGetters.bind(Address.fromString(GETTERS_CONTRACT_ADDRESS));
-    let rawArtifact = getters.bulkGetArtifactsByIds([event.params.tokenId]);
+    const getters = DarkForestGetters.bind(Address.fromString(GETTERS_CONTRACT_ADDRESS));
+    const rawArtifact = getters.bulkGetArtifactsByIds([event.params.tokenId]);
 
     artifact = refreshArtifactFromContractData(event.params.tokenId, rawArtifact[0]);
     artifact.save();

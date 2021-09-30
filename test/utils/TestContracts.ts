@@ -1,3 +1,4 @@
+import { NETWORK_ID } from '@darkforest_eth/contracts';
 import {
   DarkForestCore,
   DarkForestGetters,
@@ -113,7 +114,11 @@ export async function initializeContracts({
     { unsafeAllowLinkedLibraries: true }
   )) as DarkForestGetters;
 
-  await darkForestTokens.initialize(darkForestCore.address, deployer.address, 'TESTROUND');
+  await darkForestTokens.initialize(
+    darkForestCore.address,
+    deployer.address,
+    `https://nft-test.zkga.me/token-uri/artifact/${NETWORK_ID}-${darkForestTokens.address}/`
+  );
 
   const DarkForestGPTCreditContractFactory = await ethers.getContractFactory('DarkForestGPTCredit');
 

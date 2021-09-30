@@ -1,3 +1,4 @@
+/* eslint-disable eqeqeq */
 import { CORE_CONTRACT_ADDRESS, GETTERS_CONTRACT_ADDRESS } from '@darkforest_eth/contracts';
 import { Address, BigInt, ethereum, log } from '@graphprotocol/graph-ts';
 import {
@@ -7,10 +8,6 @@ import {
   ArtifactDeposited,
   ArtifactFound,
   ArtifactWithdrawn,
-  DarkForestCore__planetArrivalsResultValue0Struct,
-  DarkForestCore__planetsExtendedInfoResultValue0Struct,
-  DarkForestCore__planetsResultValue0Struct,
-  DarkForestCore__revealedCoordsResultValue0Struct,
   LocationRevealed,
   PlanetHatBought,
   PlanetProspected,
@@ -38,24 +35,24 @@ import {
 // result be very careful with your copy pastes. And TODO, unify the codebases
 
 export function handleArtifactFound(event: ArtifactFound): void {
-  let meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
+  const meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
   addToPlanetRefreshQueue(meta, event.params.loc);
   meta.save();
 
   // instead of adding to artifact refresh queue, which is processed at end of block
   // make a contract call to save the artifact immediately, in case we need to grab
   // it from store in any additional handler in this block
-  let getters = DarkForestGetters.bind(Address.fromString(GETTERS_CONTRACT_ADDRESS));
-  let rawArtifact = getters.bulkGetArtifactsByIds([event.params.artifactId]);
+  const getters = DarkForestGetters.bind(Address.fromString(GETTERS_CONTRACT_ADDRESS));
+  const rawArtifact = getters.bulkGetArtifactsByIds([event.params.artifactId]);
 
-  let artifact = refreshArtifactFromContractData(event.params.artifactId, rawArtifact[0]);
+  const artifact = refreshArtifactFromContractData(event.params.artifactId, rawArtifact[0]);
   artifact.save();
 
   // also update player's score
-  let playerId = event.params.player.toHexString();
-  let player = Player.load(playerId);
+  const playerId = event.params.player.toHexString();
+  const player = Player.load(playerId);
   if (player) {
-    let scoreToAdd = BigInt.fromI32(artifactRarityToPoints(artifact.rarity));
+    const scoreToAdd = BigInt.fromI32(artifactRarityToPoints(artifact.rarity));
     player.score = player.score.plus(scoreToAdd);
     player.save();
   } else {
@@ -65,19 +62,19 @@ export function handleArtifactFound(event: ArtifactFound): void {
 }
 
 export function handleArtifactDeposited(event: ArtifactDeposited): void {
-  let meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
+  const meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
   addToPlanetRefreshQueue(meta, event.params.loc);
   addToArtifactRefreshQueue(meta, event.params.artifactId);
   meta.save();
 }
 
 export function handleArtifactWithdrawn(event: ArtifactWithdrawn): void {
-  let meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
+  const meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
   addToPlanetRefreshQueue(meta, event.params.loc);
   addToArtifactRefreshQueue(meta, event.params.artifactId);
 
-  let artifactId = hexStringToPaddedUnprefixed(event.params.artifactId.toHexString());
-  let artifact = Artifact.load(artifactId);
+  const artifactId = hexStringToPaddedUnprefixed(event.params.artifactId.toHexString());
+  const artifact = Artifact.load(artifactId);
   if (artifact) {
     // synthetic field, not updated on refresh so done here
     artifact.onPlanet = null;
@@ -91,14 +88,14 @@ export function handleArtifactWithdrawn(event: ArtifactWithdrawn): void {
 }
 
 export function handleArtifactActivated(event: ArtifactActivated): void {
-  let meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
+  const meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
   addToPlanetRefreshQueue(meta, event.params.loc);
   addToArtifactRefreshQueue(meta, event.params.artifactId);
   meta.save();
 
   // set planet's activatedArtifact
-  let planetId = hexStringToPaddedUnprefixed(event.params.loc.toHexString());
-  let planet = Planet.load(planetId);
+  const planetId = hexStringToPaddedUnprefixed(event.params.loc.toHexString());
+  const planet = Planet.load(planetId);
   if (planet) {
     planet.activatedArtifact = hexStringToPaddedUnprefixed(event.params.artifactId.toHexString());
     planet.save();
@@ -109,13 +106,13 @@ export function handleArtifactActivated(event: ArtifactActivated): void {
 }
 
 export function handleArtifactDeactivated(event: ArtifactDeactivated): void {
-  let meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
+  const meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
   addToPlanetRefreshQueue(meta, event.params.loc);
   addToArtifactRefreshQueue(meta, event.params.artifactId);
   meta.save();
 
-  let planetId = hexStringToPaddedUnprefixed(event.params.loc.toHexString());
-  let planet = Planet.load(planetId);
+  const planetId = hexStringToPaddedUnprefixed(event.params.loc.toHexString());
+  const planet = Planet.load(planetId);
   if (planet) {
     planet.activatedArtifact = null;
     planet.save();
@@ -126,37 +123,37 @@ export function handleArtifactDeactivated(event: ArtifactDeactivated): void {
 }
 
 export function handlePlanetProspected(event: PlanetProspected): void {
-  let meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
+  const meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
   addToPlanetRefreshQueue(meta, event.params.loc);
   meta.save();
 }
 
 export function handlePlanetTransferred(event: PlanetTransferred): void {
-  let meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
+  const meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
   addToPlanetRefreshQueue(meta, event.params.loc);
   meta.save();
 }
 
 export function handlePlayerInitialized(event: PlayerInitialized): void {
-  let locationDec = event.params.loc;
-  let locationId = hexStringToPaddedUnprefixed(locationDec.toHexString());
+  const locationDec = event.params.loc;
+  const locationId = hexStringToPaddedUnprefixed(locationDec.toHexString());
 
   // addresses gets 0x prefixed and 0 padded in toHexString
-  let player = new Player(event.params.player.toHexString());
+  const player = new Player(event.params.player.toHexString());
   player.initTimestamp = event.block.timestamp.toI32();
   player.homeWorld = locationId;
   player.score = BigInt.fromI32(0);
   player.lastRevealTimestamp = 0;
   player.save();
 
-  let meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
+  const meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
   addToPlanetRefreshQueue(meta, locationDec);
   meta.save();
 }
 
 export function handleBlock(block: ethereum.Block): void {
-  let current = block.timestamp.toI32();
-  let meta = getMeta(current, block.number.toI32());
+  const current = block.timestamp.toI32();
+  const meta = getMeta(current, block.number.toI32());
 
   processScheduledArrivalsSinceLastBlock(meta, current);
   refreshTouchedPlanets(meta);
@@ -171,20 +168,20 @@ export function handleBlock(block: ethereum.Block): void {
 // Sadly I can't use mini refresh to save a call as I need the upgrades from the
 // planetExtendedInfo
 export function handlePlanetHatBought(event: PlanetHatBought): void {
-  let locationDec = event.params.loc;
+  const locationDec = event.params.loc;
 
   // queue planet to refresh
-  let meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
+  const meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
   addToPlanetRefreshQueue(meta, locationDec);
   meta.save();
 
   // update Hat in store, or create if doesn't exist
-  let locationId = hexStringToPaddedUnprefixed(locationDec.toHexString());
+  const locationId = hexStringToPaddedUnprefixed(locationDec.toHexString());
   let hat = Hat.load(locationId);
   if (hat) {
     hat.hatLevel = hat.hatLevel + 1;
-    let purchaseTimestamps = hat.purchaseTimestamps.map<i32>((x) => x);
-    let purchasers = hat.purchasers.map<string>((x) => x); // need to change ref otherwise won't save
+    const purchaseTimestamps = hat.purchaseTimestamps.map<i32>((x) => x);
+    const purchasers = hat.purchasers.map<string>((x) => x); // need to change ref otherwise won't save
     purchaseTimestamps.push(event.block.timestamp.toI32());
     purchasers.push(event.params.player.toHexString());
     hat.purchaseTimestamps = purchaseTimestamps;
@@ -195,7 +192,7 @@ export function handlePlanetHatBought(event: PlanetHatBought): void {
     hat.hatLevel = 1;
     hat.purchaseTimestamps = [event.block.timestamp.toI32()];
     hat.purchasers = [event.params.player.toHexString()];
-    let planet = Planet.load(locationId);
+    const planet = Planet.load(locationId);
     if (planet) {
       planet.hat = locationId;
       planet.save();
@@ -211,8 +208,8 @@ export function handlePlanetHatBought(event: PlanetHatBought): void {
 // DepartureQueue for later processing in handleBlock
 // We delay minirefresh to the blockhandler
 export function handleArrivalQueued(event: ArrivalQueued): void {
-  let current = event.block.timestamp.toI32();
-  let meta = getMeta(current, event.block.number.toI32());
+  const current = event.block.timestamp.toI32();
+  const meta = getMeta(current, event.block.number.toI32());
 
   // add voyage ID to Meta, for later processing
   addToVoyageAddQueue(meta, event.params.arrivalId);
@@ -230,19 +227,19 @@ export function handleArrivalQueued(event: ArrivalQueued): void {
 
 export function handlePlanetUpgraded(event: PlanetUpgraded): void {
   // queue planet to refresh
-  let meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
+  const meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
   addToPlanetRefreshQueue(meta, event.params.loc);
   meta.save();
 }
 
 export function handlePlanetSilverWithdrawn(event: PlanetSilverWithdrawn): void {
   // queue planet to refresh
-  let meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
+  const meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
   addToPlanetRefreshQueue(meta, event.params.loc);
   meta.save();
 
-  let playerAddress = event.params.player.toHexString();
-  let player = Player.load(playerAddress);
+  const playerAddress = event.params.player.toHexString();
+  const player = Player.load(playerAddress);
   if (player) {
     player.score = player.score.plus(event.params.amount.div(BigInt.fromI32(1000)));
     player.save();
@@ -254,11 +251,11 @@ export function handlePlanetSilverWithdrawn(event: PlanetSilverWithdrawn): void 
 
 export function handleLocationRevealed(event: LocationRevealed): void {
   // queue planet to refresh
-  let meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
+  const meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
   addToPlanetRefreshQueue(meta, event.params.loc);
   meta.save();
 
-  let revealerAddress = event.params.revealer.toHexString();
+  const revealerAddress = event.params.revealer.toHexString();
   let player = Player.load(revealerAddress);
   if (player) {
     player.lastRevealTimestamp = event.block.timestamp.toI32();
@@ -277,13 +274,13 @@ function processScheduledArrivalsSinceLastBlock(meta: Meta, current: i32): void 
   // process last+1 up to and including current
   for (let i = meta.lastProcessed + 1; i <= current; i++) {
     // @ts-ignore: ts linter will complain about i32.toString(), but this is fine for AS compiler
-    let bucket = ArrivalQueue.load(i.toString());
+    const bucket = ArrivalQueue.load(i.toString());
     if (bucket !== null) {
       // multiple arrivals are in order of arrivalid
-      let arrivals = bucket.arrivals.map<Arrival | null>((aid) => Arrival.load(aid));
+      const arrivals = bucket.arrivals.map<Arrival | null>((aid) => Arrival.load(aid));
 
       for (let i = 0; i < arrivals.length; i++) {
-        let arrival = arrivals[i];
+        const arrival = arrivals[i];
 
         if (!arrival) {
           log.error('attempting to process unknown arrival', []);
@@ -296,22 +293,22 @@ function processScheduledArrivalsSinceLastBlock(meta: Meta, current: i32): void 
           throw new Error();
         }
 
-        toPlanet = arrive(toPlanet as Planet, arrival as Arrival);
+        toPlanet = arrive(toPlanet, arrival);
         toPlanet.save();
 
         arrival.arrived = true;
         arrival.save();
 
         if (arrival.carriedArtifact) {
-          let artifact = Artifact.load(arrival.carriedArtifact);
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          const carriedArtifact = arrival.carriedArtifact!;
+          const artifact = Artifact.load(carriedArtifact);
           if (artifact) {
             artifact.onVoyage = null;
             artifact.onPlanet = toPlanet.id;
             artifact.save();
           } else {
-            log.error('attempting to move apply arrival with artifact: {}', [
-              arrival.carriedArtifact,
-            ]);
+            log.error('attempting to move apply arrival with artifact: {}', [carriedArtifact]);
             throw new Error();
           }
         }
@@ -325,7 +322,7 @@ function addToPlanetRefreshQueue(meta: Meta, planetId: BigInt): void {
   // in AS we can't index into meta._currentlyRefreshingPlanets within a for loop
   // (see https://github.com/AssemblyScript/assemblyscript/issues/222)
   // so we copy into memory array and index into that
-  let containedPlanetDecIds = meta._currentlyRefreshingPlanets.map<BigInt>((x) => x);
+  const containedPlanetDecIds = meta._currentlyRefreshingPlanets.map<BigInt>((x) => x);
 
   for (let j = 0; j < meta._currentlyRefreshingPlanets.length; j++) {
     if (containedPlanetDecIds[j].equals(planetId)) {
@@ -334,7 +331,7 @@ function addToPlanetRefreshQueue(meta: Meta, planetId: BigInt): void {
     }
   }
   if (!alreadyContains) {
-    let _currentlyRefreshingPlanets = meta._currentlyRefreshingPlanets;
+    const _currentlyRefreshingPlanets = meta._currentlyRefreshingPlanets;
     _currentlyRefreshingPlanets.push(planetId);
     meta._currentlyRefreshingPlanets = _currentlyRefreshingPlanets; // need to change ref otherwise won't save
   }
@@ -345,7 +342,7 @@ function addToArtifactRefreshQueue(meta: Meta, artifactId: BigInt): void {
   // in AS we can't index into meta._currentlyRefreshingPlanets within a for loop
   // (see https://github.com/AssemblyScript/assemblyscript/issues/222)
   // so we copy into memory array and index into that
-  let containedArtifactDecIds = meta._currentlyRefreshingArtifacts.map<BigInt>((x) => x);
+  const containedArtifactDecIds = meta._currentlyRefreshingArtifacts.map<BigInt>((x) => x);
 
   for (let j = 0; j < meta._currentlyRefreshingArtifacts.length; j++) {
     if (containedArtifactDecIds[j].equals(artifactId)) {
@@ -354,14 +351,14 @@ function addToArtifactRefreshQueue(meta: Meta, artifactId: BigInt): void {
     }
   }
   if (!alreadyContains) {
-    let _currentlyRefreshingArtifacts = meta._currentlyRefreshingArtifacts;
+    const _currentlyRefreshingArtifacts = meta._currentlyRefreshingArtifacts;
     _currentlyRefreshingArtifacts.push(artifactId);
     meta._currentlyRefreshingArtifacts = _currentlyRefreshingArtifacts; // need to change ref otherwise won't save
   }
 }
 
 function addToVoyageAddQueue(meta: Meta, voyageId: BigInt): void {
-  let _currentlyAddingVoyages = meta._currentlyAddingVoyages;
+  const _currentlyAddingVoyages = meta._currentlyAddingVoyages;
   _currentlyAddingVoyages.push(voyageId);
   meta._currentlyAddingVoyages = _currentlyAddingVoyages; // need to change ref otherwise won't save
 }
@@ -372,19 +369,19 @@ function refreshTouchedPlanets(meta: Meta): void {
     return;
   }
 
-  let getters = DarkForestGetters.bind(Address.fromString(GETTERS_CONTRACT_ADDRESS));
-  let planetDatas = getters.bulkGetPlanetsDataByIds(meta._currentlyRefreshingPlanets);
+  const getters = DarkForestGetters.bind(Address.fromString(GETTERS_CONTRACT_ADDRESS));
+  const planetDatas = getters.bulkGetPlanetsDataByIds(meta._currentlyRefreshingPlanets);
   // in AS we can't index into meta._currentlyRefreshingPlanets within a for loop
   // (see https://github.com/AssemblyScript/assemblyscript/issues/222)
   // so we copy into memory array and index into that
-  let planetDecIds = meta._currentlyRefreshingPlanets.map<BigInt>((x) => x);
+  const planetDecIds = meta._currentlyRefreshingPlanets.map<BigInt>((x) => x);
   for (let i = 0; i < meta._currentlyRefreshingPlanets.length; i++) {
-    let rawData = planetDatas[i];
-    let planet = refreshPlanetFromContractData(
+    const rawData = planetDatas[i];
+    const planet = refreshPlanetFromContractData(
       planetDecIds[i],
-      rawData.planet as DarkForestCore__planetsResultValue0Struct,
-      rawData.info as DarkForestCore__planetsExtendedInfoResultValue0Struct,
-      rawData.revealedCoords as DarkForestCore__revealedCoordsResultValue0Struct
+      rawData.planet,
+      rawData.info,
+      rawData.revealedCoords
     );
     planet.save();
   }
@@ -399,15 +396,15 @@ function refreshTouchedArtifacts(meta: Meta): void {
     return;
   }
 
-  let getters = DarkForestGetters.bind(Address.fromString(GETTERS_CONTRACT_ADDRESS));
-  let rawArtifacts = getters.bulkGetArtifactsByIds(meta._currentlyRefreshingArtifacts);
+  const getters = DarkForestGetters.bind(Address.fromString(GETTERS_CONTRACT_ADDRESS));
+  const rawArtifacts = getters.bulkGetArtifactsByIds(meta._currentlyRefreshingArtifacts);
   // in AS we can't index into meta._currentlyRefreshingArtifacts within a for loop
   // (see https://github.com/AssemblyScript/assemblyscript/issues/222)
   // so we copy into memory array and index into that
-  let artifactDecIds = meta._currentlyRefreshingArtifacts.map<BigInt>((x) => x);
+  const artifactDecIds = meta._currentlyRefreshingArtifacts.map<BigInt>((x) => x);
   for (let i = 0; i < meta._currentlyRefreshingArtifacts.length; i++) {
-    let rawData = rawArtifacts[i];
-    let artifact = refreshArtifactFromContractData(artifactDecIds[i], rawData);
+    const rawData = rawArtifacts[i];
+    const artifact = refreshArtifactFromContractData(artifactDecIds[i], rawData);
     artifact.save();
   }
 
@@ -421,21 +418,18 @@ function addNewDepartures(meta: Meta): void {
     return;
   }
 
-  let getters = DarkForestGetters.bind(Address.fromString(GETTERS_CONTRACT_ADDRESS));
-  let voyageDatas = getters.bulkGetVoyagesByIds(meta._currentlyAddingVoyages);
+  const getters = DarkForestGetters.bind(Address.fromString(GETTERS_CONTRACT_ADDRESS));
+  const voyageDatas = getters.bulkGetVoyagesByIds(meta._currentlyAddingVoyages);
   // in AS we can't index into meta._currentlyAddingVoyages within a for loop
   // (see https://github.com/AssemblyScript/assemblyscript/issues/222)
   // so we copy into memory array and index into that
-  let voyageIds = meta._currentlyAddingVoyages.map<BigInt>((x) => x);
+  const voyageIds = meta._currentlyAddingVoyages.map<BigInt>((x) => x);
   for (let i = 0; i < voyageDatas.length; i++) {
-    let rawVoyage = voyageDatas[i];
-    let voyage = refreshVoyageFromContractData(
-      voyageIds[i],
-      rawVoyage as DarkForestCore__planetArrivalsResultValue0Struct
-    );
+    const rawVoyage = voyageDatas[i];
+    const voyage = refreshVoyageFromContractData(voyageIds[i], rawVoyage);
     voyage.arrived = false;
     voyage.save();
-    let arrivalTime = voyage.arrivalTime;
+    const arrivalTime = voyage.arrivalTime;
     // @ts-ignore: ts linter will complain about i32.toString(), but this is fine for AS compiler
     let pending = ArrivalQueue.load(arrivalTime.toString());
     let pendingArrivals: string[] = [];
@@ -467,14 +461,14 @@ function getMeta(timestamp: i32, blockNumber: i32): Meta {
     meta._currentlyRefreshingArtifacts = [];
 
     // add the null player, representing barbarian-owned planets
-    let nullPlayer = new Player('0x0000000000000000000000000000000000000000');
+    const nullPlayer = new Player('0x0000000000000000000000000000000000000000');
     nullPlayer.initTimestamp = timestamp;
     nullPlayer.score = BigInt.fromI32(0);
     nullPlayer.lastRevealTimestamp = 0;
     nullPlayer.save();
 
     // add the core contract into Player store, because it can own artifacts
-    let coreContract = new Player(toLowercase(CORE_CONTRACT_ADDRESS));
+    const coreContract = new Player(toLowercase(CORE_CONTRACT_ADDRESS));
     coreContract.initTimestamp = timestamp;
     coreContract.score = BigInt.fromI32(0);
     coreContract.lastRevealTimestamp = 0;

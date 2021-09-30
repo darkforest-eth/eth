@@ -1,3 +1,4 @@
+import { NETWORK_ID } from '@darkforest_eth/contracts';
 import { expect } from 'chai';
 import { TestLocation } from './utils/TestLocation';
 import {
@@ -126,7 +127,10 @@ describe('DarkForestArtifacts', function () {
     const artifactsOnPlanet = await world.contracts.core.planetArtifacts(ARTIFACT_PLANET_1.id);
     const tokenUri = await world.contracts.tokens.tokenURI(artifactsOnPlanet[0]);
 
-    expect(tokenUri).to.eq('https://nft.zkga.me/token-uri/artifact/TESTROUND/' + artifactsOnPlanet);
+    expect(tokenUri).to.eq(
+      `https://nft-test.zkga.me/token-uri/artifact/${NETWORK_ID}-${world.contracts.tokens.address}/` +
+        artifactsOnPlanet[0]
+    );
   });
 
   it("should not be able to deposit an artifact you don't own", async function () {
