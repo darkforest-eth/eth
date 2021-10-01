@@ -56,6 +56,8 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
 
     event PlanetSilverWithdrawn(address player, uint256 loc, uint256 amount);
 
+    // initialization functions are only called once during deployment. They are not called during upgrades.
+
     function initialize(
         address _adminAddress,
         address payable _whitelistAddress,

@@ -23,6 +23,7 @@ contract DarkForestGPTCredit is Initializable {
         _;
     }
 
+    // initialization functions are only called once during deployment. They are not called during upgrades.
     function initialize(address _admin) public initializer {
         creditPrice = 0.1 ether; // default price is 0.10 xDAI
         admin = _admin;

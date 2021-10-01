@@ -23,6 +23,7 @@ contract DarkForestTokens is ERC721Upgradeable {
         _;
     }
 
+    // initialization functions are only called once during deployment. They are not called during upgrades.
     function initialize(
         address _coreAddress,
         address _adminAddress,
@@ -35,6 +36,12 @@ contract DarkForestTokens is ERC721Upgradeable {
 
     function changeAdmin(address _newAdminAddress) public onlyAdmin {
         adminAddress = _newAdminAddress;
+    }
+
+    function setBaseUriForStaging() public onlyAdmin {
+        _setBaseURI(
+            "https://nft.zkga.me/token-uri/artifact/100-0xb4112582d061d6d0ce0adf8d6fdbf09c173a68c9/"
+        );
     }
 
     function createArtifact(DarkForestTypes.DFTCreateArtifactArgs memory args)

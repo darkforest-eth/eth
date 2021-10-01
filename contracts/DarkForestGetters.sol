@@ -11,6 +11,7 @@ contract DarkForestGetters is Initializable {
     DarkForestCore coreContract;
     DarkForestTokens tokensContract;
 
+    // initialization functions are only called once during deployment. They are not called during upgrades.
     function initialize(
         address _adminAddress,
         address _coreContractAddress,
