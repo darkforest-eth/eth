@@ -7,16 +7,16 @@ WORLD_RADIUS_LOCKED = false
 TOKEN_MINT_END_TIMESTAMP = 2021-10-05T04:00:00.000Z # Mon Oct 04 2021 21:00:00 GMT-0700 (Pacific Daylight Time)
 TARGET4_RADIUS = 1600
 INITIAL_WORLD_RADIUS = 8000
-ROUND_NAME = "0.6 round 4"
+ROUND_NAME = "0.6.6 round 4"
 ROUND_END = 2021-10-05T04:00:00.000Z # Mon Oct 04 2021 21:00:00 GMT-0700 (Pacific Daylight Time)
 
 ##################################
 # SNARK keys & Perlin parameters #
 ##################################
 DISABLE_ZK_CHECKS = false
-PLANETHASH_KEY = 1729
-SPACETYPE_KEY = 1730
-BIOMEBASE_KEY = 1731
+PLANETHASH_KEY = 6278
+SPACETYPE_KEY = 6279
+BIOMEBASE_KEY = 6270
 PERLIN_MIRROR_X = false
 PERLIN_MIRROR_Y = false
 PERLIN_LENGTH_SCALE = 16384 # must be a power of two no greater than 16384
