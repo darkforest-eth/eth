@@ -427,7 +427,7 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         return (_location, _branch);
     }
 
-    function transferOwnership(uint256 _location, address _player) public notPaused disabled {
+    function transferOwnership(uint256 _location, address _player) public notPaused {
         require(
             s.planetsExtendedInfo[_location].isInitialized == true,
             "Planet is not initialized"
