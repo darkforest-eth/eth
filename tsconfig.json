@@ -8,5 +8,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
-  }
+  },
+  "include": ["./scripts", "./test", "../packages/contracts/typechain"],
+  "files": ["./hardhat.config.ts"]
 }

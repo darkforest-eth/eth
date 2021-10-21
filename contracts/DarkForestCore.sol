@@ -42,10 +42,11 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         uint256 to,
         uint256 artifactId
     );
+    event AdminPlanetCreated(uint256 loc);
     event PlanetUpgraded(address player, uint256 loc, uint256 branch, uint256 toBranchLevel); // emitted in DFPlanet library
     event PlanetHatBought(address player, uint256 loc, uint256 tohatLevel);
     event PlanetTransferred(address sender, uint256 loc, address receiver);
-    event LocationRevealed(address revealer, uint256 loc);
+    event LocationRevealed(address revealer, uint256 loc, uint256 x, uint256 y);
 
     event PlanetProspected(address player, uint256 loc);
     event ArtifactFound(address player, uint256 artifactId, uint256 loc);
@@ -242,6 +243,8 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         );
         s.planetIds.push(args.location);
         s.initializedPlanetCountByLevel[args.level] += 1;
+
+        emit AdminPlanetCreated(args.location);
     }
 
     //////////////////////
@@ -302,7 +305,7 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
             _input[3],
             msg.sender != s.adminAddress
         );
-        emit LocationRevealed(msg.sender, _input[0]);
+        emit LocationRevealed(msg.sender, _input[0], _input[2], _input[3]);
     }
 
     function initializePlayer(

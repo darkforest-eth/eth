@@ -60,11 +60,8 @@ type Planet @entity {
   # revealed coords
   "Whether this planet's location has been revealed"
   isRevealed: Boolean!
-  "planet's x coordinate, if revealed"
-  x: Int
-  "planet's y coordinate, if revealed"
-  y: Int
-  revealer: Player
+  "planet's x,y coordinate, if revealed"
+  revealedCoordinate: RevealedCoordinate
 
   # artifacts
   hasTriedFindingArtifact: Boolean!
@@ -135,6 +132,15 @@ type Hat @entity {
   "Seconds since epoch, needs to be multiplied by 1000 for javascript representation"
   purchaseTimestamps: [Int!]!
   purchasers: [ID!]! # these are eth addresses
+}
+
+"A revealed location"
+type RevealedCoordinate @entity {
+  "locationId: 0 padded hex value of locationDec, no 0x prefix"
+  id: ID!
+  x: Int!
+  y: Int!
+  revealer: Player!
 }
 
 enum PlanetType {

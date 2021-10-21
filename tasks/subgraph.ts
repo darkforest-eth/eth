@@ -14,6 +14,14 @@ export const TASK_SUBGRAPH_CODEGEN = 'subgraph:codegen';
 export const TASK_SUBGRAPH_DOCKER = 'subgraph:docker';
 export const TASK_SUBGRAPH_CLEANUP = 'subgraph:cleanup';
 
+// Dockerode typings are community generated and of dubious quality/content
+// This should be upstreamed eventually, but for now create the DockerodeError type
+type DockerodeError = Error & {
+  reason: string;
+  statusCode: number;
+  json: string;
+};
+
 type DockerodeProcess = {
   name: string;
   container: Container;
@@ -68,7 +76,7 @@ async function subgraphDeploy(args: { name: string }, hre: HardhatRuntimeEnviron
   try {
     await docker.ping();
   } catch (error) {
-    throw new HardhatPluginError(PLUGIN_NAME, 'Unable to connect to Docker', error);
+    throw new HardhatPluginError(PLUGIN_NAME, 'Unable to connect to Docker');
   }
 
   await hre.run(TASK_SUBGRAPH_DOCKER, args);
@@ -108,20 +116,34 @@ async function terminate(processes: DockerodeProcess[]) {
       console.log('stopping', process.container.id);
       try {
         await process.container.stop();
-      } catch (error) {
-        // Container might not exist or already be stopped, thats ok
-        if (error.statusCode !== 304 && error.statusCode !== 404) {
-          throw error;
+      } catch (err) {
+        if (err instanceof Error) {
+          const error = err as DockerodeError;
+          // Container might not exist or already be stopped, thats ok
+          if (error.statusCode !== 304 && error.statusCode !== 404) {
+            throw new HardhatPluginError(
+              PLUGIN_NAME,
+              'Could not stop ' + process.container.id,
+              error
+            );
+          }
         }
       }
 
       console.log('removing', process.container.id);
       try {
         await process.container.remove();
-      } catch (error) {
-        // Container might not exist, thats ok
-        if (error.statusCode !== 404) {
-          throw error;
+      } catch (err) {
+        if (err instanceof Error) {
+          const error = err as DockerodeError;
+          // Container might not exist, thats ok
+          if (error.statusCode !== 404) {
+            throw new HardhatPluginError(
+              PLUGIN_NAME,
+              'Could not remove ' + process.container.id,
+              error
+            );
+          }
         }
       }
     })
@@ -163,10 +185,14 @@ async function subgraphDocker({}, hre: HardhatRuntimeEnvironment) {
 
   try {
     await docker.createNetwork({ Name: 'thegraph_default', CheckDuplicate: true });
-  } catch (error) {
-    // There is no network remove so after first run this always exists. No reason to error
-    if (error.statusCode !== 409) {
-      throw error;
+  } catch (err) {
+    if (err instanceof Error) {
+      const error = err as DockerodeError;
+      // There is no network remove so after first run this always exists. No
+      // reason to error
+      if (error.statusCode !== 409) {
+        throw new HardhatPluginError(PLUGIN_NAME, 'Could not createNetwork', error);
+      }
     }
   }
 
@@ -228,7 +254,7 @@ async function subgraphDocker({}, hre: HardhatRuntimeEnvironment) {
 
       processes.push(p);
     } catch (err) {
-      throw new HardhatPluginError(PLUGIN_NAME, `Unable to create service: ${svc.name}`, err);
+      throw new HardhatPluginError(PLUGIN_NAME, `Unable to create service: ${svc.name}`);
     }
   }
 

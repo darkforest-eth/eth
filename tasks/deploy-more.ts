@@ -4,17 +4,13 @@ import { Contract, Signer } from 'ethers';
 import { subtask, types } from 'hardhat/config';
 import { FactoryOptions, HardhatRuntimeEnvironment } from 'hardhat/types';
 import type {
-  DarkForestArtifactUtils,
   DarkForestCore,
   DarkForestCoreReturn,
   DarkForestGetters,
   DarkForestGPTCredit,
-  DarkForestPlanet,
   DarkForestScoringRound3,
   DarkForestTokens,
-  DarkForestUtils,
   LibraryContracts,
-  Verifier,
   Whitelist,
 } from '../task-types';
 
@@ -166,11 +162,11 @@ async function deployLibraries({}, hre: HardhatRuntimeEnvironment): Promise<Libr
 
   return {
     lazyUpdate,
-    utils: utils as DarkForestUtils,
-    planet: planet as DarkForestPlanet,
+    utils: utils,
+    planet: planet,
     initialize,
-    verifier: verifier as Verifier,
-    artifactUtils: artifactUtils as DarkForestArtifactUtils,
+    verifier: verifier,
+    artifactUtils: artifactUtils,
   };
 }
 

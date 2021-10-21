@@ -4,12 +4,10 @@ import {
   DarkForestGetters__bulkGetArtifactsByIdsResultRetStruct,
   DarkForestGetters__bulkGetPlanetsDataByIdsResultRetInfoStruct,
   DarkForestGetters__bulkGetPlanetsDataByIdsResultRetPlanetStruct,
-  DarkForestGetters__bulkGetPlanetsDataByIdsResultRetRevealedCoordsStruct,
   DarkForestGetters__bulkGetVoyagesByIdsResultRetStruct,
 } from '../../generated/DarkForestCore/DarkForestGetters';
 import { Arrival, Artifact, Planet } from '../../generated/schema';
 import {
-  bjjFieldElementToSignedInt,
   hexStringToPaddedUnprefixed,
   isDefenseBoosted,
   isEnergyCapBoosted,
@@ -27,11 +25,11 @@ import {
 export function refreshPlanetFromContractData(
   locationDec: BigInt,
   rawPlanet: DarkForestGetters__bulkGetPlanetsDataByIdsResultRetPlanetStruct,
-  rawInfo: DarkForestGetters__bulkGetPlanetsDataByIdsResultRetInfoStruct,
-  rawRevealedCoords: DarkForestGetters__bulkGetPlanetsDataByIdsResultRetRevealedCoordsStruct
+  rawInfo: DarkForestGetters__bulkGetPlanetsDataByIdsResultRetInfoStruct
 ): Planet {
-  const locationId = hexStringToPaddedUnprefixed(locationDec.toHexString());
+  const locationId = hexStringToPaddedUnprefixed(locationDec);
 
+  // this preserves synthetic fields not found in the contract like hat and revealedCoordinate
   let planet = Planet.load(locationId);
   if (!planet) planet = new Planet(locationId);
 
@@ -65,16 +63,6 @@ export function refreshPlanetFromContractData(
   planet.destroyed = rawInfo.destroyed;
   planet.isHomePlanet = rawPlanet.isHomePlanet;
 
-  // revealed coords
-  if (!rawRevealedCoords.locationId.equals(BigInt.fromI32(0))) {
-    planet.isRevealed = true;
-    planet.x = bjjFieldElementToSignedInt(rawRevealedCoords.x);
-    planet.y = bjjFieldElementToSignedInt(rawRevealedCoords.y);
-    planet.revealer = rawRevealedCoords.revealer.toHexString();
-  } else {
-    planet.isRevealed = false;
-  }
-
   // artifacts
   planet.hasTriedFindingArtifact = rawInfo.hasTriedFindingArtifact;
   if (rawInfo.prospectedBlockNumber.notEqual(BigInt.fromI32(0))) {
@@ -96,8 +84,8 @@ export function refreshVoyageFromContractData(
 
   voyage.arrivalId = voyageIdDec.toI32();
   voyage.player = rawVoyage.player.toHexString();
-  voyage.fromPlanet = hexStringToPaddedUnprefixed(rawVoyage.fromPlanet.toHexString());
-  voyage.toPlanet = hexStringToPaddedUnprefixed(rawVoyage.toPlanet.toHexString());
+  voyage.fromPlanet = hexStringToPaddedUnprefixed(rawVoyage.fromPlanet);
+  voyage.toPlanet = hexStringToPaddedUnprefixed(rawVoyage.toPlanet);
   voyage.milliEnergyArriving = rawVoyage.popArriving;
   voyage.milliSilverMoved = rawVoyage.silverMoved;
   voyage.departureTime = rawVoyage.departureTime.toI32();
@@ -108,7 +96,7 @@ export function refreshVoyageFromContractData(
   if (rawVoyage.carriedArtifactId.equals(BigInt.fromI32(0))) {
     voyage.carriedArtifact = null;
   } else {
-    voyage.carriedArtifact = hexStringToPaddedUnprefixed(rawVoyage.carriedArtifactId.toHexString());
+    voyage.carriedArtifact = hexStringToPaddedUnprefixed(rawVoyage.carriedArtifactId);
   }
 
   return voyage;
@@ -118,7 +106,7 @@ export function refreshArtifactFromContractData(
   artifactIdDec: BigInt,
   rawArtifact: DarkForestGetters__bulkGetArtifactsByIdsResultRetStruct
 ): Artifact {
-  const artifactId = hexStringToPaddedUnprefixed(artifactIdDec.toHexString());
+  const artifactId = hexStringToPaddedUnprefixed(artifactIdDec);
 
   let artifact = Artifact.load(artifactId);
   if (!artifact) artifact = new Artifact(artifactId);
@@ -128,7 +116,7 @@ export function refreshArtifactFromContractData(
     artifact.planetDiscoveredOn = null;
   } else {
     artifact.planetDiscoveredOn = hexStringToPaddedUnprefixed(
-      rawArtifact.artifact.planetDiscoveredOn.toHexString()
+      rawArtifact.artifact.planetDiscoveredOn
     );
   }
   artifact.rarity = toArtifactRarity(rawArtifact.artifact.rarity);
@@ -142,9 +130,7 @@ export function refreshArtifactFromContractData(
   if (rawArtifact.artifact.wormholeTo.equals(BigInt.fromI32(0))) {
     artifact.wormholeTo = null;
   } else {
-    artifact.wormholeTo = hexStringToPaddedUnprefixed(
-      rawArtifact.artifact.wormholeTo.toHexString()
-    );
+    artifact.wormholeTo = hexStringToPaddedUnprefixed(rawArtifact.artifact.wormholeTo);
   }
 
   artifact.energyCapMultiplier = rawArtifact.upgrade.popCapMultiplier.toI32();
@@ -158,7 +144,7 @@ export function refreshArtifactFromContractData(
   if (rawArtifact.locationId.equals(BigInt.fromI32(0))) {
     artifact.onPlanet = null;
   } else {
-    artifact.onPlanet = hexStringToPaddedUnprefixed(rawArtifact.locationId.toHexString());
+    artifact.onPlanet = hexStringToPaddedUnprefixed(rawArtifact.locationId);
   }
 
   if (rawArtifact.voyageId.equals(BigInt.fromI32(0))) {

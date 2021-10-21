@@ -40,6 +40,8 @@ dataSources:
           handler: handleArtifactActivated
         - event: ArtifactDeactivated(address,uint256,uint256)
           handler: handleArtifactDeactivated
+        - event: AdminPlanetCreated(uint256)
+          handler: handleAdminPlanetCreated
         - event: PlanetProspected(address,uint256)
           handler: handlePlanetProspected
         - event: PlanetTransferred(address,uint256,address)
@@ -54,7 +56,7 @@ dataSources:
           handler: handlePlayerInitialized
         - event: PlanetSilverWithdrawn(address,uint256,uint256)
           handler: handlePlanetSilverWithdrawn
-        - event: LocationRevealed(address,uint256)
+        - event: LocationRevealed(address,uint256,uint256,uint256)
           handler: handleLocationRevealed
       blockHandlers:
         - handler: handleBlock

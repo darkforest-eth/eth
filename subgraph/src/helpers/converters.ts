@@ -26,8 +26,10 @@ export function isDefenseBoosted(locationId: string): boolean {
   return locationId.charAt(26) == '0';
 }
 
-// BigInt does not get 0 padded by toHexString plus gets a 0x prefix...
-export function hexStringToPaddedUnprefixed(prefixed: string): string {
+// Artifact Id and locationId are 0 padded with no 0x prefix. Note player
+// addresses do NOT use this helper, but rather toHexString
+export function hexStringToPaddedUnprefixed(int: BigInt): string {
+  const prefixed = int.toHexString();
   // strip 0x
   const stripped = prefixed.substring(2, prefixed.length);
   // pad to 64

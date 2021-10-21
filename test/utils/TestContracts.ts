@@ -47,10 +47,10 @@ export async function initializeContracts({
   ])) as Whitelist;
 
   const VerifierContract = await ethers.getContractFactory('Verifier');
-  const verifier = (await VerifierContract.deploy()) as Verifier;
+  const verifier = await VerifierContract.deploy();
 
   const DarkForestUtilsContract = await ethers.getContractFactory('DarkForestUtils');
-  const darkForestUtils = (await DarkForestUtilsContract.deploy()) as DarkForestUtils;
+  const darkForestUtils = await DarkForestUtilsContract.deploy();
 
   const DarkForestTokensContract = await ethers.getContractFactory('DarkForestTokens');
 
@@ -80,7 +80,7 @@ export async function initializeContracts({
       DarkForestArtifactUtils: artifactUtils.address,
     },
   });
-  const darkForestPlanet = (await DarkForestPlanet.deploy()) as DarkForestPlanet;
+  const darkForestPlanet = await DarkForestPlanet.deploy();
 
   const DarkForestInitializeContract = await ethers.getContractFactory('DarkForestInitialize');
   const darkForestInitialize = await DarkForestInitializeContract.deploy();

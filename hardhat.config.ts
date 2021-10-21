@@ -1,9 +1,9 @@
 import '@nomiclabs/hardhat-ethers';
 import '@nomiclabs/hardhat-waffle';
 import '@openzeppelin/hardhat-upgrades';
+import '@typechain/hardhat';
 import 'hardhat-circom';
 import 'hardhat-contract-sizer';
-import 'hardhat-typechain';
 import { extendEnvironment, HardhatUserConfig } from 'hardhat/config';
 import { lazyObject } from 'hardhat/plugins';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
@@ -160,6 +160,7 @@ const config: HardhatUserConfig = {
   },
   typechain: {
     outDir: path.join(packageDirs['@darkforest_eth/contracts'], 'typechain'),
+    target: 'ethers-v5',
   },
 };
 

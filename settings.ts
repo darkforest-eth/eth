@@ -169,7 +169,12 @@ export function parse<S extends yup.BaseSchema>(schema: S, data: unknown): yup.A
   try {
     return schema.validateSync(data, { abortEarly: false });
   } catch (err) {
-    printValidationErrors(err);
+    if (err instanceof Error) {
+      const error = err as yup.ValidationError;
+      printValidationErrors(error);
+    } else {
+      console.log(err);
+    }
     process.exit(1);
   }
 }
@@ -236,7 +241,10 @@ function tomlLoader(filename: string, content: string) {
     return toml.parse(content);
   } catch (err) {
     console.error(chalk.red(`Error parsing ${path.basename(filename)}`));
-    console.error(chalk.yellow(err.message));
+    if (err instanceof Error) {
+      console.error(chalk.yellow(err.message));
+    }
+
     process.exit(1);
   }
 }

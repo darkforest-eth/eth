@@ -2,6 +2,7 @@
 import { CORE_CONTRACT_ADDRESS, GETTERS_CONTRACT_ADDRESS } from '@darkforest_eth/contracts';
 import { Address, BigInt, ethereum, log } from '@graphprotocol/graph-ts';
 import {
+  AdminPlanetCreated,
   ArrivalQueued,
   ArtifactActivated,
   ArtifactDeactivated,
@@ -17,10 +18,20 @@ import {
   PlayerInitialized,
 } from '../generated/DarkForestCore/DarkForestCore';
 import { DarkForestGetters } from '../generated/DarkForestCore/DarkForestGetters';
-import { Arrival, ArrivalQueue, Artifact, Hat, Meta, Planet, Player } from '../generated/schema';
+import {
+  Arrival,
+  ArrivalQueue,
+  Artifact,
+  Hat,
+  Meta,
+  Planet,
+  Player,
+  RevealedCoordinate,
+} from '../generated/schema';
 import { arrive } from './helpers/arrivalHelpers';
 import {
   artifactRarityToPoints,
+  bjjFieldElementToSignedInt,
   hexStringToPaddedUnprefixed,
   toLowercase,
 } from './helpers/converters';
@@ -33,6 +44,17 @@ import {
 // NOTE: the timestamps within are all unix epoch in seconds NOT MILLISECONDS
 // like in all the JS code where youll see divided by contractPrecision. As a
 // result be very careful with your copy pastes. And TODO, unify the codebases
+
+// NOTE: in most event handlers we attempt not to do a lot of contract calls as
+// they are expensive. We also attempt to let the contract do a lot of math for
+// us, and simple copy its homework. Thus we can mostly get away with scheduling
+// planet refreshes for when the blockhandler fires after all events finish
+// allowing us to batch those calls. For for synthetic fields like hat or
+// artifactfound or revealedCoordinate assuming planet exists we can pretty
+// cheaply add that data to the planet entity where the planet refresh will find
+// it. Thus another quandry exists, we generally have to create planets in
+// handlers even though that can be costly, but so those other handlers can
+// planet.load successfully
 
 export function handleArtifactFound(event: ArtifactFound): void {
   const meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
@@ -73,7 +95,7 @@ export function handleArtifactWithdrawn(event: ArtifactWithdrawn): void {
   addToPlanetRefreshQueue(meta, event.params.loc);
   addToArtifactRefreshQueue(meta, event.params.artifactId);
 
-  const artifactId = hexStringToPaddedUnprefixed(event.params.artifactId.toHexString());
+  const artifactId = hexStringToPaddedUnprefixed(event.params.artifactId);
   const artifact = Artifact.load(artifactId);
   if (artifact) {
     // synthetic field, not updated on refresh so done here
@@ -94,10 +116,10 @@ export function handleArtifactActivated(event: ArtifactActivated): void {
   meta.save();
 
   // set planet's activatedArtifact
-  const planetId = hexStringToPaddedUnprefixed(event.params.loc.toHexString());
+  const planetId = hexStringToPaddedUnprefixed(event.params.loc);
   const planet = Planet.load(planetId);
   if (planet) {
-    planet.activatedArtifact = hexStringToPaddedUnprefixed(event.params.artifactId.toHexString());
+    planet.activatedArtifact = hexStringToPaddedUnprefixed(event.params.artifactId);
     planet.save();
   } else {
     log.error('tried to process artifact activate on unknown planet: {}', [planetId]);
@@ -111,7 +133,7 @@ export function handleArtifactDeactivated(event: ArtifactDeactivated): void {
   addToArtifactRefreshQueue(meta, event.params.artifactId);
   meta.save();
 
-  const planetId = hexStringToPaddedUnprefixed(event.params.loc.toHexString());
+  const planetId = hexStringToPaddedUnprefixed(event.params.loc);
   const planet = Planet.load(planetId);
   if (planet) {
     planet.activatedArtifact = null;
@@ -136,7 +158,7 @@ export function handlePlanetTransferred(event: PlanetTransferred): void {
 
 export function handlePlayerInitialized(event: PlayerInitialized): void {
   const locationDec = event.params.loc;
-  const locationId = hexStringToPaddedUnprefixed(locationDec.toHexString());
+  const locationId = hexStringToPaddedUnprefixed(locationDec);
 
   // addresses gets 0x prefixed and 0 padded in toHexString
   const player = new Player(event.params.player.toHexString());
@@ -146,9 +168,13 @@ export function handlePlayerInitialized(event: PlayerInitialized): void {
   player.lastRevealTimestamp = 0;
   player.save();
 
-  const meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
-  addToPlanetRefreshQueue(meta, locationDec);
-  meta.save();
+  // expensive to create planet in handler, but needs to exist in case say a hat
+  // bought in same block
+  const getters = DarkForestGetters.bind(Address.fromString(GETTERS_CONTRACT_ADDRESS));
+  const planetDatas = getters.bulkGetPlanetsDataByIds([event.params.loc]);
+  const rawData = planetDatas[0];
+  const planet = refreshPlanetFromContractData(event.params.loc, rawData.planet, rawData.info);
+  planet.save();
 }
 
 export function handleBlock(block: ethereum.Block): void {
@@ -165,8 +191,6 @@ export function handleBlock(block: ethereum.Block): void {
   meta.save();
 }
 
-// Sadly I can't use mini refresh to save a call as I need the upgrades from the
-// planetExtendedInfo
 export function handlePlanetHatBought(event: PlanetHatBought): void {
   const locationDec = event.params.loc;
 
@@ -176,7 +200,7 @@ export function handlePlanetHatBought(event: PlanetHatBought): void {
   meta.save();
 
   // update Hat in store, or create if doesn't exist
-  const locationId = hexStringToPaddedUnprefixed(locationDec.toHexString());
+  const locationId = hexStringToPaddedUnprefixed(locationDec);
   let hat = Hat.load(locationId);
   if (hat) {
     hat.hatLevel = hat.hatLevel + 1;
@@ -204,9 +228,8 @@ export function handlePlanetHatBought(event: PlanetHatBought): void {
   hat.save();
 }
 
-// A departure (or ArrivalQueued) event. We add these arrivalIds to a
+// A move (or departure or ArrivalQueued) event. We add these arrivalIds to a
 // DepartureQueue for later processing in handleBlock
-// We delay minirefresh to the blockhandler
 export function handleArrivalQueued(event: ArrivalQueued): void {
   const current = event.block.timestamp.toI32();
   const meta = getMeta(current, event.block.number.toI32());
@@ -249,25 +272,53 @@ export function handlePlanetSilverWithdrawn(event: PlanetSilverWithdrawn): void 
   }
 }
 
-export function handleLocationRevealed(event: LocationRevealed): void {
-  // queue planet to refresh
+export function handleAdminPlanetCreated(event: AdminPlanetCreated): void {
+  // This request can be scheduled as much like move(handleArrivalQueued) to an
+  // untouched planet, nothing should need to access the planet until the voyage
+  // arrives and someone owns it. (except for LocationRevealed which creates
+  // planet anyway)
   const meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
   addToPlanetRefreshQueue(meta, event.params.loc);
   meta.save();
+}
 
+export function handleLocationRevealed(event: LocationRevealed): void {
   const revealerAddress = event.params.revealer.toHexString();
+  const planetId = hexStringToPaddedUnprefixed(event.params.loc);
+
   let player = Player.load(revealerAddress);
-  if (player) {
-    player.lastRevealTimestamp = event.block.timestamp.toI32();
-    player.save();
-  } else {
-    // revealed by admin, who is not included as a player
-    player = new Player(revealerAddress);
+  if (!player) {
+    // revealed by admin account, who is not included as a player, use 0x0 which
+    // has to exist by now
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    player = Player.load('0x0000000000000000000000000000000000000000')!;
     player.initTimestamp = event.block.timestamp.toI32();
     player.score = BigInt.fromI32(0);
-    player.lastRevealTimestamp = 0;
+    player.lastRevealTimestamp = event.block.timestamp.toI32();
     player.save();
   }
+
+  let planet = Planet.load(planetId);
+  if (!planet) {
+    // Expensive action for a handler but might not exist if never interacted
+    // with before, or if it was an admin created planet that was scheduled but
+    // refreshed yet
+    const getters = DarkForestGetters.bind(Address.fromString(GETTERS_CONTRACT_ADDRESS));
+    const planetDatas = getters.bulkGetPlanetsDataByIds([event.params.loc]);
+    const rawData = planetDatas[0];
+    planet = refreshPlanetFromContractData(event.params.loc, rawData.planet, rawData.info);
+    planet.save();
+  }
+
+  const coord = new RevealedCoordinate(planet.id);
+  coord.x = bjjFieldElementToSignedInt(event.params.x);
+  coord.y = bjjFieldElementToSignedInt(event.params.y);
+  coord.revealer = player.id;
+  coord.save();
+
+  planet.revealedCoordinate = planet.id;
+  planet.isRevealed = true;
+  planet.save();
 }
 
 function processScheduledArrivalsSinceLastBlock(meta: Meta, current: i32): void {
@@ -377,12 +428,7 @@ function refreshTouchedPlanets(meta: Meta): void {
   const planetDecIds = meta._currentlyRefreshingPlanets.map<BigInt>((x) => x);
   for (let i = 0; i < meta._currentlyRefreshingPlanets.length; i++) {
     const rawData = planetDatas[i];
-    const planet = refreshPlanetFromContractData(
-      planetDecIds[i],
-      rawData.planet,
-      rawData.info,
-      rawData.revealedCoords
-    );
+    const planet = refreshPlanetFromContractData(planetDecIds[i], rawData.planet, rawData.info);
     planet.save();
   }
 
