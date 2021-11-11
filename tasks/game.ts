@@ -7,7 +7,7 @@ import {
   revealSnarkZkeyPath,
   SnarkJSProofAndSignals,
 } from '@darkforest_eth/snarks';
-import { BigNumber } from '@ethersproject/bignumber';
+import { BigNumber } from 'ethers';
 import { task, types } from 'hardhat/config';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 // @ts-ignore

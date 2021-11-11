@@ -57,12 +57,12 @@ extendEnvironment((env: HardhatRuntimeEnvironment) => {
 
 // The xdai config, but it isn't added to networks unless we have a DEPLOYER_MNEMONIC
 const xdai = {
-  // Using our archive node for admin task running
-  url: 'https://rpc-df.xdaichain.com/',
+  url: process.env.XDAI_RPC_URL ?? 'https://rpc-df.xdaichain.com/',
   accounts: {
     mnemonic: DEPLOYER_MNEMONIC,
   },
   chainId: 100,
+  gasMultiplier: 5,
 };
 
 // The mainnet config, but it isn't added to networks unless we have a DEPLOYER_MNEMONIC

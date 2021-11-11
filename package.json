@@ -1,15 +1,15 @@
 {
   "name": "eth",
-  "version": "6.6.6",
+  "version": "6.7.0-staging-nov-11.0",
   "private": true,
   "license": "GPL-3.0",
-  "author": "Clown Town Labs Inc. <brian@clowntown.dev>",
+  "author": "0xPARC <ivan@0xPARC.org>",
   "main": "index.js",
   "devDependencies": {
-    "@darkforest_eth/contracts": "6.6.6",
-    "@darkforest_eth/hashing": "6.6.6",
-    "@darkforest_eth/snarks": "6.6.6",
-    "@darkforest_eth/types": "6.6.6",
+    "@darkforest_eth/contracts": "6.7.0-staging-nov-11.0",
+    "@darkforest_eth/hashing": "6.7.0-staging-nov-11.0",
+    "@darkforest_eth/snarks": "6.7.0-staging-nov-11.0",
+    "@darkforest_eth/types": "6.7.0-staging-nov-11.0",
     "@graphprotocol/graph-cli": "0.22.1",
     "@graphprotocol/graph-ts": "0.22.1",
     "@iarna/toml": "^2.2.5",
@@ -27,10 +27,10 @@
     "chalk": "^4.1.0",
     "cosmiconfig": "^7.0.0",
     "dockerode": "^3.2.1",
-    "dotenv": "^8.2.0",
+    "dotenv": "^10.0.0",
     "eslint": "^7.30.0",
     "ethereum-waffle": "^3.2.2",
-    "ethers": "^5.0.26",
+    "ethers": "^5.5.1",
     "hardhat": "^2.6.0",
     "hardhat-circom": "^1.1.0",
     "hardhat-contract-sizer": "^2.0.3",
@@ -43,11 +43,11 @@
     "ts-generator": "^0.1.1",
     "ts-node": "^10.0.0",
     "typechain": "^5.0.1",
-    "typescript": "^4.3.5",
+    "typescript": "4.4.x",
     "yup": "^0.32.9"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=16"
   },
   "scripts": {
     "prepare": "yarn run compile",
@@ -63,6 +63,7 @@
     "circom:dev": "hardhat circom --deterministic --verbose",
     "subgraph:template:dev": "yarn hardhat:dev subgraph:codegen",
     "subgraph:template:prod": "yarn hardhat:prod subgraph:codegen",
-    "subgraph:deploy:prod": "cd subgraph && graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/"
+    "subgraph:deploy:prod": "cd subgraph && graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/",
+    "clean": "rm -rf artifacts cache node_modules"
   }
 }

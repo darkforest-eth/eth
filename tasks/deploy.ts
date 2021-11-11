@@ -133,10 +133,17 @@ async function deploy(
   }
 
   // Note Ive seen `ProviderError: Internal error` when not enough money...
-  await deployer.sendTransaction({
+  console.log(`funding whitelist with ${args.fund}`);
+
+  const tx = await deployer.sendTransaction({
     to: whitelist.address,
     value: hre.ethers.utils.parseEther(args.fund.toString()),
+    nonce: await deployer.getTransactionCount(),
   });
+  await tx.wait();
+
+  console.log('funded whitelist');
+
   console.log(`Sent ${args.fund} to whitelist contract (${whitelist.address}) to fund drips`);
 
   if (args.subgraph) {
