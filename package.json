@@ -1,15 +1,15 @@
 {
   "name": "eth",
-  "version": "6.7.0-staging-nov-11-2.0",
+  "version": "6.7.0-staging-nov-16.0",
   "private": true,
   "license": "GPL-3.0",
   "author": "0xPARC <ivan@0xPARC.org>",
   "main": "index.js",
   "devDependencies": {
-    "@darkforest_eth/contracts": "6.7.0-staging-nov-11-2.0",
-    "@darkforest_eth/hashing": "6.7.0-staging-nov-11-2.0",
-    "@darkforest_eth/snarks": "6.7.0-staging-nov-11-2.0",
-    "@darkforest_eth/types": "6.7.0-staging-nov-11-2.0",
+    "@darkforest_eth/contracts": "6.7.0-staging-nov-16.0",
+    "@darkforest_eth/hashing": "6.7.0-staging-nov-16.0",
+    "@darkforest_eth/snarks": "6.7.0-staging-nov-16.0",
+    "@darkforest_eth/types": "6.7.0-staging-nov-16.0",
     "@graphprotocol/graph-cli": "0.22.1",
     "@graphprotocol/graph-ts": "0.22.1",
     "@iarna/toml": "^2.2.5",
@@ -64,6 +64,6 @@
     "subgraph:template:dev": "yarn hardhat:dev subgraph:codegen",
     "subgraph:template:prod": "yarn hardhat:prod subgraph:codegen",
     "subgraph:deploy:prod": "cd subgraph && graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/",
-    "clean": "rm -rf artifacts cache node_modules"
+    "clean": "del-cli artifacts cache node_modules"
   }
 }
