@@ -1,8 +1,6 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.7.6;
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity ^0.8.0;
 
-// Libraries
-import "./ABDKMath64x64.sol";
 import "./DarkForestTypes.sol";
 
 library DarkForestInitialize {

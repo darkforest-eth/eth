@@ -1,6 +1,6 @@
 import { subtask } from 'hardhat/config';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
-import { DarkForestCore, DarkForestGPTCredit, DarkForestTokens, Whitelist } from '../task-types';
+import { DarkForestCore, DarkForestTokens, Whitelist } from '../task-types';
 
 subtask('utils:assertChainId', 'Assert proper network is selectaed').setAction(assertChainId);
 
@@ -64,16 +64,4 @@ async function getTokens({}, hre: HardhatRuntimeEnvironment): Promise<DarkForest
   const tokens = DarkForestTokensFactory.attach(TOKENS_CONTRACT_ADDRESS);
   const t = tokens.connect(deployer);
   return t;
-}
-
-subtask('utils:getGPTCredit', 'get the current tokens contract').setAction(getGPTCredit);
-
-async function getGPTCredit({}, hre: HardhatRuntimeEnvironment): Promise<DarkForestGPTCredit> {
-  const { GPT_CREDIT_CONTRACT_ADDRESS } = hre.contracts;
-
-  const [deployer] = await hre.ethers.getSigners();
-  const DarkForestGPTCreditFactory = await hre.ethers.getContractFactory('DarkForestGPTCredit');
-  const gptCredit = DarkForestGPTCreditFactory.attach(GPT_CREDIT_CONTRACT_ADDRESS);
-  const g = gptCredit.connect(deployer);
-  return g;
 }

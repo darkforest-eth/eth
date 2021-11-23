@@ -35,14 +35,6 @@ async function copyAbi(
     JSON.stringify((await hre.artifacts.readArtifact('DarkForestGetters')).abi),
     { semi: false, parser: 'json' }
   );
-  const gptCreditAbi = prettier.format(
-    JSON.stringify((await hre.artifacts.readArtifact('DarkForestGPTCredit')).abi),
-    { semi: false, parser: 'json' }
-  );
-  const scoringAbi = prettier.format(
-    JSON.stringify((await hre.artifacts.readArtifact('DarkForestScoringRound3')).abi),
-    { semi: false, parser: 'json' }
-  );
 
   const abisDir = path.join(hre.packageDirs['@darkforest_eth/contracts'], 'abis');
 
@@ -53,8 +45,6 @@ async function copyAbi(
   await fs.writeFile(path.join(abisDir, 'DarkForestTokens.json'), tokensAbi);
   await fs.writeFile(path.join(abisDir, 'Whitelist.json'), whitelistAbi);
   await fs.writeFile(path.join(abisDir, 'DarkForestGetters.json'), gettersAbi);
-  await fs.writeFile(path.join(abisDir, 'DarkForestGPTCredit.json'), gptCreditAbi);
-  await fs.writeFile(path.join(abisDir, 'DarkForestScoringRound3.json'), scoringAbi);
 
   // workaround for: https://github.com/graphprotocol/graph-cli/issues/588
   // just remove calls we cant process, note makes them unusable from within

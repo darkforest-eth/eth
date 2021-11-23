@@ -1,9 +1,7 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.7.6;
-pragma experimental ABIEncoderV2;
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity ^0.8.0;
 
-// Import base Initializable contract
-import "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 contract Whitelist is Initializable {
     bool whitelistEnabled;

@@ -15,7 +15,6 @@ import './tasks/compile';
 import './tasks/debug';
 import './tasks/deploy';
 import './tasks/game';
-import './tasks/gpt-credits';
 import './tasks/subgraph';
 import './tasks/upgrades';
 import './tasks/utils';
@@ -114,11 +113,11 @@ const config: HardhatUserConfig = {
     },
   },
   solidity: {
-    version: '0.7.6',
+    version: '0.8.10',
     settings: {
       optimizer: {
         enabled: true,
-        runs: 200,
+        runs: 100,
       },
     },
   },

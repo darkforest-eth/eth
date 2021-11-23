@@ -1,12 +1,12 @@
 import toml from '@iarna/toml';
 import chalk from 'chalk';
 import { cosmiconfigSync } from 'cosmiconfig';
+import * as decoders from 'decoders';
 // HRE stuff
 import 'hardhat/types/runtime';
 import * as path from 'path';
 import resolvePackage from 'resolve-package-path';
 import dedent from 'ts-dedent';
-import * as yup from 'yup';
 
 declare module 'hardhat/types/runtime' {
   interface HardhatRuntimeEnvironment {
@@ -18,81 +18,86 @@ declare module 'hardhat/types/runtime' {
       '@darkforest_eth/snarks': string;
     };
 
-    contracts: yup.Asserts<typeof Contracts>;
+    contracts: ReturnType<typeof Contracts>;
 
-    initializers: yup.Asserts<typeof Initializers>;
+    initializers: ReturnType<typeof Initializers>;
 
-    adminPlanets: yup.Asserts<typeof AdminPlanets>;
+    adminPlanets: ReturnType<typeof AdminPlanets>;
   }
 }
 
-export const Contracts = yup
-  .object({
+export const Contracts = decoders.guard(
+  decoders.exact({
     /**
      * Network information
      */
-    NETWORK: yup.string().required(),
-    NETWORK_ID: yup.number().required(),
-    START_BLOCK: yup.number().required(),
+    NETWORK: decoders.string,
+    NETWORK_ID: decoders.number,
+    START_BLOCK: decoders.number,
     /**
      * Library addresses
      */
-    UTILS_LIBRARY_ADDRESS: yup.string().required(),
-    PLANET_LIBRARY_ADDRESS: yup.string().required(),
-    ARTIFACT_UTILS_LIBRARY_ADDRESS: yup.string().required(),
-    VERIFIER_LIBRARY_ADDRESS: yup.string().required(),
-    INITIALIZE_LIBRARY_ADDRESS: yup.string().required(),
-    LAZY_UPDATE_LIBRARY_ADDRESS: yup.string().required(),
+    UTILS_LIBRARY_ADDRESS: decoders.string,
+    PLANET_LIBRARY_ADDRESS: decoders.string,
+    ARTIFACT_UTILS_LIBRARY_ADDRESS: decoders.string,
+    VERIFIER_LIBRARY_ADDRESS: decoders.string,
+    INITIALIZE_LIBRARY_ADDRESS: decoders.string,
+    LAZY_UPDATE_LIBRARY_ADDRESS: decoders.string,
     /**
      * Contract addresses
      */
-    CORE_CONTRACT_ADDRESS: yup.string().required(),
-    TOKENS_CONTRACT_ADDRESS: yup.string().required(),
-    GETTERS_CONTRACT_ADDRESS: yup.string().required(),
-    WHITELIST_CONTRACT_ADDRESS: yup.string().required(),
-    GPT_CREDIT_CONTRACT_ADDRESS: yup.string().required(),
-    SCORING_CONTRACT_ADDRESS: yup.string(),
-  })
-  .defined();
+    CORE_CONTRACT_ADDRESS: decoders.string,
+    TOKENS_CONTRACT_ADDRESS: decoders.string,
+    GETTERS_CONTRACT_ADDRESS: decoders.string,
+    WHITELIST_CONTRACT_ADDRESS: decoders.string,
+  }),
+  { style: 'simple' }
+);
 
-export const Initializers = yup
-  .object({
-    ADMIN_CAN_ADD_PLANETS: yup.boolean().default(false),
-    WORLD_RADIUS_LOCKED: yup.boolean().default(false),
-    TOKEN_MINT_END_TIMESTAMP: dateInSeconds().default(oneYearFromNow),
-    TARGET4_RADIUS: yup.number().default(800),
-    INITIAL_WORLD_RADIUS: yup.number().default(8000),
+type PlanetTypeWeights = ExactArray4<ExactArray10<ExactArray5<number>>>;
+
+// Handle Date or ISO8601 strings because the TOML parser converts to Date already
+const dateInSeconds = decoders.map(decoders.either(decoders.date, decoders.iso8601), (val) =>
+  Math.floor(val.getTime() / 1000)
+);
+
+export const Initializers = decoders.guard(
+  decoders.exact({
+    ADMIN_CAN_ADD_PLANETS: withDefault(decoders.boolean, false),
+    WORLD_RADIUS_LOCKED: withDefault(decoders.boolean, false),
+    TOKEN_MINT_END_TIMESTAMP: withDefault(dateInSeconds, oneYearFromNow()),
+    TARGET4_RADIUS: withDefault(decoders.number, 800),
+    INITIAL_WORLD_RADIUS: withDefault(decoders.number, 8000),
     /**
      * SNARK keys & Perlin parameters
      */
-    DISABLE_ZK_CHECKS: yup.boolean().default(false),
-    PLANETHASH_KEY: yup.number().required(),
-    SPACETYPE_KEY: yup.number().required(),
-    BIOMEBASE_KEY: yup.number().required(),
-    PERLIN_MIRROR_X: yup.boolean().default(false),
-    PERLIN_MIRROR_Y: yup.boolean().default(false),
-    PERLIN_LENGTH_SCALE: yup.number().default(8192), // must be power of two at most 8192
+    DISABLE_ZK_CHECKS: withDefault(decoders.boolean, false),
+    PLANETHASH_KEY: decoders.number,
+    SPACETYPE_KEY: decoders.number,
+    BIOMEBASE_KEY: decoders.number,
+    PERLIN_MIRROR_X: withDefault(decoders.boolean, false),
+    PERLIN_MIRROR_Y: withDefault(decoders.boolean, false),
+    PERLIN_LENGTH_SCALE: withDefault(decoders.number, 8192), // must be power of two at most 8192
     /**
      * Game configuration
      */
-    MAX_NATURAL_PLANET_LEVEL: yup.number().default(256),
-    TIME_FACTOR_HUNDREDTHS: yup.number().default(100),
-    PERLIN_THRESHOLD_1: yup.number().default(13),
-    PERLIN_THRESHOLD_2: yup.number().default(15),
-    PERLIN_THRESHOLD_3: yup.number().default(18),
-    INIT_PERLIN_MIN: yup.number().default(12),
-    INIT_PERLIN_MAX: yup.number().default(13),
-    BIOME_THRESHOLD_1: yup.number().default(15),
-    BIOME_THRESHOLD_2: yup.number().default(17),
-    PLANET_RARITY: yup.number().default(16384),
-    PHOTOID_ACTIVATION_DELAY: yup.number().default(60 * 60 * 12),
-    SPAWN_RIM_AREA: yup.mixed().default(0),
-    LOCATION_REVEAL_COOLDOWN: yup.number().default(60 * 60 * 24),
-    CLAIM_PLANET_COOLDOWN: yup.number().default(60 * 60 * 3),
-    PLANET_TYPE_WEIGHTS: yup
-      .array(yup.array(yup.array(yup.number().min(0).max(255)).length(5)).length(10))
-      .length(4)
-      .default([
+    MAX_NATURAL_PLANET_LEVEL: withDefault(decoders.number, 256),
+    TIME_FACTOR_HUNDREDTHS: withDefault(decoders.number, 100),
+    PERLIN_THRESHOLD_1: withDefault(decoders.number, 13),
+    PERLIN_THRESHOLD_2: withDefault(decoders.number, 15),
+    PERLIN_THRESHOLD_3: withDefault(decoders.number, 18),
+    INIT_PERLIN_MIN: withDefault(decoders.number, 12),
+    INIT_PERLIN_MAX: withDefault(decoders.number, 13),
+    BIOME_THRESHOLD_1: withDefault(decoders.number, 15),
+    BIOME_THRESHOLD_2: withDefault(decoders.number, 17),
+    PLANET_RARITY: withDefault(decoders.number, 16384),
+    PHOTOID_ACTIVATION_DELAY: withDefault(decoders.number, 60 * 60 * 12),
+    SPAWN_RIM_AREA: withDefault(decoders.number, 0),
+    LOCATION_REVEAL_COOLDOWN: withDefault(decoders.number, 60 * 60 * 24),
+    CLAIM_PLANET_COOLDOWN: withDefault(decoders.number, 60 * 60 * 3),
+    PLANET_TYPE_WEIGHTS: withDefault<PlanetTypeWeights>(
+      exactArray4(exactArray10(exactArray5(between(decoders.number, 0, 255)))),
+      [
         [
           [1, 0, 0, 0, 0],
           [13, 2, 0, 0, 1],
@@ -141,37 +146,34 @@ export const Initializers = yup
           [8, 4, 1, 2, 1],
           [8, 4, 1, 2, 1],
         ],
-      ]),
-    ARTIFACT_POINT_VALUES: yup
-      .array()
-      .length(6)
-      .default([0, 2000, 10000, 200000, 3000000, 20000000]),
-    ROUND_NAME: yup.string().required(),
-    ROUND_END: dateInSeconds().required(),
-  })
-  .defined();
+      ]
+    ),
+    ARTIFACT_POINT_VALUES: withDefault<Tuple6<number>>(
+      array6(decoders.number),
+      [0, 2000, 10000, 200000, 3000000, 20000000]
+    ),
+  }),
+  { style: 'simple' }
+);
 
-const AdminPlanet = yup
-  .object({
-    x: yup.number().required(),
-    y: yup.number().required(),
-    level: yup.number().required(),
-    planetType: yup.number().required(),
-    requireValidLocationId: yup.boolean().required(),
-    revealLocation: yup.boolean().required(),
-  })
-  .defined();
+const AdminPlanet = decoders.exact({
+  x: decoders.number,
+  y: decoders.number,
+  level: decoders.number,
+  planetType: decoders.number,
+  requireValidLocationId: decoders.boolean,
+  revealLocation: decoders.boolean,
+});
 
-export const AdminPlanets = yup.array(AdminPlanet).defined();
+export const AdminPlanets = decoders.guard(decoders.array(AdminPlanet), { style: 'simple' });
 
 // Util for parsing & validating schemas with pretty printing
-export function parse<S extends yup.BaseSchema>(schema: S, data: unknown): yup.Asserts<S> {
+export function parse<S>(guard: decoders.Guard<S>, data: unknown): ReturnType<decoders.Guard<S>> {
   try {
-    return schema.validateSync(data, { abortEarly: false });
+    return guard(data);
   } catch (err) {
     if (err instanceof Error) {
-      const error = err as yup.ValidationError;
-      printValidationErrors(error);
+      printValidationErrors(err);
     } else {
       console.log(err);
     }
@@ -181,13 +183,13 @@ export function parse<S extends yup.BaseSchema>(schema: S, data: unknown): yup.A
 
 // A function that iterates over a Hardhat `lazyObject` to force them to be loaded.
 //
-// This is needed because some of our Yup Schemas have `.required()` properties but aren't
+// This is needed because some of our Schemas have required properties but aren't
 // immediately validated due to `lazyObject`.
 export function required<S extends { [key: string]: unknown }>(schema: S, keys: Array<keyof S>) {
-  const header = '* Required keys/values:';
+  const header = 'Required keys/values:';
   const messages = keys.map((key, idx) => {
     if (typeof key === 'string' || typeof key === 'number') {
-      return `* ${idx + 1}. ${key}: ${schema[key]}`;
+      return `${idx + 1}. ${key}: ${schema[key]}`;
     } else {
       console.error(chalk.red('Invalid key'), key);
       process.exit(1);
@@ -200,7 +202,7 @@ export function required<S extends { [key: string]: unknown }>(schema: S, keys: 
   const msg = dedent`
     ${stars}
     ${header}
-    *
+
     ${messages.join('\n')}
     ${stars}
   `;
@@ -209,18 +211,19 @@ export function required<S extends { [key: string]: unknown }>(schema: S, keys: 
   console.log(chalk.green(msg));
 }
 
-function printValidationErrors(err: yup.ValidationError) {
-  const header = '* Encountered configuration errors:';
-  const messages = err.errors.map((msg: string, idx: number) => `* ${idx + 1}. ${msg}`);
-
-  const longest = messages.reduce((max, msg) => Math.max(msg.length, max), header.length);
+function printValidationErrors(err: Error) {
+  const header = `Encountered configuration errors:`;
+  const message = err.message.trim();
+  const longest = err.message
+    .split('\n')
+    .reduce((max, msg) => Math.max(msg.length, max), header.length);
   const stars = '*'.repeat(longest);
 
   const msg = dedent`
     ${stars}
     ${header}
-    *
-    ${messages.join('\n')}
+
+    ${message}
     ${stars}
   `;
 
@@ -272,16 +275,85 @@ export function load(network: string): { [key: string]: unknown } {
   }
 }
 
-// Util for generating a number representing seconds timestamp from input datetime
-function dateInSeconds() {
-  return yup.number().transform(function (value, originalValue) {
-    if (this.isType(value)) return value;
-
-    return Math.floor(new Date(originalValue).getTime() / 1000);
+// Decoder helpers that will probably be refactored into a package
+function withDefault<A>(decoder: decoders.Decoder<A>, def: A) {
+  return decoders.map(decoders.optional(decoder), (val) => {
+    if (val === undefined) {
+      return def;
+    } else {
+      return val;
+    }
   });
 }
 
-// Generates the Default for TOKEN_MINT_END_TIMESTAMP
+function between(decoder: decoders.Decoder<number>, min: number, max: number) {
+  return decoders.compose(
+    decoder,
+    decoders.predicate((val) => val >= min && val <= max, `Must be between ${min} and ${max}`)
+  );
+}
+
+type ExactArray4<A> = [A, A, A, A];
+
+function exactArray4<A>(decoder: decoders.Decoder<A>) {
+  return decoders.map(
+    decoders.compose(
+      decoders.array(decoder),
+      decoders.predicate((arr) => arr.length === 4, `Must be exactly 4-length`)
+    ),
+    (value) => [value[0], value[1], value[2], value[3]] as ExactArray4<A>
+  );
+}
+
+type ExactArray5<A> = [A, A, A, A, A];
+
+function exactArray5<A>(decoder: decoders.Decoder<A>) {
+  return decoders.map(
+    decoders.compose(
+      decoders.array(decoder),
+      decoders.predicate((arr) => arr.length === 5, `Must be exactly 5-length`)
+    ),
+    (value) => [value[0], value[1], value[2], value[3], value[4]] as ExactArray5<A>
+  );
+}
+
+type Tuple6<A> = [A, A, A, A, A, A];
+
+function array6<A>(decoder: decoders.Decoder<A>) {
+  return decoders.map(
+    decoders.compose(
+      decoders.array(decoder),
+      decoders.predicate((arr) => arr.length === 6, `Must be exactly 6-length`)
+    ),
+    (value) => [value[0], value[1], value[2], value[3], value[4], value[5]] as Tuple6<A>
+  );
+}
+
+type ExactArray10<A> = [A, A, A, A, A, A, A, A, A, A];
+
+function exactArray10<A>(decoder: decoders.Decoder<A>) {
+  return decoders.map(
+    decoders.compose(
+      decoders.array(decoder),
+      decoders.predicate((arr) => arr.length === 10, `Must be exactly 10-length`)
+    ),
+    (value) =>
+      [
+        value[0],
+        value[1],
+        value[2],
+        value[3],
+        value[4],
+        value[5],
+        value[6],
+        value[7],
+        value[8],
+        value[9],
+      ] as ExactArray10<A>
+  );
+}
+
+// Generates the default for TOKEN_MINT_END_TIMESTAMP
 function oneYearFromNow() {
   const oneYear = 60 * 60 * 24 * 365 * 1000;
   // The default doesn't get passed through the transform so we still need to divide by 1000

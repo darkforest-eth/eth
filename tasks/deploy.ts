@@ -7,7 +7,6 @@ import * as settings from '../settings';
 import type {
   DarkForestCoreReturn,
   DarkForestGetters,
-  DarkForestGPTCredit,
   DarkForestTokens,
   LibraryContracts,
   Whitelist,
@@ -109,12 +108,6 @@ async function deploy(
 
   const gettersAddress = darkForestGetters.address;
 
-  const gpt3Credit: DarkForestGPTCredit = await hre.run('deploy:gptcredits', {
-    controllerWalletAddress,
-  });
-  const gptCreditAddress = gpt3Credit.address;
-
-  const scoringAddress = '';
   await hre.run('deploy:save', {
     coreBlockNumber: darkForestCoreReturn.blockNumber,
     libraries,
@@ -122,8 +115,6 @@ async function deploy(
     tokensAddress,
     gettersAddress,
     whitelistAddress,
-    gptCreditAddress,
-    scoringAddress,
   });
 
   // Note Ive seen `ProviderError: Internal error` when not enough money...
@@ -138,6 +129,7 @@ async function deploy(
   console.log(`Sent ${args.fund} to whitelist contract (${whitelist.address}) to fund drips`);
 
   // give all contract administration over to an admin adress if was provided
+  // MUST COME LAST because hardhat-upgrades doesn't wait for a new nonce.
   if (hre.ADMIN_PUBLIC_ADDRESS) {
     await hre.upgrades.admin.transferProxyAdminOwnership(hre.ADMIN_PUBLIC_ADDRESS);
     console.log('transfered all contracts');
@@ -163,8 +155,6 @@ async function deploySave(
     tokensAddress: string;
     gettersAddress: string;
     whitelistAddress: string;
-    gptCreditAddress: string;
-    scoringAddress: string;
   },
   hre: HardhatRuntimeEnvironment
 ) {
@@ -257,14 +247,6 @@ async function deploySave(
    * The address for the Whitelist contract.
    */
   export const WHITELIST_CONTRACT_ADDRESS = '${args.whitelistAddress}';
-  /**
-   * The address for the DarkForestGPTCredit contract.
-   */
-  export const GPT_CREDIT_CONTRACT_ADDRESS = '${args.gptCreditAddress}';
-  /**
-   * The address for the DarkForestScoring contract.
-   */
-  export const SCORING_CONTRACT_ADDRESS = '${args.scoringAddress}';
   `;
 
   const { jsContents, dtsContents } = tscompile(tsContents);

@@ -7,8 +7,6 @@ WORLD_RADIUS_LOCKED = false
 TOKEN_MINT_END_TIMESTAMP = 2021-10-05T04:00:00.000Z # Mon Oct 04 2021 21:00:00 GMT-0700 (Pacific Daylight Time)
 TARGET4_RADIUS = 1600
 INITIAL_WORLD_RADIUS = 8000
-ROUND_NAME = "0.6.6 round 4"
-ROUND_END = 2021-10-05T04:00:00.000Z # Mon Oct 04 2021 21:00:00 GMT-0700 (Pacific Daylight Time)
 
 ##################################
 # SNARK keys & Perlin parameters #

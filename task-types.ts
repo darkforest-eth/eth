@@ -3,9 +3,7 @@ import type {
   DarkForestArtifactUtils,
   DarkForestCore,
   DarkForestGetters,
-  DarkForestGPTCredit,
   DarkForestPlanet,
-  DarkForestScoringRound3,
   DarkForestTokens,
   DarkForestUtils,
   Verifier,
@@ -19,11 +17,9 @@ export {
   DarkForestGetters,
   DarkForestPlanet,
   DarkForestUtils,
-  DarkForestGPTCredit,
   DarkForestArtifactUtils,
   Verifier,
   Whitelist,
-  DarkForestScoringRound3,
 };
 
 export interface LibraryContracts {

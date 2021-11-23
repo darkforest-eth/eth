@@ -1,4 +1,3 @@
-//@ts-nocheck Because we can't run these tests
 import { expect } from 'chai';
 import {
   conquerUnownedPlanet,
@@ -9,9 +8,7 @@ import {
 import { defaultWorldFixture, World } from './utils/TestWorld';
 import { LVL1_ASTEROID_1, LVL3_SPACETIME_1, SPAWN_PLANET_1 } from './utils/WorldConstants';
 
-// This was never a contract, so these tests won't ever run again
-// Keeping for historical purposes, like adding a R2 scoring contract for arenas
-describe.skip('DFScoringRound2', async function () {
+describe('DFScoringRound2', async function () {
   // Bump the time out so that the test doesn't timeout during
   // initial fixture creation
   this.timeout(1000 * 60);
@@ -42,8 +39,15 @@ describe.skip('DFScoringRound2', async function () {
       .to.emit(world.contracts.core, 'PlanetSilverWithdrawn')
       .withArgs(world.user1.address, LVL3_SPACETIME_1.id, withdrawnAmount);
 
+    // According to DarkForestPlanet.sol:
+    // Energy and Silver are not stored as floats in the smart contracts,
+    // so any of those values coming from the contracts need to be divided by
+    // `CONTRACT_PRECISION` to get their true integer value.
+    // FIXME(blaine): This should have been done client-side because this type of
+    // division isn't supposed to be done in the contract. That's the whole point of
+    // `CONTRACT_PRECISION`
     expect((await world.contracts.core.players(world.user1.address)).score).to.equal(
-      withdrawnAmount
+      withdrawnAmount.div(1000)
     );
   });
 

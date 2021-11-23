@@ -1,13 +1,7 @@
-import {
-  DarkForestCore,
-  DarkForestGPTCredit,
-  DarkForestScoringRound3,
-  Whitelist,
-} from '@darkforest_eth/contracts/typechain';
+import { DarkForestCore, Whitelist } from '@darkforest_eth/contracts/typechain';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address';
 import { BigNumber, utils } from 'ethers';
 import { ethers } from 'hardhat';
-import * as yup from 'yup';
 import * as settings from '../../settings';
 import { initializeContracts, TestContracts } from './TestContracts';
 import { initializers, target4Initializers } from './WorldConstants';
@@ -21,10 +15,6 @@ export interface World {
   user2Core: DarkForestCore;
   user1Whitelist: Whitelist;
   user2Whitelist: Whitelist;
-  user1GPTCredit: DarkForestGPTCredit;
-  user2GPTCredit: DarkForestGPTCredit;
-  user1Scoring: DarkForestScoringRound3;
-  user2Scoring: DarkForestScoringRound3;
 }
 
 export interface Player {
@@ -37,7 +27,7 @@ export interface Player {
 }
 
 export interface InitializeWorldArgs {
-  initializers: yup.Asserts<typeof settings.Initializers>;
+  initializers: ReturnType<typeof settings.Initializers>;
   enableWhitelist: boolean;
 }
 
@@ -82,9 +72,5 @@ export async function initializeWorld(args: InitializeWorldArgs): Promise<World>
     user2Core: contracts.core.connect(user2),
     user1Whitelist: contracts.whitelist.connect(user1),
     user2Whitelist: contracts.whitelist.connect(user2),
-    user1GPTCredit: contracts.gptCredits.connect(user1),
-    user2GPTCredit: contracts.gptCredits.connect(user2),
-    user1Scoring: contracts.scoring.connect(user1),
-    user2Scoring: contracts.scoring.connect(user2),
   };
 }

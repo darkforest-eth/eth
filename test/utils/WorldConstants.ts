@@ -8,12 +8,10 @@ export const initializers = settings.parse(settings.Initializers, {
   SPACETYPE_KEY: 2,
   BIOMEBASE_KEY: 3,
   ADMIN_CAN_ADD_PLANETS: true,
-  TOKEN_MINT_END_TIMESTAMP: '1937674799',
+  TOKEN_MINT_END_TIMESTAMP: '3031-05-27T18:59:59.000Z',
   WORLD_RADIUS_LOCKED: true,
   INITIAL_WORLD_RADIUS: 304514,
   SPAWN_RIM_AREA: 7234560000,
-  ROUND_NAME: 'test',
-  ROUND_END: '1937674799',
 });
 
 // This builds a fake HRE-like object used to initialize the test contracts
@@ -22,11 +20,9 @@ export const target4Initializers = settings.parse(settings.Initializers, {
   PLANETHASH_KEY: 1,
   SPACETYPE_KEY: 2,
   BIOMEBASE_KEY: 3,
-  TOKEN_MINT_END_TIMESTAMP: '1937674799',
+  TOKEN_MINT_END_TIMESTAMP: '3031-05-27T18:59:59.000Z',
   TARGET4_RADIUS: 1,
   SPAWN_RIM_AREA: 7234560000,
-  ROUND_NAME: 'test',
-  ROUND_END: '1937674799',
 });
 
 export const VALID_INIT_PERLIN = initializers.INIT_PERLIN_MIN;

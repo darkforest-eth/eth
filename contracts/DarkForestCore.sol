@@ -1,11 +1,7 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.7.6;
-pragma experimental ABIEncoderV2;
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity ^0.8.0;
 
-// Import base Initializable contract
-import "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/math/MathUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "./Verifier.sol";
 import "./DarkForestStorageV1.sol";
 import "./DarkForestTokens.sol";
@@ -31,8 +27,6 @@ import "./DarkForestArtifactUtils.sol";
 
 contract DarkForestCore is Initializable, DarkForestStorageV1 {
     using ABDKMath64x64 for *;
-    using SafeMathUpgradeable for *;
-    using MathUpgradeable for uint256;
 
     event PlayerInitialized(address player, uint256 loc);
     event ArrivalQueued(
@@ -217,7 +211,8 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
     }
 
     function withdraw() public onlyAdmin {
-        msg.sender.transfer(address(this).balance);
+        // TODO: Don't send to msg.sender, instead send to contract admin
+        payable(msg.sender).transfer(address(this).balance);
     }
 
     function setTokenMintEndTime(uint256 newTokenMintEndTime) public onlyAdmin {

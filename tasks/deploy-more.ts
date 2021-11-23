@@ -7,8 +7,6 @@ import type {
   DarkForestCore,
   DarkForestCoreReturn,
   DarkForestGetters,
-  DarkForestGPTCredit,
-  DarkForestScoringRound3,
   DarkForestTokens,
   LibraryContracts,
   Whitelist,
@@ -59,50 +57,6 @@ async function deployWhitelist(
     contractName: 'Whitelist',
     signerOrOptions: {},
     contractArgs: [args.controllerWalletAddress, args.whitelistEnabled],
-    deployOptions: {},
-    retries: 5,
-    hre,
-  });
-}
-
-subtask('deploy:gptcredits', 'deploy and return GPT credits contract')
-  .addParam('controllerWalletAddress', '', undefined, types.string)
-  .setAction(deployGPTCredits);
-
-async function deployGPTCredits(
-  args: { controllerWalletAddress: string },
-  hre: HardhatRuntimeEnvironment
-): Promise<DarkForestGPTCredit> {
-  return deployProxyWithRetry<DarkForestGPTCredit>({
-    contractName: 'DarkForestGPTCredit',
-    signerOrOptions: {},
-    contractArgs: [args.controllerWalletAddress],
-    deployOptions: {},
-    retries: 5,
-    hre,
-  });
-}
-
-subtask('deploy:score', 'deploy and return Scoring Contract')
-  .addParam('coreAddress', '', undefined, types.string)
-  .addParam('roundName', '', undefined, types.string)
-  .addParam('roundEnd', '', undefined, types.int)
-  .addParam('claimPlanetCooldown', '', undefined, types.int)
-  .setAction(deployScoreContract);
-
-async function deployScoreContract(
-  args: {
-    coreAddress: string;
-    roundName: string;
-    roundEnd: number;
-    claimPlanetCooldown: number;
-  },
-  hre: HardhatRuntimeEnvironment
-): Promise<DarkForestScoringRound3> {
-  return deployProxyWithRetry<DarkForestScoringRound3>({
-    contractName: 'DarkForestScoringRound3',
-    signerOrOptions: {},
-    contractArgs: [args.coreAddress, args.roundName, args.roundEnd, args.claimPlanetCooldown],
     deployOptions: {},
     retries: 5,
     hre,

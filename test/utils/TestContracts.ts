@@ -2,16 +2,13 @@ import { NETWORK_ID } from '@darkforest_eth/contracts';
 import {
   DarkForestCore,
   DarkForestGetters,
-  DarkForestGPTCredit,
   DarkForestPlanet,
-  DarkForestScoringRound3,
   DarkForestTokens,
   DarkForestUtils,
   Verifier,
   Whitelist,
 } from '@darkforest_eth/contracts/typechain';
 import { ethers, upgrades } from 'hardhat';
-import * as yup from 'yup';
 import * as settings from '../../settings';
 
 export interface TestContracts {
@@ -22,12 +19,10 @@ export interface TestContracts {
   planet: DarkForestPlanet;
   core: DarkForestCore;
   getters: DarkForestGetters;
-  gptCredits: DarkForestGPTCredit;
-  scoring: DarkForestScoringRound3;
 }
 
 export interface InitializeContractArgs {
-  initializers: yup.Asserts<typeof settings.Initializers>;
+  initializers: ReturnType<typeof settings.Initializers>;
   enableWhitelist?: boolean;
 }
 
@@ -120,21 +115,6 @@ export async function initializeContracts({
     `https://nft-test.zkga.me/token-uri/artifact/${NETWORK_ID}-${darkForestTokens.address}/`
   );
 
-  const DarkForestGPTCreditContractFactory = await ethers.getContractFactory('DarkForestGPTCredit');
-
-  const darkForestGPTCredit = (await upgrades.deployProxy(DarkForestGPTCreditContractFactory, [
-    deployer.address,
-  ])) as DarkForestGPTCredit;
-
-  const DarkForestScoringRound3Factory = await ethers.getContractFactory('DarkForestScoringRound3');
-
-  const darkForestScoringContract = (await upgrades.deployProxy(DarkForestScoringRound3Factory, [
-    darkForestCore.address,
-    initializers.ROUND_NAME,
-    initializers.ROUND_END,
-    initializers.CLAIM_PLANET_COOLDOWN,
-  ])) as DarkForestScoringRound3;
-
   return {
     whitelist,
     tokens: darkForestTokens,
@@ -143,7 +123,5 @@ export async function initializeContracts({
     planet: darkForestPlanet,
     core: darkForestCore,
     getters: darkForestGetters,
-    gptCredits: darkForestGPTCredit,
-    scoring: darkForestScoringContract,
   };
 }

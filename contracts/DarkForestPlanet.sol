@@ -1,8 +1,6 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.7.6;
-pragma experimental ABIEncoderV2;
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
 import "./DarkForestTypes.sol";
 import "./DarkForestTokens.sol";
 import "./DarkForestLazyUpdate.sol";
@@ -271,10 +269,9 @@ library DarkForestPlanet {
         }
 
         // initial population (pirates) and silver
-        _planet.population = SafeMathUpgradeable.div(
-            SafeMathUpgradeable.mul(_planet.populationCap, _planetDefaultStats.barbarianPercentage),
-            100
-        );
+        _planet.population =
+            (_planet.populationCap * _planetDefaultStats.barbarianPercentage) /
+            100;
 
         // pirates adjusted for def debuffs, and buffed in space/deepspace
         if (deadSpace) {

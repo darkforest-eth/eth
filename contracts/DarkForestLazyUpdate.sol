@@ -1,9 +1,6 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.7.6;
-pragma experimental ABIEncoderV2;
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/math/MathUpgradeable.sol";
 import "./ABDKMath64x64.sol";
 import "./DarkForestTypes.sol";
 
@@ -40,14 +37,12 @@ library DarkForestLazyUpdate {
         }
 
         if (planet.silver < planet.silverCap) {
-            uint256 _timeDiff =
-                SafeMathUpgradeable.sub(updateToTime, planetExtendedInfo.lastUpdated);
-            uint256 _silverMined = SafeMathUpgradeable.mul(planet.silverGrowth, _timeDiff);
+            uint256 _timeDiff = updateToTime - planetExtendedInfo.lastUpdated;
+            uint256 _silverMined = planet.silverGrowth * _timeDiff;
 
-            planet.silver = MathUpgradeable.min(
-                planet.silverCap,
-                SafeMathUpgradeable.add(planet.silver, _silverMined)
-            );
+            uint256 _maxSilver = planet.silverCap;
+            uint256 _currentSilver = planet.silver + _silverMined;
+            planet.silver = _maxSilver < _currentSilver ? _maxSilver : _currentSilver;
         }
     }
 
@@ -136,7 +131,7 @@ library DarkForestLazyUpdate {
         // checks whether the planet is owned by the player sending ships
         if (arrival.player == planet.owner) {
             // simply increase the population if so
-            planet.population = SafeMathUpgradeable.add(planet.population, arrival.popArriving);
+            planet.population = planet.population + arrival.popArriving;
         } else {
             if (arrival.arrivalType == DarkForestTypes.ArrivalType.Wormhole) {
                 // if this is a wormhole arrival to a planet that isn't owned by the initiator of
@@ -144,20 +139,18 @@ library DarkForestLazyUpdate {
             } else if (planet.population > (arrival.popArriving * 100) / planet.defense) {
                 // handles if the planet population is bigger than the arriving ships
                 // simply reduce the amount of planet population by the arriving ships
-                planet.population = SafeMathUpgradeable.sub(
-                    planet.population,
-                    (arrival.popArriving * 100) / planet.defense
-                );
+                planet.population =
+                    planet.population -
+                    ((arrival.popArriving * 100) / planet.defense);
             } else {
                 // handles if the planet population is equal or less the arriving ships
                 // reduce the arriving ships amount with the current population and the
                 // result is the new population of the planet now owned by the attacking
                 // player
                 planet.owner = arrival.player;
-                planet.population = SafeMathUpgradeable.sub(
-                    arrival.popArriving,
-                    (planet.population * planet.defense) / 100
-                );
+                planet.population =
+                    arrival.popArriving -
+                    ((planet.population * planet.defense) / 100);
                 if (planet.population == 0) {
                     // make sure pop is never 0
                     planet.population = 1;
@@ -173,10 +166,9 @@ library DarkForestLazyUpdate {
             }
         }
 
-        planet.silver = MathUpgradeable.min(
-            planet.silverCap,
-            SafeMathUpgradeable.add(planet.silver, arrival.silverMoved)
-        );
+        uint256 _maxSilver = planet.silverCap;
+        uint256 _nextSilver = planet.silver + arrival.silverMoved;
+        planet.silver = _maxSilver < _nextSilver ? _maxSilver : _nextSilver;
 
         return (arrival.carriedArtifactId, planet);
     }
