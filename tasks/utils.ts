@@ -39,7 +39,7 @@ async function getCore({}, hre: HardhatRuntimeEnvironment): Promise<DarkForestCo
 
   const darkForestCore = DarkForestCoreFactory.attach(CORE_CONTRACT_ADDRESS);
   const d = darkForestCore.connect(deployer);
-  return d;
+  return d as DarkForestCore;
 }
 
 subtask('utils:getWhitelist', 'get the current whitelist contract').setAction(getWhitelist);
@@ -51,7 +51,7 @@ async function getWhitelist({}, hre: HardhatRuntimeEnvironment): Promise<Whiteli
   const WhitelistFactory = await hre.ethers.getContractFactory('Whitelist');
   const whitelist = WhitelistFactory.attach(WHITELIST_CONTRACT_ADDRESS);
   const w = whitelist.connect(deployer);
-  return w;
+  return w as Whitelist;
 }
 
 subtask('utils:getTokens', 'get the current tokens contract').setAction(getTokens);
@@ -63,5 +63,5 @@ async function getTokens({}, hre: HardhatRuntimeEnvironment): Promise<DarkForest
   const DarkForestTokensFactory = await hre.ethers.getContractFactory('DarkForestTokens');
   const tokens = DarkForestTokensFactory.attach(TOKENS_CONTRACT_ADDRESS);
   const t = tokens.connect(deployer);
-  return t;
+  return t as DarkForestTokens;
 }

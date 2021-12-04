@@ -299,7 +299,9 @@ describe('DarkForestPlanet', function () {
     expect(Math.floor(regularPlanet.silverCap.toNumber() * 10)).to.be.equal(
       quasarPlanet.silverCap.toNumber()
     );
-    expect(Math.floor(regularPlanet.speed.toNumber())).to.be.equal(quasarPlanet.speed.toNumber());
+    expect(Math.floor(regularPlanet.speed.toNumber() / 2)).to.be.equal(
+      quasarPlanet.speed.toNumber()
+    );
     expect(Math.floor(quasarPlanet.populationGrowth.toNumber())).to.be.equal(0);
     expect(Math.floor(regularPlanet.populationCap.toNumber() * 5)).to.be.equal(
       quasarPlanet.populationCap.toNumber()
