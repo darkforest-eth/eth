@@ -55,7 +55,7 @@
     "test": "hardhat test && yarn subgraph:template:dev",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "hardhat:node": "hardhat node --hostname 0.0.0.0",
+    "hardhat:node": "hardhat node --hostname localhost",
     "hardhat:dev": "hardhat --network localhost",
     "hardhat:prod": "hardhat --network xdai",
     "hardhat:mainnet": "hardhat --network mainnet",
