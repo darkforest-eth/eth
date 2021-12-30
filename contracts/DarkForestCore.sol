@@ -48,6 +48,7 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
     event ArtifactWithdrawn(address player, uint256 artifactId, uint256 loc);
     event ArtifactActivated(address player, uint256 artifactId, uint256 loc); // emitted in DFPlanet library
     event ArtifactDeactivated(address player, uint256 artifactId, uint256 loc); // emitted in DFPlanet library
+    event PlanetDestroyed(address player, uint256 loc); // emitted in DFPlanet library
 
     event PlanetSilverWithdrawn(address player, uint256 loc, uint256 amount);
 
@@ -88,6 +89,8 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
             PERLIN_LENGTH_SCALE: initArgs.PERLIN_LENGTH_SCALE
         });
         s.gameConstants = DarkForestTypes.GameConstants({
+            DESTROY_THRESHOLD: initArgs.DESTROY_THRESHOLD,
+            INITIAL_WORLD_RADIUS: initArgs.INITIAL_WORLD_RADIUS,
             MAX_NATURAL_PLANET_LEVEL: initArgs.MAX_NATURAL_PLANET_LEVEL,
             TIME_FACTOR_HUNDREDTHS: initArgs.TIME_FACTOR_HUNDREDTHS,
             PERLIN_THRESHOLD_1: initArgs.PERLIN_THRESHOLD_1,
@@ -240,6 +243,10 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         s.initializedPlanetCountByLevel[args.level] += 1;
 
         emit AdminPlanetCreated(args.location);
+    }
+
+    function changeDestroyThreshold(uint256 newThreshold) public onlyAdmin {
+            s.gameConstants.DESTROY_THRESHOLD = newThreshold;
     }
 
     //////////////////////
@@ -449,22 +456,22 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         emit PlanetTransferred(msg.sender, _location, _player);
     }
 
-    function buyHat(uint256 _location) public payable {
-        require(
-            s.planetsExtendedInfo[_location].isInitialized == true,
-            "Planet is not initialized"
-        );
-        refreshPlanet(_location);
+    // function buyHat(uint256 _location) public payable {
+    //     require(
+    //         s.planetsExtendedInfo[_location].isInitialized == true,
+    //         "Planet is not initialized"
+    //     );
+    //     refreshPlanet(_location);
 
-        require(s.planets[_location].owner == msg.sender, "Only owner can buy hat for planet");
+    //     require(s.planets[_location].owner == msg.sender, "Only owner can buy hat for planet");
 
-        uint256 cost = (1 << s.planetsExtendedInfo[_location].hatLevel) * 1 ether;
+    //     uint256 cost = (1 << s.planetsExtendedInfo[_location].hatLevel) * 1 ether;
 
-        require(msg.value == cost, "Wrong value sent");
+    //     require(msg.value == cost, "Wrong value sent");
 
-        s.planetsExtendedInfo[_location].hatLevel += 1;
-        emit PlanetHatBought(msg.sender, _location, s.planetsExtendedInfo[_location].hatLevel);
-    }
+    //     s.planetsExtendedInfo[_location].hatLevel += 1;
+    //     emit PlanetHatBought(msg.sender, _location, s.planetsExtendedInfo[_location].hatLevel);
+    // }
 
     function findArtifact(
         uint256[2] memory _a,

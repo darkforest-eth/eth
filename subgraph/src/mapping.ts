@@ -307,6 +307,7 @@ export function handleLocationRevealed(event: LocationRevealed): void {
     const planetDatas = getters.bulkGetPlanetsDataByIds([event.params.loc]);
     const rawData = planetDatas[0];
     planet = refreshPlanetFromContractData(event.params.loc, rawData.planet, rawData.info);
+    // planet.radius = DO this math.
     planet.save();
   }
 

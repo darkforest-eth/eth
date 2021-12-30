@@ -109,6 +109,7 @@ export function arrive(toPlanet: Planet, arrival: Arrival): Planet {
       toPlanet.milliEnergyLazy = toPlanet.milliEnergyLazy.minus(effectiveEnergy);
     } else {
       // conquers planet
+      // if(criteria) toPlanet.destroyed = true;
       toPlanet.owner = arrival.player;
       const effectiveDefendingEnergy = toPlanet.milliEnergyLazy
         .times(BigInt.fromI32(toPlanet.defense))

@@ -3,7 +3,7 @@
 
 [initializers]
 ADMIN_CAN_ADD_PLANETS = true
-WORLD_RADIUS_LOCKED = false
+WORLD_RADIUS_LOCKED = true
 TOKEN_MINT_END_TIMESTAMP = 2021-10-05T04:00:00.000Z # Mon Oct 04 2021 21:00:00 GMT-0700 (Pacific Daylight Time)
 TARGET4_RADIUS = 1600
 INITIAL_WORLD_RADIUS = 8000
@@ -11,7 +11,7 @@ INITIAL_WORLD_RADIUS = 8000
 ##################################
 # SNARK keys & Perlin parameters #
 ##################################
-DISABLE_ZK_CHECKS = false
+DISABLE_ZK_CHECKS = true
 PLANETHASH_KEY = 6278
 SPACETYPE_KEY = 6279
 BIOMEBASE_KEY = 6270
@@ -22,13 +22,14 @@ PERLIN_LENGTH_SCALE = 16384 # must be a power of two no greater than 16384
 ######################
 # Game configuration #
 ######################
+DESTROY_THRESHOLD = 2
 MAX_NATURAL_PLANET_LEVEL = 256
-TIME_FACTOR_HUNDREDTHS = 600 # speedup/slowdown game
-PERLIN_THRESHOLD_1 = 14
-PERLIN_THRESHOLD_2 = 15
-PERLIN_THRESHOLD_3 = 19
-INIT_PERLIN_MIN = 13
-INIT_PERLIN_MAX = 14
+TIME_FACTOR_HUNDREDTHS = 6000 # speedup/slowdown game
+PERLIN_THRESHOLD_1 = 1
+PERLIN_THRESHOLD_2 = 2
+PERLIN_THRESHOLD_3 = 18
+INIT_PERLIN_MIN = 1
+INIT_PERLIN_MAX = 31
 SPAWN_RIM_AREA = 0
 BIOME_THRESHOLD_1 = 15
 BIOME_THRESHOLD_2 = 17
@@ -91,3 +92,10 @@ PLANET_TYPE_WEIGHTS = [
 ##########################
 # Planets to add to game #
 ##########################
+[[planets]]
+  x = 0
+  y = 0
+  level = 9
+  planetType = 3
+  requireValidLocationId = false
+  revealLocation = true
