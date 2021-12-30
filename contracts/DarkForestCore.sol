@@ -49,6 +49,7 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
     event ArtifactActivated(address player, uint256 artifactId, uint256 loc); // emitted in DFPlanet library
     event ArtifactDeactivated(address player, uint256 artifactId, uint256 loc); // emitted in DFPlanet library
     event PlanetDestroyed(address player, uint256 loc); // emitted in DFPlanet library
+    event RadiusUpdated(uint256 radius);
 
     event PlanetSilverWithdrawn(address player, uint256 loc, uint256 amount);
 
@@ -105,7 +106,14 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
             PHOTOID_ACTIVATION_DELAY: initArgs.PHOTOID_ACTIVATION_DELAY,
             LOCATION_REVEAL_COOLDOWN: initArgs.LOCATION_REVEAL_COOLDOWN,
             PLANET_TYPE_WEIGHTS: initArgs.PLANET_TYPE_WEIGHTS,
-            ARTIFACT_POINT_VALUES: initArgs.ARTIFACT_POINT_VALUES
+            ARTIFACT_POINT_VALUES: initArgs.ARTIFACT_POINT_VALUES,
+           SHRINK_START: initArgs.SHRINK_START,
+            ROUND_END: initArgs.ROUND_END,
+            MIN_RADIUS: initArgs.MIN_RADIUS,
+            SHRINK_FACTOR: initArgs.SHRINK_FACTOR,
+            DISC_LOWER_BOUND: initArgs.DISC_LOWER_BOUND,
+            DISC_UPPER_BOUND: initArgs.DISC_UPPER_BOUND,
+            SHRINK: initArgs.SHRINK
         });
 
         s.worldRadius = initArgs.INITIAL_WORLD_RADIUS; // will be overridden by TARGET4_RADIUS if !WORLD_RADIUS_LOCKED
@@ -166,6 +174,7 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
     function _updateWorldRadius() private {
         if (!s.WORLD_RADIUS_LOCKED) {
             s.worldRadius = DarkForestUtils._getRadius();
+            emit RadiusUpdated(s.worldRadius);
         }
     }
 
@@ -207,6 +216,7 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
 
     function adminSetWorldRadius(uint256 _newRadius) public onlyAdmin {
         s.worldRadius = _newRadius;
+        emit RadiusUpdated(s.worldRadius);
     }
 
     function changeLocationRevealCooldown(uint256 newCooldown) public onlyAdmin {
@@ -247,6 +257,14 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
 
     function changeDestroyThreshold(uint256 newThreshold) public onlyAdmin {
             s.gameConstants.DESTROY_THRESHOLD = newThreshold;
+    }
+
+    function setShrinkStart(uint256 newShrinkStart) public onlyAdmin {
+        s.gameConstants.SHRINK_START = newShrinkStart;
+    }
+
+    function setRoundEnd(uint256 newEndTime) public onlyAdmin {
+        s.gameConstants.ROUND_END = newEndTime;
     }
 
     //////////////////////

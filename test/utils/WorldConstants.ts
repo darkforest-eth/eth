@@ -25,6 +25,21 @@ export const target4Initializers = settings.parse(settings.Initializers, {
   SPAWN_RIM_AREA: 7234560000,
 });
 
+export const shrinkingInitializers = settings.parse(settings.Initializers, {
+  DISABLE_ZK_CHECKS: true,
+  PLANETHASH_KEY: 1,
+  SPACETYPE_KEY: 2,
+  BIOMEBASE_KEY: 3,
+  INITIAL_WORLD_RADIUS: 3000,
+  TOKEN_MINT_END_TIMESTAMP: '3031-05-27T18:59:59.000Z',
+  MIN_RADIUS: 1000,
+  SHRINK_FACTOR: 2,
+  SHRINK: true,
+  WORLD_RADIUS_LOCKED: false,
+  DISC_LOWER_BOUND: 50,
+  DISC_UPPER_BOUND: 75
+});
+
 export const VALID_INIT_PERLIN = initializers.INIT_PERLIN_MIN;
 export const NEBULA_PERLIN = initializers.PERLIN_THRESHOLD_1 - 1;
 export const SPACE_PERLIN = initializers.PERLIN_THRESHOLD_1;
