@@ -4,7 +4,7 @@
 [initializers]
 ADMIN_CAN_ADD_PLANETS = true
 WORLD_RADIUS_LOCKED = false
-TOKEN_MINT_END_TIMESTAMP = 2022-01-04T15:35:00.000Z # Jan 4, 2022, 11:59:00 PM (EST)
+TOKEN_MINT_END_TIMESTAMP = 2022-01-05T07:59:59.000Z # Jan 4, 2022, 11:59:59 PM (PST)
 TARGET4_RADIUS = 1600
 INITIAL_WORLD_RADIUS = 8000
 
@@ -23,9 +23,9 @@ PERLIN_LENGTH_SCALE = 16384 # must be a power of two no greater than 16384
 # Game configuration #
 ######################
 SHRINK = 2 # No shrink if 0
-# SHRINK_START: withDefault(dateInSeconds, Math.floor(Date.now() / 1000)), // Current time in seconds
-# ROUND_END: withDefault(dateInSeconds, Math.floor(Date.now() / 1000) + 600), // 10 minute round is default
-MIN_RADIUS = 1
+# SHRINK_START = # 2022-01-01T20:00:00.000Z Jan 1, 2022, 12:00:00 PM 
+# ROUND_END = 2022-01-05T07:59:59.000Z # Jan 4, 2022, 11:59:59 PM (PST)
+MIN_RADIUS = 400 # SHOULD be 5% of INITIAL_WORLD_RADIUS.
 DESTROY_THRESHOLD = 2
 MAX_NATURAL_PLANET_LEVEL = 256
 TIME_FACTOR_HUNDREDTHS = 6000 # speedup/slowdown game
