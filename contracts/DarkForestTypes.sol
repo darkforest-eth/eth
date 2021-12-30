@@ -95,6 +95,7 @@ library DarkForestTypes {
     // Game config
     // This struct is ~1 properties from maximum struct size
     struct GameConstants {
+        uint256 INITIAL_WORLD_RADIUS;
         uint256 MAX_NATURAL_PLANET_LEVEL;
         uint256 TIME_FACTOR_HUNDREDTHS; // speedup/slowdown game
         uint256 PERLIN_THRESHOLD_1;
