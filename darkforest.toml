@@ -3,7 +3,7 @@
 
 [initializers]
 ADMIN_CAN_ADD_PLANETS = true
-WORLD_RADIUS_LOCKED = true
+WORLD_RADIUS_LOCKED = false
 TOKEN_MINT_END_TIMESTAMP = 2021-10-05T04:00:00.000Z # Mon Oct 04 2021 21:00:00 GMT-0700 (Pacific Daylight Time)
 TARGET4_RADIUS = 1600
 INITIAL_WORLD_RADIUS = 8000
@@ -11,7 +11,7 @@ INITIAL_WORLD_RADIUS = 8000
 ##################################
 # SNARK keys & Perlin parameters #
 ##################################
-DISABLE_ZK_CHECKS = true
+DISABLE_ZK_CHECKS = false
 PLANETHASH_KEY = 6278
 SPACETYPE_KEY = 6279
 BIOMEBASE_KEY = 6270
@@ -22,6 +22,10 @@ PERLIN_LENGTH_SCALE = 16384 # must be a power of two no greater than 16384
 ######################
 # Game configuration #
 ######################
+SHRINK = 2 # No shrink if 0
+# SHRINK_START: withDefault(dateInSeconds, Math.floor(Date.now() / 1000)), // Current time in seconds
+# ROUND_END: withDefault(dateInSeconds, Math.floor(Date.now() / 1000) + 600), // 10 minute round is default
+MIN_RADIUS = 1
 DESTROY_THRESHOLD = 2
 MAX_NATURAL_PLANET_LEVEL = 256
 TIME_FACTOR_HUNDREDTHS = 6000 # speedup/slowdown game

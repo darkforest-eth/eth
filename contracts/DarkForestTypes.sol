@@ -112,6 +112,12 @@ library DarkForestTypes {
         uint256 LOCATION_REVEAL_COOLDOWN;
         uint8[5][10][4] PLANET_TYPE_WEIGHTS; // spaceType (enum 0-3) -> planetLevel (0-7) -> planetType (enum 0-4)
         uint256[6] ARTIFACT_POINT_VALUES;
+        uint256 SHRINK_START;
+        uint256 ROUND_END;
+        uint256 MIN_RADIUS;
+        uint256 SHRINK;
+        uint256 DISC_LOWER_BOUND;
+        uint256 DISC_UPPER_BOUND;
     }
 
     struct DFInitArgs {
@@ -145,6 +151,12 @@ library DarkForestTypes {
         uint8[5][10][4] PLANET_TYPE_WEIGHTS; // spaceType (enum 0-3) -> planetLevel (0-7) -> planetType (enum 0-4)
         uint256[6] ARTIFACT_POINT_VALUES;
         uint256 PHOTOID_ACTIVATION_DELAY;
+        uint256 SHRINK_START;
+        uint256 ROUND_END;
+        uint256 MIN_RADIUS;
+        uint256 SHRINK;
+        uint256 DISC_LOWER_BOUND;
+        uint256 DISC_UPPER_BOUND;
     }
 
     struct DFPInitPlanetArgs {
