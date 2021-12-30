@@ -8,7 +8,8 @@ import {
   makeInitArgs,
   makeMoveArgs,
   getCurrentTime,
-  feedSilverToCap
+  feedSilverToCap,
+  shrinkAlgorithm
 } from './utils/TestUtils';
 import { defaultWorldFixture, growingWorldFixture, shrinkingWorldFixture, World } from './utils/TestWorld';
 import {
@@ -28,11 +29,12 @@ describe('DarkForestShrink', function () {
 
   describe('in a shrinking universe', async function () {
     let initialRadius: BigNumber;
+    let time: number
 
     beforeEach(async function () {
       world = await fixtureLoader(shrinkingWorldFixture);
 
-      const time = await getCurrentTime();
+      time = await getCurrentTime();
 
       await world.contracts.core.setShrinkStart(time);
       await world.contracts.core.setRoundEnd(time + 5000);
@@ -43,14 +45,18 @@ describe('DarkForestShrink', function () {
 
     it('should decrease radius size after move', async function () {
       const initRadius = await world.contracts.core.worldRadius();
-      await increaseBlockchainTime(5);
+      await increaseBlockchainTime(500);
 
       // Recall that universe will only shrink when a player makes a move.
       await world.user1Core.move(
         ...makeMoveArgs(SPAWN_PLANET_1, SPAWN_PLANET_2, 0, 40000, 0)
-      ); 
+      );    
+
+      const radius = shrinkAlgorithm(time, time + 5000, time + 500);
+      console.log("radius from algo", radius)
 
       const currRadius = await world.contracts.core.worldRadius();
+      console.log("radius from chain", currRadius.toNumber());
       expect(currRadius.toNumber()).lessThan(initRadius.toNumber());
     });
 
@@ -69,6 +75,8 @@ describe('DarkForestShrink', function () {
 
     it('accepts a player spawning in middle ring and shrinks radius', async function () {
       const initRadius = await world.contracts.core.worldRadius();
+      await increaseBlockchainTime(500);
+
       await expect(world.user2Core.initializePlayer(...makeInitArgs(SPAWN_PLANET_2, SPAWN_PLANET_2.distFromOrigin)))
         .to.emit(world.contracts.core, 'PlayerInitialized')
         .withArgs(world.user2.address, SPAWN_PLANET_2.id.toString());

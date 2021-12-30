@@ -33,11 +33,10 @@ export const shrinkingInitializers = settings.parse(settings.Initializers, {
   INITIAL_WORLD_RADIUS: 3000,
   TOKEN_MINT_END_TIMESTAMP: '3031-05-27T18:59:59.000Z',
   MIN_RADIUS: 1000,
-  SHRINK_FACTOR: 2,
-  SHRINK: true,
+  SHRINK: 2,
   WORLD_RADIUS_LOCKED: false,
   DISC_LOWER_BOUND: 50,
-  DISC_UPPER_BOUND: 75
+  DISC_UPPER_BOUND: 75,
 });
 
 export const VALID_INIT_PERLIN = initializers.INIT_PERLIN_MIN;

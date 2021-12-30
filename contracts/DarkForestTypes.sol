@@ -115,10 +115,9 @@ library DarkForestTypes {
         uint256 SHRINK_START;
         uint256 ROUND_END;
         uint256 MIN_RADIUS;
-        uint256 SHRINK_FACTOR;
+        uint256 SHRINK;
         uint256 DISC_LOWER_BOUND;
         uint256 DISC_UPPER_BOUND;
-        bool SHRINK;
     }
 
     struct DFInitArgs {
@@ -155,10 +154,9 @@ library DarkForestTypes {
         uint256 SHRINK_START;
         uint256 ROUND_END;
         uint256 MIN_RADIUS;
-        uint256 SHRINK_FACTOR;
+        uint256 SHRINK;
         uint256 DISC_LOWER_BOUND;
         uint256 DISC_UPPER_BOUND;
-        bool SHRINK;
     }
 
     struct DFPInitPlanetArgs {

@@ -142,7 +142,7 @@ library DarkForestUtils {
     }
 
     function _getRadius() public view returns (uint256) {
-        if(s().gameConstants.SHRINK) {
+        if(s().gameConstants.SHRINK > 0) {
             return _shrinkRadius();
         }
         else {
@@ -153,7 +153,7 @@ library DarkForestUtils {
     function _shrinkRadius() internal view returns (uint256) {
         uint256 radius = s().worldRadius;
         console.log("curr radius is %s", radius);
-        uint256 shrinkFactor = s().gameConstants.SHRINK_FACTOR;
+        uint256 shrinkFactor = s().gameConstants.SHRINK;
         uint256 totalTime = s().gameConstants.ROUND_END - s().gameConstants.SHRINK_START;
         // Only shrink after START_TIME has occurred. Allows for delaying of shrinking.
         uint256 startTime = s().gameConstants.SHRINK_START > block.timestamp ? block.timestamp: s().gameConstants.SHRINK_START;
@@ -168,7 +168,7 @@ library DarkForestUtils {
 
         // only shrink after initial time elapsed.
         radius = (
-            s().worldRadius * 
+            s().gameConstants.INITIAL_WORLD_RADIUS * 
                 (
                     (totalTime**shrinkFactor) - 
                     (timeElapsed**shrinkFactor)

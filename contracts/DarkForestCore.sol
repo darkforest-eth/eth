@@ -107,13 +107,12 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
             LOCATION_REVEAL_COOLDOWN: initArgs.LOCATION_REVEAL_COOLDOWN,
             PLANET_TYPE_WEIGHTS: initArgs.PLANET_TYPE_WEIGHTS,
             ARTIFACT_POINT_VALUES: initArgs.ARTIFACT_POINT_VALUES,
+            SHRINK: initArgs.SHRINK,
            SHRINK_START: initArgs.SHRINK_START,
             ROUND_END: initArgs.ROUND_END,
             MIN_RADIUS: initArgs.MIN_RADIUS,
-            SHRINK_FACTOR: initArgs.SHRINK_FACTOR,
             DISC_LOWER_BOUND: initArgs.DISC_LOWER_BOUND,
-            DISC_UPPER_BOUND: initArgs.DISC_UPPER_BOUND,
-            SHRINK: initArgs.SHRINK
+            DISC_UPPER_BOUND: initArgs.DISC_UPPER_BOUND
         });
 
         s.worldRadius = initArgs.INITIAL_WORLD_RADIUS; // will be overridden by TARGET4_RADIUS if !WORLD_RADIUS_LOCKED

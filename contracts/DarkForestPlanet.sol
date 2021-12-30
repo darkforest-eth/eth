@@ -376,9 +376,9 @@ library DarkForestPlanet {
                 "Player can only spawn at the universe rim"
             );
         }
-        
+
         // this will only allow players to initialize in the middle ring of the universe. 
-        if(s().gameConstants.SHRINK) {
+        if(s().gameConstants.SHRINK > 0) {
             uint256 radius = s().worldRadius;
             uint256 upperQuartile = (radius * s().gameConstants.DISC_UPPER_BOUND) / 100;
             uint256 lowerQuartile = (radius * s().gameConstants.DISC_LOWER_BOUND) / 100;
