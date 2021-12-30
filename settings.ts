@@ -81,6 +81,7 @@ export const Initializers = decoders.guard(
     /**
      * Game configuration
      */
+    DESTROY_THRESHOLD: withDefault(decoders.number, 0),
     MAX_NATURAL_PLANET_LEVEL: withDefault(decoders.number, 256),
     TIME_FACTOR_HUNDREDTHS: withDefault(decoders.number, 100),
     PERLIN_THRESHOLD_1: withDefault(decoders.number, 13),

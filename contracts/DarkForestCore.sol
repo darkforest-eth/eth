@@ -48,6 +48,7 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
     event ArtifactWithdrawn(address player, uint256 artifactId, uint256 loc);
     event ArtifactActivated(address player, uint256 artifactId, uint256 loc); // emitted in DFPlanet library
     event ArtifactDeactivated(address player, uint256 artifactId, uint256 loc); // emitted in DFPlanet library
+    event PlanetDestroyed(address player, uint256 loc); // emitted in DFPlanet library
 
     event PlanetSilverWithdrawn(address player, uint256 loc, uint256 amount);
 
@@ -88,6 +89,7 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
             PERLIN_LENGTH_SCALE: initArgs.PERLIN_LENGTH_SCALE
         });
         s.gameConstants = DarkForestTypes.GameConstants({
+            DESTROY_THRESHOLD: initArgs.DESTROY_THRESHOLD,
             INITIAL_WORLD_RADIUS: initArgs.INITIAL_WORLD_RADIUS,
             MAX_NATURAL_PLANET_LEVEL: initArgs.MAX_NATURAL_PLANET_LEVEL,
             TIME_FACTOR_HUNDREDTHS: initArgs.TIME_FACTOR_HUNDREDTHS,
@@ -243,6 +245,10 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         emit AdminPlanetCreated(args.location);
     }
 
+    function changeDestroyThreshold(uint256 newThreshold) public onlyAdmin {
+            s.gameConstants.DESTROY_THRESHOLD = newThreshold;
+    }
+    
     //////////////////////
     /// Game Mechanics ///
     //////////////////////
