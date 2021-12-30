@@ -809,7 +809,7 @@ describe('DarkForestArtifacts', function () {
   });
 
   describe('black domain', function () {
-    it('is burnt after usage, and prevents moves from being made to it and from it', async function () {
+    it.skip('is burnt after usage, and prevents moves from being made to it and from it', async function () {
       const to = LVL0_PLANET;
       const dist = 50;
       const shipsSent = 10000;
@@ -853,8 +853,61 @@ describe('DarkForestArtifacts', function () {
 
       // moves from destroyed planets also don't work
       await expect(
-        world.user1Core.move(...makeMoveArgs(SPAWN_PLANET_1, to, dist, shipsSent, silverSent))
+        world.user1Core.move(...makeMoveArgs(to, SPAWN_PLANET_1, dist, shipsSent, silverSent))
       ).to.be.revertedWith('planet is destroyed');
+    });
+
+    it('is burnt after usage and move is a no-op', async function () {
+      const to = LVL0_PLANET;
+      const dist = 50;
+      const shipsSent = 10000;
+      const silverSent = 0;
+
+      await world.user1Core.move(...makeMoveArgs(SPAWN_PLANET_1, to, dist, shipsSent, silverSent));
+      await increaseBlockchainTime();
+
+      await world.user1Core.refreshPlanet(to.id);
+      const conqueredSecondPlanet = await world.user1Core.planets(to.id);
+      expect(conqueredSecondPlanet.owner).to.eq(world.user1.address);
+
+      const newTokenId = hexToBigNumber('1');
+      await world.contracts.tokens.createArtifact({
+        tokenId: newTokenId,
+        discoverer: world.user1.address,
+        planetId: 1, // planet id
+        rarity: 1, // rarity
+        biome: 1, // biome
+        artifactType: 9, // black domain
+        owner: world.user1.address,
+      });
+      await world.user1Core.depositArtifact(LVL3_SPACETIME_1.id, newTokenId);
+      await world.user1Core.move(...makeMoveArgs(LVL3_SPACETIME_1, to, 0, 500000, 0, newTokenId));
+      await world.user1Core.activateArtifact(to.id, newTokenId, 0);
+
+      // black domain is no longer on a planet (is instead owned by contract), and so is effectively burned
+      const blackDomainPostActivation = await world.contracts.getters.getArtifactById(newTokenId);
+      expect(blackDomainPostActivation.locationId.toString()).to.eq('0');
+
+      // check the planet is destroyed
+      const newInfo = await world.user1Core.planetsExtendedInfo(to.id);
+      expect(newInfo.destroyed).to.eq(true);
+
+
+      await increaseBlockchainTime();
+      
+      const refreshTx = await world.user1Core.refreshPlanet(SPAWN_PLANET_1.id);
+      await  refreshTx.wait();
+
+      const newP = await world.user1Core.planets(SPAWN_PLANET_1.id);
+
+      // moves to destroyed planets work
+      await world.user1Core.move(...makeMoveArgs(SPAWN_PLANET_1, to, dist, shipsSent, silverSent))
+
+      // moves from destroyed planets also don't work
+      await world.user1Core.move(...makeMoveArgs(to, SPAWN_PLANET_1, dist, shipsSent, silverSent))
+
+      const currP = await world.user1Core.planets(SPAWN_PLANET_1.id);
+      expect(newP.population).to.equal(currP.population);
     });
 
     it("can't be used on a planet of too high level", async function () {
