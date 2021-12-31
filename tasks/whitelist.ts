@@ -147,8 +147,9 @@ async function noKeyWhitelistRegister(args: { path: string }, hre: HardhatRuntim
   const prevPlayers = await whitelist.numPlayers();
   console.log('num whitelisted players before adding:', prevPlayers.toNumber());
 
-  const allowedAccounts = await whitelist.bulkGetWhitelistIds(hre.ethers.constants.Zero, prevPlayers);
-  /// console.log('allowed accounts', allowedAccounts);
+  const allowedAccounts = await whitelist.bulkGetWhitelistIds(hre.ethers.constants.Zero, prevPlayers) as string[];
+  const lowerCaseAccounts = allowedAccounts.map(acc => acc.toLowerCase());
+  console.log('allowed accounts', allowedAccounts);
 
   let addresses = "";
   console.log("path", args.path);
@@ -164,13 +165,15 @@ async function noKeyWhitelistRegister(args: { path: string }, hre: HardhatRuntim
 
   // also filter for whitelisted addresses that are already in game.
   let validAddresses = finalAddresses
+      .map(acc => acc.toLowerCase())
       .filter(hre.ethers.utils.isAddress)
-      .filter(acc => !allowedAccounts.includes(acc)); // Filter out accounts that are already whitelisted.
+      .filter(acc => !lowerCaseAccounts.includes(acc)); // Filter out accounts that are already whitelisted.
   
   const slice = 100;
 
-  validAddresses = validAddresses.slice(0,500);
+  validAddresses = validAddresses.slice(0,slice);
 
+  console.log('validAddresses', validAddresses)
   console.log("total players to add", validAddresses.length);
   console.log(`require ${parseFloat(drip) * validAddresses.length} < ${prevBalanceEth} in contract`);
 
@@ -201,10 +204,11 @@ async function noKeyWhitelistRegister(args: { path: string }, hre: HardhatRuntim
     console.log(parseFloat(drip));
     console.log("expected amount in whitelist", parseFloat(drip) * addressChunk.length);
   
-    if( parseFloat(drip) * addressChunk.length > parseFloat(hre.ethers.utils.formatEther(prevBalance))) {
+    if(parseFloat(drip) * addressChunk.length > parseFloat(hre.ethers.utils.formatEther(prevBalance))) {
       console.log("not enough eth in contract. Add more before whitelisting");
       break;
     }
+
     console.log('whitelist balance before adding:', parseFloat(hre.ethers.utils.formatEther(prevBalance)));
 
     const prevPlayers = await whitelist.numPlayers();
