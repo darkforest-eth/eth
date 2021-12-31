@@ -63,7 +63,7 @@ type Planet @entity {
   isRevealed: Boolean!
   "planet's x,y coordinate, if revealed"
   revealedCoordinate: RevealedCoordinate
-  radius: Int!
+  revealedRadius: Int!
 
   # artifacts
   hasTriedFindingArtifact: Boolean!

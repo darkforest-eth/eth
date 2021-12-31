@@ -1,9 +1,9 @@
 /* eslint-disable eqeqeq */
 import { BigDecimal, BigInt } from '@graphprotocol/graph-ts';
-import { Arrival, Planet } from '../../generated/schema';
+import { Arrival, Planet, Player } from '../../generated/schema';
 
 function hasOwner(planet: Planet): boolean {
-  return planet.owner !== '0x0000000000000000000000000000000000000000';
+  return planet.owner != '0x0000000000000000000000000000000000000000';
 }
 
 function getSilverOverTime(planet: Planet, startTimeS: i32, endTimeS: i32): BigInt {
@@ -95,7 +95,7 @@ export function arrive(toPlanet: Planet, arrival: Arrival): Planet {
   // apply energy
   const shipsMoved = arrival.milliEnergyArriving;
 
-  if (arrival.player !== toPlanet.owner) {
+  if (arrival.player != toPlanet.owner) {
     // attacking enemy - includes emptyAddress
     const effectiveEnergy = shipsMoved
       .times(BigInt.fromI32(100))
@@ -110,6 +110,19 @@ export function arrive(toPlanet: Planet, arrival: Arrival): Planet {
     } else {
       // conquers planet
       // if(criteria) toPlanet.destroyed = true;
+      // DESTROY_THRESHOLD is hard coded.
+      const DESTROY_THRESHOLD = 2;
+      if(hasOwner(toPlanet) && DESTROY_THRESHOLD > 0) {
+        if(effectiveEnergy.gt(toPlanet.milliEnergyLazy.times(BigInt.fromI32(DESTROY_THRESHOLD)))) {
+          toPlanet.destroyed = true;
+          const player = Player.load(arrival.player);
+          if (player) {
+            const scoreToAdd = BigInt.fromI32(i32(Math.pow(4,toPlanet.planetLevel)));
+            player.destroyedScore = player.destroyedScore.plus(scoreToAdd);
+            player.save();
+          } 
+        }
+      }
       toPlanet.owner = arrival.player;
       const effectiveDefendingEnergy = toPlanet.milliEnergyLazy
         .times(BigInt.fromI32(toPlanet.defense))
