@@ -48,10 +48,8 @@ export function shrinkAlgorithm(
       ) 
       / Math.pow(totalTime,shrinkFactor);
 
-  console.log("pre min check radius is %s", radius);
   // // set minimum
   if (radius < minRadius) radius = minRadius;
-  console.log("post min check radius is %s", radius);
 
   return Math.floor(radius);
 }
