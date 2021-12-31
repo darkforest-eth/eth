@@ -110,6 +110,14 @@ export function arrive(toPlanet: Planet, arrival: Arrival): Planet {
     } else {
       // conquers planet
       // if(criteria) toPlanet.destroyed = true;
+      // DESTROY_THRESHOLD is hard coded.
+      // const DESTROY_THRESHOLD = 2;
+      // if(hasOwner(toPlanet) && DESTROY_THRESHOLD > 0) {
+      //   if(effectiveEnergy > toPlanet.milliEnergyLazy.times(BigInt.fromI32(DESTROY_THRESHOLD))) {
+      //     toPlanet.destroyed = true;
+      //   }
+      // }
+
       toPlanet.owner = arrival.player;
       const effectiveDefendingEnergy = toPlanet.milliEnergyLazy
         .times(BigInt.fromI32(toPlanet.defense))
