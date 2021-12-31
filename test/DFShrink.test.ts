@@ -115,8 +115,8 @@ describe('DarkForestShrink', function () {
     beforeEach(async function () {
       world = await fixtureLoader(defaultWorldFixture);
 
-      await world.contracts.core.adminSetWorldRadius(initializers.INITIAL_WORLD_RADIUS);
-      await world.user1Core.initializePlayer(...makeInitArgs(SPAWN_PLANET_1, SPAWN_PLANET_1.distFromOrigin));
+      // await world.contracts.core.adminSetWorldRadius(initializers.INITIAL_WORLD_RADIUS);
+      await world.user1Core.initializePlayer(...makeInitArgs(SPAWN_PLANET_1));
 
       // Conquer MINE_REGULAR and LVL3_SPACETIME_1 to accumulate silver
       await conquerUnownedPlanet(world, world.user1Core, SPAWN_PLANET_1, LVL1_ASTEROID_1);
