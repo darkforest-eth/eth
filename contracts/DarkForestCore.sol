@@ -170,7 +170,7 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
     //////////////
 
     // Private helpers that modify state
-    function _updateWorldRadius() private {
+    function _updateWorldRadius() public {
         if (!s.WORLD_RADIUS_LOCKED) {
             s.worldRadius = DarkForestUtils._getRadius();
             emit RadiusUpdated(s.worldRadius);
