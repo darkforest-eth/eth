@@ -129,10 +129,15 @@ task(
     'file path to csv of addresses',
     undefined,
     types.string
+)  .addOptionalParam(
+  'drip',
+  'whether to drip players or not',
+  undefined,
+  types.boolean
 )
 .setAction(noKeyWhitelistRegister);
 
-async function noKeyWhitelistRegister(args: { path: string }, hre: HardhatRuntimeEnvironment) {
+async function noKeyWhitelistRegister(args: { path: string, drip?: boolean }, hre: HardhatRuntimeEnvironment) {
   await hre.run('utils:assertChainId');
 
   const whitelist: Whitelist = await hre.run('utils:getWhitelist');
@@ -150,7 +155,7 @@ async function noKeyWhitelistRegister(args: { path: string }, hre: HardhatRuntim
 
   const allowedAccounts = await whitelist.bulkGetWhitelistIds(hre.ethers.constants.Zero, prevPlayers) as string[];
   const lowerCaseAccounts = allowedAccounts.map(acc => acc.toLowerCase());
-  console.log('allowed accounts', lowerCaseAccounts);
+  console.log('allowed accounts', lowerCaseAccounts.length);
 
   let addresses = "";
   console.log("path", args.path);
@@ -172,13 +177,13 @@ async function noKeyWhitelistRegister(args: { path: string }, hre: HardhatRuntim
   
   const slice = 100;
 
-  validAddresses = validAddresses.slice(0,slice);
+  // validAddresses = validAddresses.slice(0,slice);
 
-  console.log('validAddresses', validAddresses)
+  // console.log('validAddresses', validAddresses)
   console.log("total players to add", validAddresses.length);
   console.log(`require ${parseFloat(drip) * validAddresses.length} < ${prevBalanceEth} in contract`);
 
-  if( (parseFloat(drip) * validAddresses.length) >= prevBalanceEth) {
+  if(args.drip && (parseFloat(drip) * validAddresses.length) >= prevBalanceEth) {
     console.log("not enough eth in contract. Add more before whitelisting");
     return;
   }
@@ -199,39 +204,41 @@ async function noKeyWhitelistRegister(args: { path: string }, hre: HardhatRuntim
       continue;
     }
 
-    const prevBalance = await hre.ethers.provider.getBalance(whitelist.address);
-
-    console.log("drip", drip);
-    console.log(parseFloat(drip));
-    console.log("expected amount in whitelist", parseFloat(drip) * addressChunk.length);
-  
-    if(parseFloat(drip) * addressChunk.length > parseFloat(hre.ethers.utils.formatEther(prevBalance))) {
-      console.log("not enough eth in contract. Add more before whitelisting");
-      break;
-    }
-
-    console.log('whitelist balance before adding:', parseFloat(hre.ethers.utils.formatEther(prevBalance)));
-
-    const prevPlayers = await whitelist.numPlayers();
-    console.log('num whitelisted players before adding:', prevPlayers.toNumber());
-
-    const addTx = await whitelist.addAndDripPlayers(addressChunk);
-    await addTx.wait();
-
-    const currBalance = await hre.ethers.provider.getBalance(whitelist.address);
-    console.log('whitelist balance after adding:', hre.ethers.utils.formatEther(currBalance));
-
-    const currPlayers = await whitelist.numPlayers();
-    console.log('num whitelisted players after adding:', currPlayers.toNumber());
-
-    const newPlayers = currPlayers.sub(prevPlayers).toNumber()
-    if(newPlayers != addressChunk.length) {
-      console.log("WARNING: not all players in list were successfully added");
-    }
+    try {
+      const prevBalance = await hre.ethers.provider.getBalance(whitelist.address);
+      console.log("expected amount in whitelist", parseFloat(drip) * addressChunk.length);
     
-    const sentAmount = hre.ethers.utils.formatEther(prevBalance.sub(currBalance));
-
-    console.log(`[${new Date()}] Registered ${newPlayers} players with $${sentAmount} xDAI.`);
+      if(args.drip && parseFloat(drip) * addressChunk.length > parseFloat(hre.ethers.utils.formatEther(prevBalance))) {
+        console.log("not enough eth in contract. Add more before whitelisting");
+        break;
+      }
+  
+      console.log('whitelist balance before adding:', parseFloat(hre.ethers.utils.formatEther(prevBalance)));
+  
+      const prevPlayers = await whitelist.numPlayers();
+      console.log('num whitelisted players before adding:', prevPlayers.toNumber());
+  
+      const addTx = await whitelist.addAndDripPlayers(addressChunk);
+      await addTx.wait();
+  
+      const currBalance = await hre.ethers.provider.getBalance(whitelist.address);
+      console.log('whitelist balance after adding:', hre.ethers.utils.formatEther(currBalance));
+  
+      const currPlayers = await whitelist.numPlayers();
+      console.log('num whitelisted players after adding:', currPlayers.toNumber());
+  
+      const newPlayers = currPlayers.sub(prevPlayers).toNumber()
+      if(newPlayers != addressChunk.length) {
+        console.log("WARNING: not all players in list were successfully added");
+      }
+      
+      const sentAmount = hre.ethers.utils.formatEther(prevBalance.sub(currBalance));
+  
+      console.log(`[${new Date()}] Registered ${newPlayers} players with $${sentAmount} xDAI.`);
+      
+    } catch (error) {
+      console.log("chunk add failed", error);
+    }
   }
 }
 
