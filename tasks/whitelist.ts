@@ -136,6 +136,7 @@ async function noKeyWhitelistRegister(args: { path: string }, hre: HardhatRuntim
   await hre.run('utils:assertChainId');
 
   const whitelist: Whitelist = await hre.run('utils:getWhitelist');
+  console.log("whitelis address", whitelist.address);
 
   const drip = hre.ethers.utils.formatEther(await whitelist.drip());
   console.log("drip", drip);
@@ -149,7 +150,7 @@ async function noKeyWhitelistRegister(args: { path: string }, hre: HardhatRuntim
 
   const allowedAccounts = await whitelist.bulkGetWhitelistIds(hre.ethers.constants.Zero, prevPlayers) as string[];
   const lowerCaseAccounts = allowedAccounts.map(acc => acc.toLowerCase());
-  console.log('allowed accounts', allowedAccounts);
+  console.log('allowed accounts', lowerCaseAccounts);
 
   let addresses = "";
   console.log("path", args.path);
