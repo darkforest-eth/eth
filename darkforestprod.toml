@@ -1,0 +1,105 @@
+# Configuration for a Dark Forest universe
+# Defined in TOML as per https://toml.io/en/v0.5.0
+
+[initializers]
+ADMIN_CAN_ADD_PLANETS = true
+WORLD_RADIUS_LOCKED = false
+TOKEN_MINT_END_TIMESTAMP = 2022-01-05T07:59:59.000Z # Jan 4, 2022, 11:59:59 PM (PST)
+TARGET4_RADIUS = 1600
+INITIAL_WORLD_RADIUS = 300000 # 300000
+
+##################################
+# SNARK keys & Perlin parameters #
+##################################
+DISABLE_ZK_CHECKS = false
+PLANETHASH_KEY = 2178
+SPACETYPE_KEY = 2179
+BIOMEBASE_KEY = 2170
+PERLIN_MIRROR_X = false
+PERLIN_MIRROR_Y = false
+PERLIN_LENGTH_SCALE = 16384 # must be a power of two no greater than 16384
+
+######################
+# Game configuration #
+######################
+SHRINK = 2 # No shrink if 0
+SHRINK_START = 2022-01-01T20:00:00.000Z # Jan 1, 2022, 12:00:00 PM 
+ROUND_END = 2022-01-05T07:59:59.000Z # Jan 4, 2022, 11:59:59 PM (PST)
+MIN_RADIUS = 60000 # SHOULD be 20% of INITIAL_WORLD_RADIUS.
+DESTROY_THRESHOLD = 2
+MAX_NATURAL_PLANET_LEVEL = 256
+TIME_FACTOR_HUNDREDTHS = 500 # speedup/slowdown game
+PERLIN_THRESHOLD_1 = 1
+PERLIN_THRESHOLD_2 = 2
+PERLIN_THRESHOLD_3 = 18
+INIT_PERLIN_MIN = 1
+INIT_PERLIN_MAX = 31
+SPAWN_RIM_AREA = 0
+BIOME_THRESHOLD_1 = 15
+BIOME_THRESHOLD_2 = 17
+PLANET_RARITY = 16384
+PHOTOID_ACTIVATION_DELAY = 14400 # seconds
+LOCATION_REVEAL_COOLDOWN = 1800 # seconds -> 30 minutes
+CLAIM_PLANET_COOLDOWN = 10800 # seconds
+PLANET_TYPE_WEIGHTS = [
+  [
+    [1, 0, 0, 0, 0],
+    [13, 2, 0, 1, 0],
+    [13, 2, 0, 1, 0],
+    [13, 2, 0, 0, 1],
+    [13, 2, 0, 0, 1],
+    [13, 2, 0, 0, 1],
+    [13, 2, 0, 0, 1],
+    [13, 2, 0, 0, 1],
+    [13, 2, 0, 0, 1],
+    [13, 2, 0, 0, 1],
+  ],
+  [
+    [1, 0, 0, 0, 0],
+    [13, 2, 1, 0, 0],
+    [12, 2, 1, 1, 0],
+    [11, 2, 1, 1, 1],
+    [12, 2, 1, 0, 1],
+    [12, 2, 1, 0, 1],
+    [12, 2, 1, 0, 1],
+    [12, 2, 1, 0, 1],
+    [12, 2, 1, 0, 1],
+    [12, 2, 1, 0, 1],
+  ],
+  [
+    [1, 0, 0, 0, 0],
+    [10, 4, 2, 0, 0],
+    [10, 4, 1, 1, 0],
+    [8, 4, 1, 2, 1],
+    [8, 4, 1, 2, 1],
+    [8, 4, 1, 2, 1],
+    [8, 4, 1, 2, 1],
+    [8, 4, 1, 2, 1],
+    [8, 4, 1, 2, 1],
+    [8, 4, 1, 2, 1],
+  ],
+  [
+    [1, 0, 0, 0, 0],
+    [11, 4, 1, 0, 0],
+    [11, 4, 1, 0, 0],
+    [7, 4, 2, 2, 1],
+    [7, 4, 2, 2, 1],
+    [7, 4, 2, 2, 1],
+    [7, 4, 2, 2, 1],
+    [7, 4, 2, 2, 1],
+    [7, 4, 2, 2, 1],
+    [7, 4, 2, 2, 1],
+  ],
+]
+
+
+##########################
+# Planets to add to game #
+##########################
+[[planets]]
+  x = 0
+  y = 0
+  level = 9
+  planetType = 3
+  requireValidLocationId = false
+  revealLocation = true
