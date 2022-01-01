@@ -141,7 +141,7 @@ async function noKeyWhitelistRegister(args: { path: string, drip?: boolean }, hr
   await hre.run('utils:assertChainId');
 
   const whitelist: Whitelist = await hre.run('utils:getWhitelist');
-  console.log("whitelis address", whitelist.address);
+  console.log("whitelist address", whitelist.address);
 
   const drip = hre.ethers.utils.formatEther(await whitelist.drip());
   console.log("drip", drip);
@@ -182,12 +182,13 @@ async function noKeyWhitelistRegister(args: { path: string, drip?: boolean }, hr
   // console.log('validAddresses', validAddresses)
   console.log("total players to add", validAddresses.length);
   console.log(`require ${parseFloat(drip) * validAddresses.length} < ${prevBalanceEth} in contract`);
-
+  
   if(args.drip && (parseFloat(drip) * validAddresses.length) >= prevBalanceEth) {
     console.log("not enough eth in contract. Add more before whitelisting");
     return;
   }
-  
+  return;
+
   if(validAddresses.length === 0) {
     console.log("no valid addresses to register");
     return;
