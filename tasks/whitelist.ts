@@ -125,22 +125,67 @@ task(
   'path to csv file of addresses'
 ) 
   .addParam(
-    'path',
-    'file path to csv of addresses',
+      'path',
+      'file path to csv of addresses',
+      undefined,
+      types.string
+  ) 
+  .addOptionalParam(
+    'drip',
+    'if true, will fail if drip can\'t happen',
+    undefined,
+    types.boolean
+  )
+  .addOptionalParam(
+    'dry',
+    'if true, will report number of players to add but won\'t add them',
+    undefined,
+    types.boolean
+  )
+  .setAction(noKeyWhitelistRegister);
+
+async function noKeyWhitelistRegister(args: { path: string, drip?: boolean, dry?: boolean }, hre: HardhatRuntimeEnvironment) {
+  await hre.run('utils:assertChainId');
+
+  let addresses = "";
+  console.log("path", args.path);
+  addresses = fs.readFileSync(args.path, 'utf8')
+  // remove new line 
+  addresses = addresses.replace(/\n|\r/g,'');
+  if(!addresses) {
+    console.log("failed to read addresses");
+    return;
+  }
+  else {
+    await hre.run('whitelist-nokey:registerList', { args });
+  }
+}
+
+subtask('whitelist-nokey:registerList', 'add list of addresses to whitelist')
+  .addParam(
+    'list',
+    'csv string of addresses',
     undefined,
     types.string
-)  .addOptionalParam(
-  'drip',
-  'whether to drip players or not',
-  undefined,
-  types.boolean
-)
-.setAction(noKeyWhitelistRegister);
+  )  .addOptionalParam(
+    'drip',
+    'if true, will fail if drip can\'t happen',
+    undefined,
+    types.boolean
+  )
+  .addOptionalParam(
+    'dry',
+    'if true, will report number of players to add but won\'t add them',
+    undefined,
+    types.boolean
+  )
+  .setAction(noKeyWhitelistRegisterList);
 
-async function noKeyWhitelistRegister(args: { path: string, drip?: boolean }, hre: HardhatRuntimeEnvironment) {
+async function noKeyWhitelistRegisterList(args: { list: string, drip?: boolean, dry?: boolean }, hre: HardhatRuntimeEnvironment) {
   await hre.run('utils:assertChainId');
 
   const whitelist: Whitelist = await hre.run('utils:getWhitelist');
+
   console.log("whitelist address", whitelist.address);
 
   const drip = hre.ethers.utils.formatEther(await whitelist.drip());
@@ -157,17 +202,7 @@ async function noKeyWhitelistRegister(args: { path: string, drip?: boolean }, hr
   const lowerCaseAccounts = allowedAccounts.map(acc => acc.toLowerCase());
   console.log('allowed accounts', lowerCaseAccounts.length);
 
-  let addresses = "";
-  console.log("path", args.path);
-  addresses = fs.readFileSync(args.path, 'utf8')
-  // remove new line 
-  addresses = addresses.replace(/\n|\r/g,'');
-  if(!addresses) {
-    console.log("failed to read addresses");
-    return;
-  }
-
-  const finalAddresses = addresses.split(',');
+  const finalAddresses = args.list.split(',');
 
   // also filter for whitelisted addresses that are already in game.
   let validAddresses = finalAddresses
@@ -177,9 +212,6 @@ async function noKeyWhitelistRegister(args: { path: string, drip?: boolean }, hr
   
   const slice = 100;
 
-  // validAddresses = validAddresses.slice(0,slice);
-
-  // console.log('validAddresses', validAddresses)
   console.log("total players to add", validAddresses.length);
   console.log(`require ${parseFloat(drip) * validAddresses.length} < ${prevBalanceEth} in contract`);
   
@@ -187,7 +219,7 @@ async function noKeyWhitelistRegister(args: { path: string, drip?: boolean }, hr
     console.log("not enough eth in contract. Add more before whitelisting");
     return;
   }
-  return;
+  if(args.dry) return;
 
   if(validAddresses.length === 0) {
     console.log("no valid addresses to register");
@@ -242,6 +274,7 @@ async function noKeyWhitelistRegister(args: { path: string, drip?: boolean }, hr
     }
   }
 }
+
 
 task(
   'whitelist:register',
