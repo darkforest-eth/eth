@@ -189,10 +189,10 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
     /// Administrative Engine ///
     /////////////////////////////
 
-    function changeAdmin(address _newAdmin) public onlyAdmin {
-        require(_newAdmin != address(0), "newOwner cannot be 0x0");
-        s.adminAddress = _newAdmin;
-    }
+    // function changeAdmin(address _newAdmin) public onlyAdmin {
+    //     require(_newAdmin != address(0), "newOwner cannot be 0x0");
+    //     s.adminAddress = _newAdmin;
+    // }
 
     function pause() public onlyAdmin {
         require(!s.paused, "Game is already paused");
