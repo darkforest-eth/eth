@@ -36,7 +36,6 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         uint256 to,
         uint256 artifactId
     );
-    event AdminPlanetCreated(uint256 loc);
     event PlanetUpgraded(address player, uint256 loc, uint256 branch, uint256 toBranchLevel); // emitted in DFPlanet library
     event PlanetHatBought(address player, uint256 loc, uint256 tohatLevel);
     event PlanetTransferred(address sender, uint256 loc, address receiver);
@@ -54,13 +53,9 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
     // initialization functions are only called once during deployment. They are not called during upgrades.
 
     function initialize(
-        address _adminAddress,
-        address payable _whitelistAddress,
         address payable _tokensAddress,
         DarkForestTypes.DFInitArgs memory initArgs
     ) public initializer {
-        s.adminAddress = _adminAddress;
-        s.whitelist = Whitelist(_whitelistAddress);
         s.tokens = DarkForestTokens(_tokensAddress);
 
         s.planetLevelsCount = 10;
@@ -79,7 +74,6 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         s.paused = false;
 
         s.snarkConstants = DarkForestTypes.SnarkConstants({
-            DISABLE_ZK_CHECKS: initArgs.DISABLE_ZK_CHECKS,
             PLANETHASH_KEY: initArgs.PLANETHASH_KEY,
             SPACETYPE_KEY: initArgs.SPACETYPE_KEY,
             BIOMEBASE_KEY: initArgs.BIOMEBASE_KEY,
@@ -106,9 +100,7 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         });
 
         s.worldRadius = initArgs.INITIAL_WORLD_RADIUS; // will be overridden by TARGET4_RADIUS if !WORLD_RADIUS_LOCKED
-        s.ADMIN_CAN_ADD_PLANETS = initArgs.ADMIN_CAN_ADD_PLANETS;
         s.WORLD_RADIUS_LOCKED = initArgs.WORLD_RADIUS_LOCKED;
-        s.TOKEN_MINT_END_TIMESTAMP = initArgs.TOKEN_MINT_END_TIMESTAMP;
         s.TARGET4_RADIUS = initArgs.TARGET4_RADIUS;
 
         DarkForestInitialize.initializeDefaults();
@@ -122,37 +114,6 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         }
 
         _updateWorldRadius();
-    }
-
-    //////////////////////
-    /// ACCESS CONTROL ///
-    //////////////////////
-    modifier onlyAdmin() {
-        require(msg.sender == s.adminAddress, "Sender is not a game master");
-        _;
-    }
-
-    modifier onlyWhitelisted() {
-        require(
-            s.whitelist.isWhitelisted(msg.sender) || msg.sender == s.adminAddress,
-            "Player is not whitelisted"
-        );
-        _;
-    }
-
-    modifier disabled() {
-        require(false, "This functionality is disabled for the current round.");
-        _;
-    }
-
-    modifier notPaused() {
-        require(!s.paused, "Game is paused");
-        _;
-    }
-
-    modifier notTokenEnded() {
-        require(block.timestamp < s.TOKEN_MINT_END_TIMESTAMP, "Token mint period has ended");
-        _;
     }
 
     //////////////
@@ -174,79 +135,11 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         DarkForestPlanet.initializePlanetWithDefaults(location, perlin, isHomePlanet);
     }
 
-    /////////////////////////////
-    /// Administrative Engine ///
-    /////////////////////////////
-
-    function changeAdmin(address _newAdmin) public onlyAdmin {
-        require(_newAdmin != address(0), "newOwner cannot be 0x0");
-        s.adminAddress = _newAdmin;
-    }
-
-    function pause() public onlyAdmin {
-        require(!s.paused, "Game is already paused");
-        s.paused = true;
-    }
-
-    function unpause() public onlyAdmin {
-        require(s.paused, "Game is already unpaused");
-        s.paused = false;
-    }
-
-    function setOwner(uint256 planetId, address newOwner) public onlyAdmin {
-        s.planets[planetId].owner = newOwner;
-    }
-
-    function changeTarget4RadiusConstant(uint256 _newConstant) public onlyAdmin {
-        s.TARGET4_RADIUS = _newConstant;
-        _updateWorldRadius();
-    }
-
-    function adminSetWorldRadius(uint256 _newRadius) public onlyAdmin {
-        s.worldRadius = _newRadius;
-    }
-
-    function changeLocationRevealCooldown(uint256 newCooldown) public onlyAdmin {
-        s.gameConstants.LOCATION_REVEAL_COOLDOWN = newCooldown;
-    }
-
-    function withdraw() public onlyAdmin {
-        // TODO: Don't send to msg.sender, instead send to contract admin
-        payable(msg.sender).transfer(address(this).balance);
-    }
-
-    function setTokenMintEndTime(uint256 newTokenMintEndTime) public onlyAdmin {
-        s.TOKEN_MINT_END_TIMESTAMP = newTokenMintEndTime;
-    }
-
-    function createPlanet(DarkForestTypes.AdminCreatePlanetArgs memory args) public onlyAdmin {
-        require(s.ADMIN_CAN_ADD_PLANETS, "admin can no longer add planets");
-        if (args.requireValidLocationId) {
-            require(DarkForestUtils._locationIdValid(args.location), "Not a valid planet location");
-        }
-        DarkForestTypes.SpaceType spaceType = DarkForestUtils.spaceTypeFromPerlin(args.perlin);
-        DarkForestPlanet._initializePlanet(
-            DarkForestTypes.DFPInitPlanetArgs(
-                args.location,
-                args.perlin,
-                args.level,
-                s.gameConstants.TIME_FACTOR_HUNDREDTHS,
-                spaceType,
-                args.planetType,
-                false
-            )
-        );
-        s.planetIds.push(args.location);
-        s.initializedPlanetCountByLevel[args.level] += 1;
-
-        emit AdminPlanetCreated(args.location);
-    }
-
     //////////////////////
     /// Game Mechanics ///
     //////////////////////
 
-    function refreshPlanet(uint256 location) public notPaused {
+    function refreshPlanet(uint256 location) public {
         DarkForestPlanet.refreshPlanet(location);
     }
 
@@ -269,9 +162,7 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         uint256[2] memory _c,
         uint256[9] memory _input
     ) public view returns (bool) {
-        if (!s.snarkConstants.DISABLE_ZK_CHECKS) {
-            require(Verifier.verifyRevealProof(_a, _b, _c, _input), "Failed reveal pf check");
-        }
+        require(Verifier.verifyRevealProof(_a, _b, _c, _input), "Failed reveal pf check");
 
         DarkForestUtils.revertIfBadSnarkPerlinFlags(
             [_input[4], _input[5], _input[6], _input[7], _input[8]],
@@ -286,7 +177,7 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         uint256[2][2] memory _b,
         uint256[2] memory _c,
         uint256[9] memory _input
-    ) public onlyWhitelisted returns (uint256) {
+    ) public returns (uint256) {
         require(checkRevealProof(_a, _b, _c, _input), "Failed reveal pf check");
 
         if (!s.planetsExtendedInfo[_input[0]].isInitialized) {
@@ -298,7 +189,6 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
             _input[1],
             _input[2],
             _input[3],
-            msg.sender != s.adminAddress
         );
         emit LocationRevealed(msg.sender, _input[0], _input[2], _input[3]);
     }
@@ -308,10 +198,8 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         uint256[2][2] memory _b,
         uint256[2] memory _c,
         uint256[8] memory _input
-    ) public onlyWhitelisted returns (uint256) {
-        if (!s.snarkConstants.DISABLE_ZK_CHECKS) {
-            require(Verifier.verifyInitProof(_a, _b, _c, _input), "Failed init proof check");
-        }
+    ) public returns (uint256) {
+        require(Verifier.verifyInitProof(_a, _b, _c, _input), "Failed init proof check");
 
         uint256 _location = _input[0];
         uint256 _perlin = _input[1];
@@ -346,7 +234,7 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         uint256[2][2] memory _b,
         uint256[2] memory _c,
         uint256[13] memory _input
-    ) public notPaused returns (uint256) {
+    ) public returns (uint256) {
         DarkForestUtils.revertIfBadSnarkPerlinFlags(
             [_input[5], _input[6], _input[7], _input[8], _input[9]],
             false
@@ -361,22 +249,20 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         uint256 silverMoved = _input[11];
         uint256 movedArtifactId = _input[12];
 
-        if (!s.snarkConstants.DISABLE_ZK_CHECKS) {
-            uint256[10] memory _proofInput =
-                [
-                    oldLoc,
-                    newLoc,
-                    newPerlin,
-                    newRadius,
-                    maxDist,
-                    _input[5],
-                    _input[6],
-                    _input[7],
-                    _input[8],
-                    _input[9]
-                ];
-            require(Verifier.verifyMoveProof(_a, _b, _c, _proofInput), "Failed move proof check");
-        }
+        uint256[10] memory _proofInput =
+            [
+                oldLoc,
+                newLoc,
+                newPerlin,
+                newRadius,
+                maxDist,
+                _input[5],
+                _input[6],
+                _input[7],
+                _input[8],
+                _input[9]
+            ];
+        require(Verifier.verifyMoveProof(_a, _b, _c, _proofInput), "Failed move proof check");
 
         // check radius
         require(newRadius <= s.worldRadius, "Attempting to move out of bounds");
@@ -425,7 +311,7 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         return (_location, _branch);
     }
 
-    function transferOwnership(uint256 _location, address _player) public notPaused {
+    function transferOwnership(uint256 _location, address _player) public {
         require(
             s.planetsExtendedInfo[_location].isInitialized == true,
             "Planet is not initialized"
@@ -471,7 +357,7 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         uint256[2][2] memory _b,
         uint256[2] memory _c,
         uint256[7] memory _input
-    ) public notPaused notTokenEnded {
+    ) public notTokenEnded {
         uint256 planetId = _input[0];
         uint256 biomebase = _input[1];
 
@@ -482,12 +368,10 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
 
         refreshPlanet(planetId);
 
-        if (!s.snarkConstants.DISABLE_ZK_CHECKS) {
-            require(
-                Verifier.verifyBiomebaseProof(_a, _b, _c, _input),
-                "biome zkSNARK failed doesn't check out"
-            );
-        }
+        require(
+            Verifier.verifyBiomebaseProof(_a, _b, _c, _input),
+            "biome zkSNARK failed doesn't check out"
+        );
 
         uint256 foundArtifactId =
             DarkForestArtifactUtils.findArtifact(
@@ -497,7 +381,7 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         emit ArtifactFound(msg.sender, foundArtifactId, planetId);
     }
 
-    function depositArtifact(uint256 locationId, uint256 artifactId) public notPaused {
+    function depositArtifact(uint256 locationId, uint256 artifactId) public {
         // should this be implemented as logic that is triggered when a player sends
         // an artifact to the contract with locationId in the extra data?
         // might be better use of the ERC721 standard - can use safeTransfer then
@@ -510,7 +394,7 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
 
     // withdraws the given artifact from the given planet. you must own the planet,
     // the artifact must be on the given planet
-    function withdrawArtifact(uint256 locationId, uint256 artifactId) public notPaused {
+    function withdrawArtifact(uint256 locationId, uint256 artifactId) public {
         refreshPlanet(locationId);
 
         DarkForestArtifactUtils.withdrawArtifact(locationId, artifactId);
@@ -525,7 +409,7 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
         uint256 locationId,
         uint256 artifactId,
         uint256 wormholeTo
-    ) public notPaused {
+    ) public {
         refreshPlanet(locationId);
 
         if (wormholeTo != 0) {
@@ -539,7 +423,7 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
     // if there's an activated artifact on this planet, deactivates it. otherwise reverts.
     // deactivating an artifact this debuffs the planet, and also removes whatever special
     // effect that the artifact bestowned upon this planet.
-    function deactivateArtifact(uint256 locationId) public notPaused {
+    function deactivateArtifact(uint256 locationId) public {
         refreshPlanet(locationId);
 
         DarkForestArtifactUtils.deactivateArtifact(locationId);
@@ -550,14 +434,14 @@ contract DarkForestCore is Initializable, DarkForestStorageV1 {
     // must first be 'prospected'. prospecting commits to a currently-unknown
     // seed that is used to randomly generate the artifact that will be
     // found on this planet.
-    function prospectPlanet(uint256 locationId) public notPaused {
+    function prospectPlanet(uint256 locationId) public {
         refreshPlanet(locationId);
         DarkForestArtifactUtils.prospectPlanet(locationId);
         emit PlanetProspected(msg.sender, locationId);
     }
 
     // withdraw silver
-    function withdrawSilver(uint256 locationId, uint256 amount) public notPaused {
+    function withdrawSilver(uint256 locationId, uint256 amount) public {
         refreshPlanet(locationId);
         DarkForestPlanet.withdrawSilver(locationId, amount);
         emit PlanetSilverWithdrawn(msg.sender, locationId, amount);

@@ -46,3 +46,9 @@ You can import the private key of one of the accounts `hardhat node` created and
 Account #2: 0x3097403b64fe672467345bf159f4c9c5464bd89e (100 ETH)
 Private Key: 0x67195c963ff445314e667112ab22f4a7404bad7f9746564eb409b9bb8c6aed32
 ```
+
+## Changes
+* Remove end time
+* Remove pause
+* Remove whitelist
+* Remove admin

@@ -6,17 +6,14 @@ import "./DarkForestCore.sol";
 import "./DarkForestTokens.sol";
 
 contract DarkForestGetters is Initializable {
-    address adminAddress;
     DarkForestCore coreContract;
     DarkForestTokens tokensContract;
 
     // initialization functions are only called once during deployment. They are not called during upgrades.
     function initialize(
-        address _adminAddress,
         address _coreContractAddress,
         address _tokensAddress
     ) public initializer {
-        adminAddress = _adminAddress;
         coreContract = DarkForestCore(_coreContractAddress);
         tokensContract = DarkForestTokens(_tokensAddress);
     }

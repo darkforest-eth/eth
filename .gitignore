@@ -21,3 +21,4 @@ subgraph/packages/*
 
 # Local development version of darkforest.toml
 darkforest.localhost.toml
+*.swp

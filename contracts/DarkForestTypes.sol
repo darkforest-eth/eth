@@ -64,14 +64,6 @@ library DarkForestTypes {
         RevealedCoords revealedCoords;
     }
 
-    struct AdminCreatePlanetArgs {
-        uint256 location;
-        uint256 perlin;
-        uint256 level;
-        PlanetType planetType;
-        bool requireValidLocationId;
-    }
-
     struct PlanetEventMetadata {
         uint256 id;
         PlanetEventType eventType;
@@ -113,14 +105,11 @@ library DarkForestTypes {
     }
 
     struct DFInitArgs {
-        bool ADMIN_CAN_ADD_PLANETS;
         bool WORLD_RADIUS_LOCKED;
         uint256 LOCATION_REVEAL_COOLDOWN;
-        uint256 TOKEN_MINT_END_TIMESTAMP;
-        uint256 TARGET4_RADIUS;
+        uint256 TARGET4_RADIUS; // TODO: change to TARGET_RADIUS
         uint256 INITIAL_WORLD_RADIUS;
         // SNARK keys and perlin params
-        bool DISABLE_ZK_CHECKS;
         uint256 PLANETHASH_KEY;
         uint256 SPACETYPE_KEY;
         uint256 BIOMEBASE_KEY;
@@ -284,14 +273,9 @@ library DarkForestTypes {
 
     struct GameStorage {
         // Contract housekeeping
-        address adminAddress;
-        Whitelist whitelist;
         DarkForestTokens tokens;
         // admin controls
-        bool paused;
-        bool ADMIN_CAN_ADD_PLANETS;
         bool WORLD_RADIUS_LOCKED;
-        uint256 TOKEN_MINT_END_TIMESTAMP;
         uint256 TARGET4_RADIUS;
         // Game configuration
         DarkForestTypes.SnarkConstants snarkConstants;

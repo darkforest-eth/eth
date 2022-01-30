@@ -104,15 +104,12 @@ library DarkForestPlanet {
         uint256 perlin,
         uint256 x,
         uint256 y,
-        bool checkTimestamp
     ) public {
-        if (checkTimestamp) {
-            require(
-                block.timestamp - s().players[msg.sender].lastRevealTimestamp >
-                    s().gameConstants.LOCATION_REVEAL_COOLDOWN,
-                "wait for cooldown before revealing again"
-            );
-        }
+        require(
+            block.timestamp - s().players[msg.sender].lastRevealTimestamp >
+                s().gameConstants.LOCATION_REVEAL_COOLDOWN,
+            "wait for cooldown before revealing again"
+        );
         require(s().revealedCoords[location].locationId == 0, "Location already revealed");
         s().revealedPlanetIds.push(location);
         s().revealedCoords[location] = DarkForestTypes.RevealedCoords({
