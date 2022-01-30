@@ -2,8 +2,7 @@
 # Defined in TOML as per https://toml.io/en/v0.5.0
 
 [initializers]
-WORLD_RADIUS_LOCKED = false
-TARGET4_RADIUS = 1600
+TARGET_RADIUS = 1600
 INITIAL_WORLD_RADIUS = 8000
 
 ##################################
