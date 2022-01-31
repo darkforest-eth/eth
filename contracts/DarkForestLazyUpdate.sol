@@ -127,12 +127,15 @@ library DarkForestLazyUpdate {
     function applyArrival(
         DarkForestTypes.Planet memory planet,
         DarkForestTypes.ArrivalData memory arrival
-    ) private pure returns (uint256 newArtifactOnPlanet, DarkForestTypes.Planet memory) {
+    ) private view returns (DarkForestTypes.ApplyArrivalData memory) {
         // checks whether the planet is owned by the player sending ships
+        bool isDestroyed = false;
+
         if (arrival.player == planet.owner) {
             // simply increase the population if so
             planet.population = planet.population + arrival.popArriving;
         } else {
+
             if (arrival.arrivalType == DarkForestTypes.ArrivalType.Wormhole) {
                 // if this is a wormhole arrival to a planet that isn't owned by the initiator of
                 // the move, then don't move any energy
@@ -147,6 +150,18 @@ library DarkForestLazyUpdate {
                 // reduce the arriving ships amount with the current population and the
                 // result is the new population of the planet now owned by the attacking
                 // player
+
+                // If moving to enemy planet, destroy if arriving energy > threshold.
+                // If threshold = 0, no destroy.
+                if (planet.owner != address(0) && s().gameConstants.DESTROY_THRESHOLD > 0) {
+                    if(
+                        ((arrival.popArriving * 100) / planet.defense) > 
+                        (planet.population * s().gameConstants.DESTROY_THRESHOLD)
+                    ) {
+                        isDestroyed = true;
+                    }
+                }
+
                 planet.owner = arrival.player;
                 planet.population =
                     arrival.popArriving -
@@ -170,7 +185,7 @@ library DarkForestLazyUpdate {
         uint256 _nextSilver = planet.silver + arrival.silverMoved;
         planet.silver = _maxSilver < _nextSilver ? _maxSilver : _nextSilver;
 
-        return (arrival.carriedArtifactId, planet);
+        return DarkForestTypes.ApplyArrivalData(arrival.carriedArtifactId, planet, isDestroyed);
     }
 
     function applyPendingEvents(
@@ -246,14 +261,18 @@ library DarkForestLazyUpdate {
                 ) {
                     eventIdsToRemove[numEventsToRemove++] = events[earliestEventIndex].id;
 
-                    uint256 newArtifactId;
-                    (newArtifactId, planet) = applyArrival(
+                    DarkForestTypes.ApplyArrivalData memory arrivalData = applyArrival(
                         planet,
                         s().planetArrivals[events[earliestEventIndex].id]
                     );
 
-                    if (newArtifactId != 0) {
-                        newArtifactsOnPlanet[numNewArtifactsOnPlanet++] = newArtifactId;
+                    if (arrivalData.newArtifactId != 0) {
+                        newArtifactsOnPlanet[numNewArtifactsOnPlanet++] = arrivalData.newArtifactId;
+                    }
+
+                    if(arrivalData.destroyed) {
+                        planetExtendedInfo.destroyed = true;
+                        break;
                     }
                 }
             }

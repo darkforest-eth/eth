@@ -5,6 +5,7 @@ type Player @entity {
   "allows null because 0x0000000000000000000000000000000000000000 has no homeWorld"
   homeWorld: Planet
   score: BigInt!
+  destroyedScore: BigInt!
   lastRevealTimestamp: Int!
   planets: [Planet!]! @derivedFrom(field: "owner")
   sentVoyages: [Arrival!]! @derivedFrom(field: "player")
@@ -62,6 +63,7 @@ type Planet @entity {
   isRevealed: Boolean!
   "planet's x,y coordinate, if revealed"
   revealedCoordinate: RevealedCoordinate
+  revealedRadius: Int!
 
   # artifacts
   hasTriedFindingArtifact: Boolean!

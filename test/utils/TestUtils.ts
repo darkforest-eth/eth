@@ -4,7 +4,7 @@ import { BigNumber, BigNumberish } from 'ethers';
 import { ethers, waffle } from 'hardhat';
 import { TestLocation } from './TestLocation';
 import { World } from './TestWorld';
-import { ARTIFACT_PLANET_1, initializers, LARGE_INTERVAL } from './WorldConstants';
+import { ARTIFACT_PLANET_1, initializers, shrinkingInitializers, LARGE_INTERVAL } from './WorldConstants';
 
 const { constants } = ethers;
 
@@ -21,6 +21,38 @@ export const ZERO_ADDRESS = constants.AddressZero;
 export const BN_ZERO = constants.Zero;
 
 export const fixtureLoader = waffle.createFixtureLoader();
+
+export function shrinkAlgorithm(
+  shrinkStart: number, 
+  roundEnd: number,
+  currTime: number
+):number 
+{
+  const shrinkFactor = shrinkingInitializers.SHRINK;
+  const totalTime = roundEnd - shrinkStart;
+  const now = currTime // in Seconds.
+
+  // Only shrink after START_TIME has occurred. Allows for delaying of shrinking.
+  const startTime = shrinkStart > now ? now : shrinkStart;
+  const minRadius = shrinkingInitializers.MIN_RADIUS;
+  var timeElapsed = now - startTime;
+  // // Clip timeElapsed to max totalTime
+  if(timeElapsed > totalTime) timeElapsed = totalTime;
+  // // only shrink after initial time elapsed.
+  var radius = (
+      shrinkingInitializers.INITIAL_WORLD_RADIUS * 
+          (
+              (Math.pow(totalTime,shrinkFactor)) - 
+              (Math.pow(timeElapsed,shrinkFactor))
+          )
+      ) 
+      / Math.pow(totalTime,shrinkFactor);
+
+  // // set minimum
+  if (radius < minRadius) radius = minRadius;
+
+  return Math.floor(radius);
+}
 
 export function hexToBigNumber(hex: string): BigNumber {
   return BigNumber.from(`0x${hex}`);

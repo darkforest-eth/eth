@@ -317,6 +317,7 @@ export function handleLocationRevealed(event: LocationRevealed): void {
   coord.save();
 
   planet.revealedCoordinate = planet.id;
+  planet.revealedRadius = i32(Math.sqrt(Math.pow(coord.x,2) + Math.pow(coord.y,2))) + 1;
   planet.isRevealed = true;
   planet.save();
 }

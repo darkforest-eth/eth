@@ -26,6 +26,7 @@ library DarkForestPlanet {
     event ArtifactActivated(address player, uint256 artifactId, uint256 loc);
     event ArtifactDeactivated(address player, uint256 artifactId, uint256 loc);
     event PlanetUpgraded(address player, uint256 loc, uint256 branch, uint256 toBranchLevel);
+    event PlanetDestroyed(address player, uint256 loc);
 
     function isPopCapBoost(uint256 _location) public pure returns (bool) {
         bytes memory _b = abi.encodePacked(_location);
@@ -376,6 +377,15 @@ library DarkForestPlanet {
             );
         }
 
+        // this will only allow players to initialize in the middle ring of the universe. 
+        if(s().gameConstants.SHRINK > 0) {
+            uint256 radius = s().worldRadius;
+            uint256 upperQuartile = (radius * s().gameConstants.DISC_UPPER_BOUND) / 100;
+            uint256 lowerQuartile = (radius * s().gameConstants.DISC_LOWER_BOUND) / 100;
+            require(_radius >= lowerQuartile, "Init radius is too low");
+            require(_radius <= upperQuartile, "Init radius is too high");
+        }
+
         require(
             _perlin >= s().gameConstants.INIT_PERLIN_MIN,
             "Init not allowed in perlin value less than INIT_PERLIN_MIN"
@@ -392,11 +402,11 @@ library DarkForestPlanet {
             DarkForestUtils.getActiveArtifact(args.oldLoc);
         DarkForestTypes.Artifact memory activeArtifactTo =
             DarkForestUtils.getActiveArtifact(args.newLoc);
-        require(
-            !s().planetsExtendedInfo[args.newLoc].destroyed &&
-                !s().planetsExtendedInfo[args.oldLoc].destroyed,
-            "planet is destroyed"
-        );
+
+        // Do nothing if planet is destroyed. Ensures that moves will still refresh planet.
+        if(s().planetsExtendedInfo[args.newLoc].destroyed || s().planetsExtendedInfo[args.oldLoc].destroyed) {
+            return;
+        }
         require(
             s().planets[args.oldLoc].owner == msg.sender,
             "Only owner account can perform operation on planets"
@@ -535,8 +545,15 @@ library DarkForestPlanet {
             uint256[12] memory artifactIdsToAddToPlanet
         ) = getRefreshedPlanet(location, block.timestamp);
 
+        DarkForestTypes.PlanetExtendedInfo memory prevPlanet = s().planetsExtendedInfo[location];
+
         s().planets[location] = planet;
         s().planetsExtendedInfo[location] = planetInfo;
+
+        // Only emit PlanetDestroyed when actual destruction occurred.
+        if(planetInfo.destroyed && !prevPlanet.destroyed) {
+            emit PlanetDestroyed(planet.owner, location);
+        }
 
         DarkForestTypes.PlanetEventMetadata[] storage events = s().planetEvents[location];
 

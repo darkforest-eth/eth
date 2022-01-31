@@ -49,6 +49,53 @@ async function gameSetRadius(args: { radius: number }, hre: HardhatRuntimeEnviro
   await setRadiusReceipt.wait();
 }
 
+task('game:setShrinkStart', 'change the shrink start')
+  .addPositionalParam('timestamp', 'the timestamp', undefined, types.int)
+  .setAction(setShrinkStart);
+
+async function setShrinkStart(args: { timestamp: number }, hre: HardhatRuntimeEnvironment) {
+  await hre.run('utils:assertChainId');
+
+  const darkForest: DarkForestCore = await hre.run('utils:getCore');
+
+  const setShrinkReceipt = await darkForest.setShrinkStart(BigNumber.from(args.timestamp));
+  await setShrinkReceipt.wait();
+  const newShrink = (await darkForest.gameConstants()).SHRINK_START;
+  console.log("new shrink", newShrink.toNumber())
+}
+
+task('game:setRoundEnd', 'change the round end')
+  .addPositionalParam('timestamp', 'the timestamp', undefined, types.int)
+  .setAction(setRoundEnd);
+
+async function setRoundEnd(args: { timestamp: number }, hre: HardhatRuntimeEnvironment) {
+  await hre.run('utils:assertChainId');
+
+  const darkForest: DarkForestCore = await hre.run('utils:getCore');
+
+  const setShrinkReceipt = await darkForest.setRoundEnd(BigNumber.from(args.timestamp));
+  await setShrinkReceipt.wait();
+  const newEnd = (await darkForest.gameConstants()).ROUND_END;
+  console.log("new end", newEnd.toNumber());
+}
+
+task('game:refreshRadius', 'refreshRadius')
+  .setAction(refreshRadius);
+
+async function refreshRadius(args: {}, hre: HardhatRuntimeEnvironment) {
+  await hre.run('utils:assertChainId');
+
+  const darkForest: DarkForestCore = await hre.run('utils:getCore');
+
+  const setShrinkReceipt = await darkForest._updateWorldRadius();
+  await setShrinkReceipt.wait();
+  const radius = (await darkForest.worldRadius());
+  console.log("radius", radius.toNumber());
+}
+
+
+
+
 task('game:setTarget4RadiusConstant', 'change the target4RadiusConstant')
   .addPositionalParam(
     'target4RadiusConstant',
