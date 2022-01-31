@@ -15,6 +15,7 @@ import './tasks/compile';
 import './tasks/debug';
 import './tasks/deploy';
 import './tasks/game';
+import './tasks/gpt-credits';
 import './tasks/subgraph';
 import './tasks/upgrades';
 import './tasks/utils';
@@ -56,12 +57,12 @@ extendEnvironment((env: HardhatRuntimeEnvironment) => {
 
 // The xdai config, but it isn't added to networks unless we have a DEPLOYER_MNEMONIC
 const xdai = {
-  url: process.env.XDAI_RPC_URL ?? 'https://rpc-df.xdaichain.com/',
+  // Using our archive node for admin task running
+  url: 'https://rpc-df.xdaichain.com/',
   accounts: {
     mnemonic: DEPLOYER_MNEMONIC,
   },
   chainId: 100,
-  gasMultiplier: 5,
 };
 
 // The mainnet config, but it isn't added to networks unless we have a DEPLOYER_MNEMONIC
@@ -113,11 +114,11 @@ const config: HardhatUserConfig = {
     },
   },
   solidity: {
-    version: '0.8.10',
+    version: '0.7.6',
     settings: {
       optimizer: {
         enabled: true,
-        runs: 100,
+        runs: 200,
       },
     },
   },

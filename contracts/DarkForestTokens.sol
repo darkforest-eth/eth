@@ -1,14 +1,14 @@
-// SPDX-License-Identifier: GPL-3.0
-pragma solidity ^0.8.0;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.7.6;
+pragma experimental ABIEncoderV2;
 
-import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "./DarkForestTypes.sol";
 
-contract DarkForestTokens is ERC721EnumerableUpgradeable {
+contract DarkForestTokens is ERC721Upgradeable {
     address coreAddress;
     mapping(uint256 => DarkForestTypes.Artifact) artifacts;
     address adminAddress;
-    string artifactBaseURI;
 
     modifier onlyAdminOrCore() {
         require(
@@ -27,11 +27,11 @@ contract DarkForestTokens is ERC721EnumerableUpgradeable {
     function initialize(
         address _coreAddress,
         address _adminAddress,
-        string memory _artifactBaseURI
+        string memory _baseURI
     ) public initializer {
         coreAddress = _coreAddress;
         adminAddress = _adminAddress;
-        artifactBaseURI = _artifactBaseURI;
+        _setBaseURI(_baseURI);
     }
 
     function changeAdmin(address _newAdminAddress) public onlyAdmin {
@@ -39,11 +39,9 @@ contract DarkForestTokens is ERC721EnumerableUpgradeable {
     }
 
     function setBaseUriForStaging() public onlyAdmin {
-        artifactBaseURI = "https://nft.zkga.me/token-uri/artifact/100-0xb4112582d061d6d0ce0adf8d6fdbf09c173a68c9/";
-    }
-
-    function _baseURI() internal view override returns (string memory) {
-        return artifactBaseURI;
+        _setBaseURI(
+            "https://nft.zkga.me/token-uri/artifact/100-0xb4112582d061d6d0ce0adf8d6fdbf09c173a68c9/"
+        );
     }
 
     function createArtifact(DarkForestTypes.DFTCreateArtifactArgs memory args)

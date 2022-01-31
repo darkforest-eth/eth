@@ -1,3 +1,4 @@
+import { SCORING_CONTRACT_ADDRESS } from '@darkforest_eth/contracts';
 import { DeployOptions } from '@openzeppelin/hardhat-upgrades/dist/deploy-proxy';
 import { getImplementationAddress, TransactionMinedTimeout } from '@openzeppelin/upgrades-core';
 import { Contract, Signer } from 'ethers';
@@ -6,6 +7,7 @@ import { FactoryOptions, HardhatRuntimeEnvironment } from 'hardhat/types';
 import type {
   DarkForestCore,
   DarkForestGetters,
+  DarkForestGPTCredit,
   DarkForestTokens,
   LibraryContracts,
   Whitelist,
@@ -28,9 +30,21 @@ async function upgradeMulti({}, hre: HardhatRuntimeEnvironment) {
     CORE_CONTRACT_ADDRESS,
     TOKENS_CONTRACT_ADDRESS,
     GETTERS_CONTRACT_ADDRESS,
+    GPT_CREDIT_CONTRACT_ADDRESS,
     WHITELIST_CONTRACT_ADDRESS,
     START_BLOCK,
   } = hre.contracts;
+
+  await upgradeProxyWithRetry<DarkForestGPTCredit>({
+    contractName: 'DarkForestGPTCredit',
+    contractAddress: GPT_CREDIT_CONTRACT_ADDRESS,
+    signerOrOptions: {},
+    deployOptions: {},
+    retries: 5,
+    hre,
+  });
+
+  console.log('upgraded DarkForestGPTCredit');
 
   await upgradeProxyWithRetry<Whitelist>({
     contractName: 'Whitelist',
@@ -73,6 +87,8 @@ async function upgradeMulti({}, hre: HardhatRuntimeEnvironment) {
     tokensAddress: TOKENS_CONTRACT_ADDRESS,
     gettersAddress: GETTERS_CONTRACT_ADDRESS,
     whitelistAddress: WHITELIST_CONTRACT_ADDRESS,
+    gptCreditAddress: GPT_CREDIT_CONTRACT_ADDRESS,
+    scoringAddress: SCORING_CONTRACT_ADDRESS,
   });
 
   console.log('upgraded DarkForestGetters');
@@ -175,6 +191,26 @@ async function upgradeTokens({}, hre: HardhatRuntimeEnvironment) {
   await upgradeProxyWithRetry<DarkForestTokens>({
     contractName: 'DarkForestTokens',
     contractAddress: TOKENS_CONTRACT_ADDRESS,
+    signerOrOptions: {},
+    deployOptions: {},
+    retries: 5,
+    hre,
+  });
+}
+
+task('upgrade:gpt', 'upgrade DarkForestGPTCredit contract (only)').setAction(upgradeGpt);
+
+async function upgradeGpt({}, hre: HardhatRuntimeEnvironment) {
+  await hre.run('utils:assertChainId');
+
+  // need to force a compile for tasks
+  await hre.run('compile');
+
+  const { GPT_CREDIT_CONTRACT_ADDRESS } = hre.contracts;
+
+  await upgradeProxyWithRetry<DarkForestGPTCredit>({
+    contractName: 'DarkForestGPTCredit',
+    contractAddress: GPT_CREDIT_CONTRACT_ADDRESS,
     signerOrOptions: {},
     deployOptions: {},
     retries: 5,
