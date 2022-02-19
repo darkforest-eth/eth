@@ -10,6 +10,10 @@ type Player @entity {
   sentVoyages: [Arrival!]! @derivedFrom(field: "player")
   "NOTE: Does not reflect current ownership"
   artifactsDiscovered: [Artifact!]! @derivedFrom(field: "discoverer")
+  spaceships: [Spaceship!]! @derivedFrom(field: "controller")
+  spaceJunk: Int!
+  spaceJunkLimit: Int!
+  claimedShips: Boolean!
 }
 
 type Planet @entity {
@@ -50,6 +54,7 @@ type Planet @entity {
   isRangeBoosted: Boolean!
   isSpeedBoosted: Boolean!
   isDefenseBoosted: Boolean!
+  isSpaceJunkHalved: Boolean!
   hatLevel: Int!
   planetType: PlanetType!
   spaceType: SpaceType!
@@ -67,12 +72,19 @@ type Planet @entity {
   hasTriedFindingArtifact: Boolean!
   prospectedBlockNumber: Int
   artifacts: [Artifact!]! @derivedFrom(field: "onPlanet")
+  spaceships: [Spaceship!]! @derivedFrom(field: "onPlanet")
   activatedArtifact: Artifact
   incomingWormholes: [Artifact!]! @derivedFrom(field: "wormholeTo")
 
   # voyages
   voyagesFrom: [Arrival!]! @derivedFrom(field: "fromPlanet")
   voyagesTo: [Arrival!]! @derivedFrom(field: "toPlanet")
+
+  spaceJunk: Int!
+  pausers: Int!
+  invader: Player
+  invadeStartBlock: BigInt!
+  capturer: Player
 }
 
 "Scheduled arrivals by arrival blocktime"
@@ -89,6 +101,7 @@ type Meta @entity {
   lastProcessed: Int!
   "last block number processed"
   blockNumber: Int!
+  _currentlyRefreshingPlayers: [String!]!
   "Internal use only: the planet IDs we need to refresh with contract data"
   _currentlyRefreshingPlanets: [BigInt!]!
   "Internal use only: the artifact IDs we need to refresh with contract data"
@@ -198,6 +211,30 @@ type Artifact @entity {
   onVoyage: Arrival
 }
 
+type Spaceship @entity {
+  "0 padded hex, no 0x prefix, recommend sorting using mintedAtTimestamp"
+  id: ID!
+  "decimal version of artifact ID"
+  idDec: BigInt!
+  "Seconds since epoch, needs to be multiplied by 1000 for javascript representation"
+  mintedAtTimestamp: Int!
+  spaceshipType: SpaceshipType!
+
+  lastActivated: Int!
+  lastDeactivated: Int!
+  isActivated: Boolean!
+
+  onPlanet: Planet
+  onVoyage: Arrival
+  controller: Player
+}
+
+type Lobby @entity {
+  id: ID!
+  ownerAddress: ID!
+  lobbyAddress: ID!
+}
+
 enum ArtifactType {
   UNKNOWN
   MONOLITH
@@ -209,6 +246,15 @@ enum ArtifactType {
   PHOTOIDCANNON
   BLOOMFILTER
   BLACKDOMAIN
+}
+
+enum SpaceshipType {
+  UNKNOWN
+  MOTHERSHIP
+  CRESCENT
+  WHALE
+  GEAR
+  TITAN
 }
 
 enum Biome {

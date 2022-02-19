@@ -18,7 +18,7 @@ describe('DarkForestHat', function () {
   });
 
   it('should buy hats', async function () {
-    let planetExtendedInfo = await world.contracts.core.planetsExtendedInfo(SPAWN_PLANET_1.id);
+    let planetExtendedInfo = await world.contract.planetsExtendedInfo(SPAWN_PLANET_1.id);
     expect(planetExtendedInfo.hatLevel.toNumber()).to.be.equal(0);
 
     await world.user1Core.buyHat(SPAWN_PLANET_1.id, {
@@ -28,24 +28,24 @@ describe('DarkForestHat', function () {
       value: '2000000000000000000',
     });
 
-    planetExtendedInfo = await world.contracts.core.planetsExtendedInfo(SPAWN_PLANET_1.id);
+    planetExtendedInfo = await world.contract.planetsExtendedInfo(SPAWN_PLANET_1.id);
 
     expect(planetExtendedInfo.hatLevel.toNumber()).to.be.equal(2);
   });
 
   it('should only allow owner to buy hat', async function () {
-    const planetExtendedInfo = await world.contracts.core.planetsExtendedInfo(SPAWN_PLANET_1.id);
+    const planetExtendedInfo = await world.contract.planetsExtendedInfo(SPAWN_PLANET_1.id);
     expect(planetExtendedInfo.hatLevel.toNumber()).to.be.equal(0);
 
     await expect(
       world.user2Core.buyHat(SPAWN_PLANET_1.id, {
         value: '1000000000000000000',
       })
-    ).to.be.revertedWith('Only owner can buy hat for planet');
+    ).to.be.revertedWith('Only owner account can perform that operation on planet.');
   });
 
   it('should not buy hat with insufficient value', async function () {
-    const planetExtendedInfo = await world.contracts.core.planetsExtendedInfo(SPAWN_PLANET_1.id);
+    const planetExtendedInfo = await world.contract.planetsExtendedInfo(SPAWN_PLANET_1.id);
 
     expect(planetExtendedInfo.hatLevel.toNumber()).to.be.equal(0);
 
@@ -64,9 +64,9 @@ describe('DarkForestHat', function () {
       value: '1000000000000000000',
     });
 
-    await world.contracts.core.withdraw();
+    await world.contract.withdraw();
 
-    expect(await ethers.provider.getBalance(world.contracts.core.address)).to.equal(BN_ZERO);
+    expect(await ethers.provider.getBalance(world.contract.address)).to.equal(BN_ZERO);
   });
 
   it('should not allow non-admin to withdraw funds', async function () {
@@ -74,6 +74,8 @@ describe('DarkForestHat', function () {
       value: '1000000000000000000',
     });
 
-    await expect(world.user1Core.withdraw()).to.be.revertedWith('Sender is not a game master');
+    await expect(world.user1Core.withdraw()).to.be.revertedWith(
+      'LibDiamond: Must be contract owner'
+    );
   });
 });

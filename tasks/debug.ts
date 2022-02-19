@@ -3,9 +3,8 @@
 
 import { task, types } from 'hardhat/config';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
-import { DarkForestTokens } from '../task-types';
 
-// see DarkForestTypes.sol - ArtifactType
+// see DFTypes.sol - ArtifactType
 const artifactOptions = (
   'Monolith,Colossus,Spaceship,Pyramid,Wormhole,' +
   'PlanetaryShield,PhotoidCannon,BloomFilter,BlackDomain'
@@ -56,10 +55,10 @@ async function giveArtifact(
   hre: HardhatRuntimeEnvironment
 ) {
   const chosenArtifactType = artifactOptions.indexOf(artifactType) + 1;
-  const tokens: DarkForestTokens = await hre.run('utils:getTokens');
+  const contract = await hre.ethers.getContractAt('DarkForest', hre.contracts.CONTRACT_ADDRESS);
 
   for (let i = 0; i < amount; i++) {
-    // see DarkForestTypes.sol - DFTCreateArtifactArgs
+    // see contracts/types/ActionTypes.sol - CreateArtifactArgs
     const createArtifactArgs = {
       tokenId: random256Id(),
       discoverer: playerAddress,
@@ -68,9 +67,10 @@ async function giveArtifact(
       biome: biome,
       artifactType: chosenArtifactType,
       owner: playerAddress,
+      controller: '0x0000000000000000000000000000000000000000',
     };
 
-    await (await tokens.createArtifact(createArtifactArgs)).wait();
+    await (await contract.createArtifact(createArtifactArgs)).wait();
   }
 }
 

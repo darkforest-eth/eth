@@ -1,30 +1,18 @@
-import {
-  DarkForestCore,
-  DarkForestGPTCredit,
-  DarkForestScoringRound3,
-  Whitelist,
-} from '@darkforest_eth/contracts/typechain';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address';
+import type { DarkForest } from '@darkforest_eth/contracts/typechain';
+import type { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address';
 import { BigNumber, utils } from 'ethers';
-import { ethers } from 'hardhat';
-import * as yup from 'yup';
-import * as settings from '../../settings';
-import { initializeContracts, TestContracts } from './TestContracts';
-import { initializers, target4Initializers } from './WorldConstants';
+import hre from 'hardhat';
+import type { HardhatRuntimeEnvironment } from 'hardhat/types';
+import { deployAndCut } from '../../tasks/deploy';
+import { initializers, noPlanetTransferInitializers, target4Initializers } from './WorldConstants';
 
 export interface World {
-  contracts: TestContracts;
+  contract: DarkForest;
   user1: SignerWithAddress;
   user2: SignerWithAddress;
   deployer: SignerWithAddress;
-  user1Core: DarkForestCore;
-  user2Core: DarkForestCore;
-  user1Whitelist: Whitelist;
-  user2Whitelist: Whitelist;
-  user1GPTCredit: DarkForestGPTCredit;
-  user2GPTCredit: DarkForestGPTCredit;
-  user1Scoring: DarkForestScoringRound3;
-  user2Scoring: DarkForestScoringRound3;
+  user1Core: DarkForest;
+  user2Core: DarkForest;
 }
 
 export interface Player {
@@ -37,54 +25,69 @@ export interface Player {
 }
 
 export interface InitializeWorldArgs {
-  initializers: yup.Asserts<typeof settings.Initializers>;
-  enableWhitelist: boolean;
+  initializers: HardhatRuntimeEnvironment['initializers'];
+  whitelistEnabled: boolean;
 }
 
 export function defaultWorldFixture(): Promise<World> {
   return initializeWorld({
     initializers,
-    enableWhitelist: false,
+    whitelistEnabled: false,
   });
 }
 
 export function growingWorldFixture(): Promise<World> {
   return initializeWorld({
     initializers: target4Initializers,
-    enableWhitelist: false,
+    whitelistEnabled: false,
   });
 }
 
 export function whilelistWorldFixture(): Promise<World> {
   return initializeWorld({
     initializers,
-    enableWhitelist: true,
+    whitelistEnabled: true,
   });
 }
 
-export async function initializeWorld(args: InitializeWorldArgs): Promise<World> {
-  const contracts = await initializeContracts(args);
-  const [deployer, user1, user2] = await ethers.getSigners();
+export function noPlanetTransferFixture(): Promise<World> {
+  return initializeWorld({
+    initializers: noPlanetTransferInitializers,
+    whitelistEnabled: false,
+  });
+}
+
+export async function initializeWorld({
+  initializers,
+  whitelistEnabled,
+}: InitializeWorldArgs): Promise<World> {
+  const [deployer, user1, user2] = await hre.ethers.getSigners();
+
+  // The tests assume that things get mined right away
+  // TODO(#912): This means the tests are wildly fragile and probably need to be rewritten
+  await hre.network.provider.send('evm_setAutomine', [true]);
+  await hre.network.provider.send('evm_setIntervalMining', [0]);
+
+  const [diamond, _initReceipt] = await deployAndCut(
+    { ownerAddress: deployer.address, whitelistEnabled, initializers },
+    hre
+  );
+
+  const contract = await hre.ethers.getContractAt('DarkForest', diamond.address);
 
   await deployer.sendTransaction({
-    to: contracts.whitelist.address,
+    to: contract.address,
     value: utils.parseEther('0.5'), // good for about (100eth / 0.5eth/test) = 200 tests
   });
 
   return {
     // If any "admin only" contract state needs to be changed, use `contracts`
     // to call methods with deployer privileges. e.g. `world.contracts.core.pause()`
-    contracts,
+    contract,
     user1,
     user2,
     deployer,
-    user1Core: contracts.core.connect(user1),
-    user2Core: contracts.core.connect(user2),
-    user1Whitelist: contracts.whitelist.connect(user1),
-    user2Whitelist: contracts.whitelist.connect(user2),
-    user1GPTCredit: contracts.gptCredits.connect(user1),
-    user2GPTCredit: contracts.gptCredits.connect(user2),
-    user1Scoring: contracts.scoring.connect(user1),
-    user2Scoring: contracts.scoring.connect(user2),
+    user1Core: contract.connect(user1),
+    user2Core: contract.connect(user2),
   };
 }

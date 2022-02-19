@@ -46,3 +46,25 @@ You can import the private key of one of the accounts `hardhat node` created and
 Account #2: 0x3097403b64fe672467345bf159f4c9c5464bd89e (100 ETH)
 Private Key: 0x67195c963ff445314e667112ab22f4a7404bad7f9746564eb409b9bb8c6aed32
 ```
+
+## subgraph
+
+Assuming you already have your contracts deployed be it on a local node or on a mainnet, you'll have the `abi/DarkForest.json` file, the `CONTRACT_ADDRESS` address, and the block the diamond contract was initialized at (so you dont waste time syncing from the genesis block) inside the `@darkforest_eth/contracts` packag. In development, the start block will be set at 0.
+
+## TheGraph hosted solution
+
+For TheGraph hosted service, you need to create an account on thegraph.com, and create a subgraph using the web interface and note the namespace yourloginname/graphname. Find the access token for this graph (it should be on the top row of the interface), and run
+
+`graph auth https://api.thegraph.com/deploy/ <ACCESS_TOKEN>`
+
+in your terminal.
+
+Then put the contract addresses into the templates and codgen thegraph files
+`yarn subgraph:template:prod`
+
+Finally ask them to start the indexing
+`yarn subgraph:deploy:prod yourloginname/graphname`
+
+## local development
+
+To run a local copy of thegraph make sure docker is installed and then run `yarn start --subgraph df` OR if you already have your contracts deployed and running run `yarn hardhat:dev subgraph:deploy --name df` and find your local hosted explorer at `http://localhost:8000/subgraphs/name/df`

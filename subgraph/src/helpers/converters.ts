@@ -26,6 +26,11 @@ export function isDefenseBoosted(locationId: string): boolean {
   return locationId.charAt(26) == '0';
 }
 
+// byte 14: space junk bonus if byte is < 16
+export function isSpaceJunkHalved(locationId: string): boolean {
+  return locationId.charAt(28) == '0';
+}
+
 // Artifact Id and locationId are 0 padded with no 0x prefix. Note player
 // addresses do NOT use this helper, but rather toHexString
 export function hexStringToPaddedUnprefixed(int: BigInt): string {
@@ -95,6 +100,26 @@ export function toArtifactType(artifactType: i32): string {
   } else {
     return 'UNKNOWN';
   }
+}
+
+export function toSpaceshipType(spaceshipType: i32): string {
+  if (spaceshipType === 10) {
+    return 'MOTHERSHIP';
+  } else if (spaceshipType === 11) {
+    return 'CRESCENT';
+  } else if (spaceshipType === 12) {
+    return 'WHALE';
+  } else if (spaceshipType === 13) {
+    return 'GEAR';
+  } else if (spaceshipType === 14) {
+    return 'TITAN';
+  } else {
+    return 'UNKNOWN';
+  }
+}
+
+export function isSpaceship(artifactType: i32): boolean {
+  return artifactType >= 10 && artifactType <= 14;
 }
 
 export function toArtifactRarity(rarity: i32): string {

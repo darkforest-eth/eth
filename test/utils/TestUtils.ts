@@ -1,4 +1,4 @@
-import { DarkForestCore, DarkForestGetters } from '@darkforest_eth/contracts/typechain';
+import type { DarkForest } from '@darkforest_eth/contracts/typechain';
 import { modPBigInt } from '@darkforest_eth/hashing';
 import { BigNumber, BigNumberish } from 'ethers';
 import { ethers, waffle } from 'hardhat';
@@ -69,7 +69,7 @@ export function makeRevealArgs(
 
 export function makeInitArgs(
   planetLoc: TestLocation,
-  spawnRadius: number = initializers.INITIAL_WORLD_RADIUS
+  spawnRadius: number = initializers.WORLD_RADIUS_MIN
 ): [
   [BigNumberish, BigNumberish],
   [[BigNumberish, BigNumberish], [BigNumberish, BigNumberish]],
@@ -111,12 +111,14 @@ export function makeMoveArgs(
   maxDist: BigNumberish,
   popMoved: BigNumberish,
   silverMoved: BigNumberish,
-  movedArtifactId: BigNumberish = 0
+  movedArtifactId: BigNumberish = 0,
+  abandoning: BigNumberish = 0
 ): [
   [BigNumberish, BigNumberish],
   [[BigNumberish, BigNumberish], [BigNumberish, BigNumberish]],
   [BigNumberish, BigNumberish],
   [
+    BigNumberish,
     BigNumberish,
     BigNumberish,
     BigNumberish,
@@ -153,6 +155,7 @@ export function makeMoveArgs(
       popMoved,
       silverMoved,
       movedArtifactId,
+      abandoning,
     ],
   ];
 }
@@ -210,23 +213,23 @@ export function getStatSum(planet: any) {
 // throws if `to` is owned
 export async function conquerUnownedPlanet(
   world: World,
-  signer: DarkForestCore,
+  signer: DarkForest,
   from: TestLocation,
   to: TestLocation
 ) {
-  const fromData = await world.contracts.core.planets(from.id);
-  let toData = await world.contracts.core.planets(to.id);
+  const fromData = await world.contract.planets(from.id);
+  let toData = await world.contract.planets(to.id);
   if (toData.owner !== ZERO_ADDRESS) {
     throw new Error('called conquerUnownedPlanet to conquer owned planet');
   }
   const attackEnergyCost = fromData.populationCap.toNumber() * 0.9;
   await increaseBlockchainTime();
   await (await signer.move(...makeMoveArgs(from, to, 0, attackEnergyCost, 0))).wait(); // creates planet in contract
-  toData = await world.contracts.core.planets(to.id);
+  toData = await world.contract.planets(to.id);
   const toPlanetStartingPop = toData.population.toNumber(); // move hasn't yet been applied
 
   await (await signer.refreshPlanet(to.id)).wait(); // applies move, since 0 moveDist
-  toData = await world.contracts.core.planets(to.id);
+  toData = await world.contract.planets(to.id);
 
   if (toData.owner === ZERO_ADDRESS) {
     // send additional attacks if not yet conquered
@@ -242,12 +245,12 @@ export async function conquerUnownedPlanet(
 // shuttles silver from `silverProducer` to `to` until `to` is maxed on silver
 export async function feedSilverToCap(
   world: World,
-  signer: DarkForestCore,
+  signer: DarkForest,
   silverMine: TestLocation,
   to: TestLocation
 ) {
-  const silverMineData = await world.contracts.core.planets(silverMine.id);
-  const toData = await world.contracts.core.planets(to.id);
+  const silverMineData = await world.contract.planets(silverMine.id);
+  const toData = await world.contract.planets(to.id);
   const attackEnergyCost = silverMineData.populationCap.toNumber() * 0.1;
   const silverMineSilverCap = silverMineData.silverCap.toNumber();
   const toSilverCap = toData.silverCap.toNumber();
@@ -259,7 +262,7 @@ export async function feedSilverToCap(
 }
 
 // returns the ID of the artifact minted
-export async function user1MintArtifactPlanet(user1Core: DarkForestCore) {
+export async function user1MintArtifactPlanet(user1Core: DarkForest) {
   await user1Core.prospectPlanet(ARTIFACT_PLANET_1.id);
   await increaseBlockchainTime();
   const findArtifactTx = await user1Core.findArtifact(...makeFindArtifactArgs(ARTIFACT_PLANET_1));
@@ -269,9 +272,9 @@ export async function user1MintArtifactPlanet(user1Core: DarkForestCore) {
   return artifactId;
 }
 
-export async function getArtifactsOwnedBy(getters: DarkForestGetters, addr: string) {
-  const artifactsIds = await getters.getPlayerArtifactIds(addr);
-  return (await getters.bulkGetArtifactsByIds(artifactsIds)).map(
+export async function getArtifactsOwnedBy(contract: DarkForest, addr: string) {
+  const artifactsIds = await contract.getPlayerArtifactIds(addr);
+  return (await contract.bulkGetArtifactsByIds(artifactsIds)).map(
     (artifactWithMetadata) => artifactWithMetadata[0]
   );
 }

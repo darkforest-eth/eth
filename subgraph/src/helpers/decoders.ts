@@ -1,31 +1,35 @@
 /* eslint-disable eqeqeq */
 import { BigInt } from '@graphprotocol/graph-ts';
 import {
-  DarkForestGetters__bulkGetArtifactsByIdsResultRetStruct,
-  DarkForestGetters__bulkGetPlanetsDataByIdsResultRetInfoStruct,
-  DarkForestGetters__bulkGetPlanetsDataByIdsResultRetPlanetStruct,
-  DarkForestGetters__bulkGetVoyagesByIdsResultRetStruct,
-} from '../../generated/DarkForestCore/DarkForestGetters';
-import { Arrival, Artifact, Planet } from '../../generated/schema';
+  DarkForest__bulkGetArtifactsByIdsResultRetStruct,
+  DarkForest__bulkGetPlanetsDataByIdsResultRetInfo2Struct,
+  DarkForest__bulkGetPlanetsDataByIdsResultRetInfoStruct,
+  DarkForest__bulkGetPlanetsDataByIdsResultRetPlanetStruct,
+  DarkForest__bulkGetVoyagesByIdsResultRetStruct,
+} from '../../generated/DarkForest/DarkForest';
+import { Arrival, Artifact, Planet, Spaceship } from '../../generated/schema';
 import {
   hexStringToPaddedUnprefixed,
   isDefenseBoosted,
   isEnergyCapBoosted,
   isEnergyGrowthBoosted,
   isRangeBoosted,
+  isSpaceJunkHalved,
   isSpeedBoosted,
   toArrivalType,
   toArtifactRarity,
   toArtifactType,
   toBiome,
   toPlanetType,
+  toSpaceshipType,
   toSpaceType,
 } from './converters';
 
 export function refreshPlanetFromContractData(
   locationDec: BigInt,
-  rawPlanet: DarkForestGetters__bulkGetPlanetsDataByIdsResultRetPlanetStruct,
-  rawInfo: DarkForestGetters__bulkGetPlanetsDataByIdsResultRetInfoStruct
+  rawPlanet: DarkForest__bulkGetPlanetsDataByIdsResultRetPlanetStruct,
+  rawInfo: DarkForest__bulkGetPlanetsDataByIdsResultRetInfoStruct,
+  rawInfo2: DarkForest__bulkGetPlanetsDataByIdsResultRetInfo2Struct
 ): Planet {
   const locationId = hexStringToPaddedUnprefixed(locationDec);
 
@@ -57,11 +61,17 @@ export function refreshPlanetFromContractData(
   planet.isRangeBoosted = isRangeBoosted(locationId);
   planet.isSpeedBoosted = isSpeedBoosted(locationId);
   planet.isDefenseBoosted = isDefenseBoosted(locationId);
+  planet.isSpaceJunkHalved = isSpaceJunkHalved(locationId);
   planet.hatLevel = rawInfo.hatLevel.toI32();
   planet.planetType = toPlanetType(rawPlanet.planetType);
   planet.spaceType = toSpaceType(rawInfo.spaceType);
   planet.destroyed = rawInfo.destroyed;
   planet.isHomePlanet = rawPlanet.isHomePlanet;
+  planet.spaceJunk = rawInfo.spaceJunk.toI32();
+  planet.pausers = rawInfo2.pausers.toI32();
+  planet.invadeStartBlock = rawInfo2.invadeStartBlock;
+  planet.invader = rawInfo2.invader.toHexString();
+  planet.capturer = rawInfo2.capturer.toHexString();
 
   // artifacts
   planet.hasTriedFindingArtifact = rawInfo.hasTriedFindingArtifact;
@@ -75,7 +85,7 @@ export function refreshPlanetFromContractData(
 
 export function refreshVoyageFromContractData(
   voyageIdDec: BigInt,
-  rawVoyage: DarkForestGetters__bulkGetVoyagesByIdsResultRetStruct
+  rawVoyage: DarkForest__bulkGetVoyagesByIdsResultRetStruct
 ): Arrival {
   const voyageId = voyageIdDec.toString(); // ts linter complains about i32.toString()
 
@@ -102,9 +112,42 @@ export function refreshVoyageFromContractData(
   return voyage;
 }
 
+export function refreshSpaceshipFromContractData(
+  artifactIdDec: BigInt,
+  rawSpaceship: DarkForest__bulkGetArtifactsByIdsResultRetStruct
+): Spaceship {
+  const artifactId = hexStringToPaddedUnprefixed(artifactIdDec);
+
+  let spaceship = Spaceship.load(artifactId);
+  if (!spaceship) spaceship = new Spaceship(artifactId);
+
+  spaceship.idDec = artifactIdDec;
+  spaceship.mintedAtTimestamp = rawSpaceship.artifact.mintedAtTimestamp.toI32();
+  spaceship.spaceshipType = toSpaceshipType(rawSpaceship.artifact.artifactType);
+  spaceship.lastActivated = rawSpaceship.artifact.lastActivated.toI32();
+  spaceship.lastDeactivated = rawSpaceship.artifact.lastDeactivated.toI32();
+  spaceship.isActivated = spaceship.lastActivated > spaceship.lastDeactivated;
+
+  if (rawSpaceship.locationId.equals(BigInt.fromI32(0))) {
+    spaceship.onPlanet = null;
+  } else {
+    spaceship.onPlanet = hexStringToPaddedUnprefixed(rawSpaceship.locationId);
+  }
+
+  if (rawSpaceship.voyageId.equals(BigInt.fromI32(0))) {
+    spaceship.onVoyage = null;
+  } else {
+    spaceship.onVoyage = rawSpaceship.voyageId.toString();
+  }
+
+  spaceship.controller = rawSpaceship.artifact.controller.toHexString();
+
+  return spaceship;
+}
+
 export function refreshArtifactFromContractData(
   artifactIdDec: BigInt,
-  rawArtifact: DarkForestGetters__bulkGetArtifactsByIdsResultRetStruct
+  rawArtifact: DarkForest__bulkGetArtifactsByIdsResultRetStruct
 ): Artifact {
   const artifactId = hexStringToPaddedUnprefixed(artifactIdDec);
 

@@ -110,24 +110,24 @@ describe('DarkForestPlanet', function () {
   });
 
   it('clips level in nebula and space', async function () {
-    const nebulaPlanet = await world.contracts.core.planets(MAX_PLANET_NEBULA.id);
-    const regularPlanet = await world.contracts.core.planets(MAX_PLANET_SPACE.id);
+    const nebulaPlanet = await world.contract.planets(MAX_PLANET_NEBULA.id);
+    const regularPlanet = await world.contract.planets(MAX_PLANET_SPACE.id);
 
     expect(nebulaPlanet.planetLevel.toNumber()).to.equal(4);
     expect(regularPlanet.planetLevel.toNumber()).to.equal(5);
   });
 
   it("doesn't clip level in deep or dead space", async function () {
-    const deepSpacePlanet = await world.contracts.core.planets(MAX_PLANET_DEEP_SPACE.id);
-    const deadSpacePlanet = await world.contracts.core.planets(MAX_PLANET_DEAD_SPACE.id);
+    const deepSpacePlanet = await world.contract.planets(MAX_PLANET_DEEP_SPACE.id);
+    const deadSpacePlanet = await world.contract.planets(MAX_PLANET_DEAD_SPACE.id);
 
     expect(deepSpacePlanet.planetLevel.toNumber()).to.be.above(4);
     expect(deadSpacePlanet.planetLevel.toNumber()).to.be.above(4);
   });
 
   it('applies medium space buffs and debuffs', async function () {
-    const nebulaPlanet = await world.contracts.core.planets(LVL3_UNOWNED_NEBULA.id);
-    const regularPlanet = await world.contracts.core.planets(LVL3_UNOWNED_SPACE.id);
+    const nebulaPlanet = await world.contract.planets(LVL3_UNOWNED_NEBULA.id);
+    const regularPlanet = await world.contract.planets(LVL3_UNOWNED_SPACE.id);
 
     expect(Math.floor(nebulaPlanet.range.toNumber() * 1.25)).to.equal(
       regularPlanet.range.toNumber()
@@ -157,8 +157,8 @@ describe('DarkForestPlanet', function () {
   });
 
   it('applies deep space buffs and debuffs', async function () {
-    const nebulaPlanet = await world.contracts.core.planets(SPAWN_PLANET_1.id);
-    const deepSpacePlanet = await world.contracts.core.planets(LVL0_PLANET_DEEP_SPACE.id);
+    const nebulaPlanet = await world.contract.planets(SPAWN_PLANET_1.id);
+    const deepSpacePlanet = await world.contract.planets(LVL0_PLANET_DEEP_SPACE.id);
 
     expect(Math.floor(nebulaPlanet.range.toNumber() * 1.5)).to.be.equal(
       deepSpacePlanet.range.toNumber()
@@ -184,8 +184,8 @@ describe('DarkForestPlanet', function () {
   });
 
   it('applies dead space buffs and debuffs', async function () {
-    const nebulaPlanet = await world.contracts.core.planets(SPAWN_PLANET_1.id);
-    const deadSpacePlanet = await world.contracts.core.planets(LVL0_PLANET_DEAD_SPACE.id);
+    const nebulaPlanet = await world.contract.planets(SPAWN_PLANET_1.id);
+    const deadSpacePlanet = await world.contract.planets(LVL0_PLANET_DEAD_SPACE.id);
 
     expect(Math.floor(nebulaPlanet.range.toNumber() * 2)).to.be.equal(
       deadSpacePlanet.range.toNumber()
@@ -211,8 +211,8 @@ describe('DarkForestPlanet', function () {
   });
 
   it('applies deep space buffs and debuffs on silver mines', async function () {
-    const nebulaMine = await world.contracts.core.planets(LVL1_ASTEROID_NEBULA.id);
-    const deepSpaceMine = await world.contracts.core.planets(LVL1_ASTEROID_DEEP_SPACE.id);
+    const nebulaMine = await world.contract.planets(LVL1_ASTEROID_NEBULA.id);
+    const deepSpaceMine = await world.contract.planets(LVL1_ASTEROID_DEEP_SPACE.id);
 
     expect(Math.floor(nebulaMine.range.toNumber() * 1.5)).to.be.equal(
       deepSpaceMine.range.toNumber()
@@ -238,8 +238,8 @@ describe('DarkForestPlanet', function () {
   });
 
   it('applies doubled stat comet buffs', async function () {
-    const normalPlanet = await world.contracts.core.planets(SPAWN_PLANET_1.id);
-    const popcapBoosterPlanet = await world.contracts.core.planets(LVL0_PLANET_POPCAP_BOOSTED.id);
+    const normalPlanet = await world.contract.planets(SPAWN_PLANET_1.id);
+    const popcapBoosterPlanet = await world.contract.planets(LVL0_PLANET_POPCAP_BOOSTED.id);
 
     // should buff popcap
     expect(normalPlanet.populationCap.toNumber() * 2).to.be.equal(
@@ -253,16 +253,16 @@ describe('DarkForestPlanet', function () {
 
   it('initializes silver mines more frequently in deep space', async function () {
     // both hex value of silver byte is 51
-    const nonSilverPlanet = await world.contracts.core.planets(LVL1_ASTEROID_NO_PRODUCE.id);
-    const silverPlanet = await world.contracts.core.planets(LVL1_ASTEROID_DEEP_SPACE.id);
+    const nonSilverPlanet = await world.contract.planets(LVL1_ASTEROID_NO_PRODUCE.id);
+    const silverPlanet = await world.contract.planets(LVL1_ASTEROID_DEEP_SPACE.id);
 
     expect(nonSilverPlanet.silverGrowth.toNumber()).to.be.equal(0);
     expect(silverPlanet.silverGrowth.toNumber()).to.be.above(0);
   });
 
   it('initializes silver mines with debuffs and silver cache', async function () {
-    const regularPlanet = await world.contracts.core.planets(LVL1_PLANET_SPACE.id);
-    const silverPlanet = await world.contracts.core.planets(LVL1_ASTEROID_2.id);
+    const regularPlanet = await world.contract.planets(LVL1_PLANET_SPACE.id);
+    const silverPlanet = await world.contract.planets(LVL1_ASTEROID_2.id);
 
     // buffs silver cap, but debuffs silver mine defense
     expect(Math.floor(regularPlanet.silverCap.toNumber() * 2)).to.be.equal(
@@ -277,8 +277,8 @@ describe('DarkForestPlanet', function () {
   });
 
   it('initializes ruins with normal stats', async function () {
-    const regularPlanet = await world.contracts.core.planets(LVL1_PLANET_SPACE.id);
-    const ruinsPlanet = await world.contracts.core.planets(ARTIFACT_PLANET_1.id);
+    const regularPlanet = await world.contract.planets(LVL1_PLANET_SPACE.id);
+    const ruinsPlanet = await world.contract.planets(ARTIFACT_PLANET_1.id);
 
     // debuffs
     expect(regularPlanet.populationCap.toNumber()).to.be.equal(
@@ -291,15 +291,17 @@ describe('DarkForestPlanet', function () {
   });
 
   it('initializes quasar with modified stats', async function () {
-    const regularPlanet = await world.contracts.core.planets(LVL1_PLANET_NEBULA.id);
-    const quasarPlanet = await world.contracts.core.planets(LVL1_QUASAR.id);
+    const regularPlanet = await world.contract.planets(LVL1_PLANET_NEBULA.id);
+    const quasarPlanet = await world.contract.planets(LVL1_QUASAR.id);
 
     // debuffs
     expect(quasarPlanet.planetType).to.be.equal(4);
     expect(Math.floor(regularPlanet.silverCap.toNumber() * 10)).to.be.equal(
       quasarPlanet.silverCap.toNumber()
     );
-    expect(Math.floor(regularPlanet.speed.toNumber())).to.be.equal(quasarPlanet.speed.toNumber());
+    expect(Math.floor(regularPlanet.speed.toNumber() / 2)).to.be.equal(
+      quasarPlanet.speed.toNumber()
+    );
     expect(Math.floor(quasarPlanet.populationGrowth.toNumber())).to.be.equal(0);
     expect(Math.floor(regularPlanet.populationCap.toNumber() * 5)).to.be.equal(
       quasarPlanet.populationCap.toNumber()
@@ -307,8 +309,8 @@ describe('DarkForestPlanet', function () {
   });
 
   it('initializes trading post with modified stats', async function () {
-    const regularPlanet = await world.contracts.core.planets(LVL3_UNOWNED_DEEP_SPACE.id);
-    const tradingPostPlanet = await world.contracts.core.planets(LVL3_SPACETIME_1.id);
+    const regularPlanet = await world.contract.planets(LVL3_UNOWNED_DEEP_SPACE.id);
+    const tradingPostPlanet = await world.contract.planets(LVL3_SPACETIME_1.id);
 
     // debuffs
     expect(regularPlanet.populationCap.toNumber()).to.be.equal(

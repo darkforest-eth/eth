@@ -1,7 +1,6 @@
 import * as fs from 'fs';
 import { subtask, task, types } from 'hardhat/config';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
-import type { Whitelist } from '../task-types';
 import { generateKey, generateKeys, keysPerTx } from './whitelist-helpers';
 
 task('whitelist:changeDrip', 'change the faucet amount for whitelisted players')
@@ -11,9 +10,9 @@ task('whitelist:changeDrip', 'change the faucet amount for whitelisted players')
 async function changeDrip(args: { value: number }, hre: HardhatRuntimeEnvironment) {
   await hre.run('utils:assertChainId');
 
-  const whitelist: Whitelist = await hre.run('utils:getWhitelist');
+  const contract = await hre.ethers.getContractAt('DarkForest', hre.contracts.CONTRACT_ADDRESS);
 
-  const txReceipt = await whitelist.changeDrip(hre.ethers.utils.parseEther(args.value.toString()));
+  const txReceipt = await contract.changeDrip(hre.ethers.utils.parseEther(args.value.toString()));
   await txReceipt.wait();
 
   console.log(`changed drip to ${args.value}`);
@@ -28,7 +27,7 @@ async function whitelistGenerate(args: { number: number }, hre: HardhatRuntimeEn
 
   const nKeys = args.number;
 
-  const whitelist: Whitelist = await hre.run('utils:getWhitelist');
+  const contract = await hre.ethers.getContractAt('DarkForest', hre.contracts.CONTRACT_ADDRESS);
 
   let allKeys: string[] = [];
   let keysGenerated = 0;
@@ -40,7 +39,7 @@ async function whitelistGenerate(args: { number: number }, hre: HardhatRuntimeEn
     const hashes: string[] = keys.map((x) => hre.ethers.utils.id(x));
 
     try {
-      const akReceipt = await whitelist.addKeys(hashes, { gasPrice: '5000000000' }); // 5gwei
+      const akReceipt = await contract.addKeys(hashes, { gasPrice: '5000000000' }); // 5gwei
       await akReceipt.wait();
 
       allKeys = allKeys.concat(keys);
@@ -54,7 +53,7 @@ async function whitelistGenerate(args: { number: number }, hre: HardhatRuntimeEn
     }
   }
 
-  const balance = await hre.ethers.provider.getBalance(whitelist.address);
+  const balance = await hre.ethers.provider.getBalance(contract.address);
   console.log('whitelist balance:', hre.ethers.utils.formatEther(balance));
 
   console.log('generated keys: ');
@@ -88,16 +87,16 @@ subtask('whitelist:existsAddress', 'determine if an address is whitelisted')
 async function whitelistExistsAddress(args: { address: string }, hre: HardhatRuntimeEnvironment) {
   await hre.run('utils:assertChainId');
 
-  const whitelist: Whitelist = await hre.run('utils:getWhitelist');
+  const contract = await hre.ethers.getContractAt('DarkForest', hre.contracts.CONTRACT_ADDRESS);
 
   const isAddress = hre.ethers.utils.isAddress(args.address);
   if (!isAddress) {
     throw new Error(`Address ${args.address} is NOT a valid address.`);
   }
 
-  const isWhitelisted = await whitelist.isWhitelisted(args.address);
+  const isWhitelisted = await contract.isWhitelisted(args.address);
 
-  const balance = await hre.ethers.provider.getBalance(whitelist.address);
+  const balance = await hre.ethers.provider.getBalance(contract.address);
   console.log('whitelist balance:', hre.ethers.utils.formatEther(balance));
 
   console.log(`Player ${args.address} is${isWhitelisted ? '' : ' NOT'} whitelisted.`);
@@ -110,11 +109,11 @@ subtask('whitelist:existsKey', 'determine if a whitelist key is valid')
 async function whitelistExistsKey(args: { key: string }, hre: HardhatRuntimeEnvironment) {
   await hre.run('utils:assertChainId');
 
-  const whitelist: Whitelist = await hre.run('utils:getWhitelist');
+  const contract = await hre.ethers.getContractAt('DarkForest', hre.contracts.CONTRACT_ADDRESS);
 
-  const isValid = await whitelist.isKeyValid(args.key);
+  const isValid = await contract.isKeyValid(args.key);
 
-  const balance = await hre.ethers.provider.getBalance(whitelist.address);
+  const balance = await hre.ethers.provider.getBalance(contract.address);
   console.log('whitelist balance:', hre.ethers.utils.formatEther(balance));
 
   console.log(`Key ${args.key} is${isValid ? '' : ' NOT'} valid.`);
@@ -156,7 +155,7 @@ subtask('whitelist:registerAddress', 'add address to whitelist with on-the-fly-g
 async function whitelistRegisterAddress(args: { address: string }, hre: HardhatRuntimeEnvironment) {
   await hre.run('utils:assertChainId');
 
-  const whitelist: Whitelist = await hre.run('utils:getWhitelist');
+  const contract = await hre.ethers.getContractAt('DarkForest', hre.contracts.CONTRACT_ADDRESS);
 
   for (const address of args.address.split(',')) {
     const isAddress = hre.ethers.utils.isAddress(address);
@@ -164,19 +163,19 @@ async function whitelistRegisterAddress(args: { address: string }, hre: HardhatR
       throw new Error(`Address ${address} is NOT a valid address.`);
     }
 
-    const isWhitelisted = await whitelist.isWhitelisted(address);
+    const isWhitelisted = await contract.isWhitelisted(address);
     if (isWhitelisted) {
       throw new Error(`Address ${address} is already whitelisted.`);
     }
 
     const apiKey: string = generateKey();
-    const akReceipt = await whitelist.addKeys([hre.ethers.utils.id(apiKey)]);
+    const akReceipt = await contract.addKeys([hre.ethers.utils.id(apiKey)]);
     await akReceipt.wait();
 
-    const ukReceipt = await whitelist.useKey(apiKey, address);
+    const ukReceipt = await contract.useKey(apiKey, address);
     await ukReceipt.wait();
 
-    const balance = await hre.ethers.provider.getBalance(whitelist.address);
+    const balance = await hre.ethers.provider.getBalance(contract.address);
     console.log('whitelist balance:', hre.ethers.utils.formatEther(balance));
 
     console.log(`[${new Date()}] Registered player ${address} with key ${apiKey}.`);
@@ -194,22 +193,22 @@ async function whitelistRegisterKey(
 ) {
   await hre.run('utils:assertChainId');
 
-  const whitelist: Whitelist = await hre.run('utils:getWhitelist');
+  const contract = await hre.ethers.getContractAt('DarkForest', hre.contracts.CONTRACT_ADDRESS);
 
-  const isValid = await whitelist.isKeyValid(args.key);
+  const isValid = await contract.isKeyValid(args.key);
   if (!isValid) {
     throw new Error(`Key ${args.key} is${isValid ? '' : ' NOT'} valid.`);
   }
 
-  const isWhitelisted = await whitelist.isWhitelisted(args.address);
+  const isWhitelisted = await contract.isWhitelisted(args.address);
   if (isWhitelisted) {
     throw new Error(`Player ${args.address} is already whitelisted.`);
   }
 
-  const ukReceipt = await whitelist.useKey(args.key, args.address);
+  const ukReceipt = await contract.useKey(args.key, args.address);
   await ukReceipt.wait();
 
-  const balance = await hre.ethers.provider.getBalance(whitelist.address);
+  const balance = await hre.ethers.provider.getBalance(contract.address);
   console.log('whitelist balance:', hre.ethers.utils.formatEther(balance));
 
   console.log(`[${new Date()}] Registered player ${args.address} with key ${args.key}.`);

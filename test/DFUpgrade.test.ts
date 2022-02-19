@@ -42,7 +42,7 @@ describe('DarkForestUpgrade', function () {
     await world.user1Core.initializePlayer(...makeInitArgs(SPAWN_PLANET_1));
 
     await expect(world.user2Core.upgradePlanet(player1Planet, 0)).to.be.revertedWith(
-      'Only owner account can perform operation on planets'
+      'Only owner account can perform that operation on planet.'
     );
   });
 
@@ -82,9 +82,9 @@ describe('DarkForestUpgrade', function () {
 
     await feedSilverToCap(world, world.user1Core, LVL1_ASTEROID_2, LVL1_PLANET_NEBULA);
 
-    await world.contracts.core.refreshPlanet(upgradeablePlanetId);
+    await world.contract.refreshPlanet(upgradeablePlanetId);
 
-    const planetBeforeUpgrade = await world.contracts.core.planets(upgradeablePlanetId);
+    const planetBeforeUpgrade = await world.contract.planets(upgradeablePlanetId);
 
     const silverCap = planetBeforeUpgrade.silverCap.toNumber();
     const initialSilver = planetBeforeUpgrade.silver.toNumber();
@@ -92,10 +92,10 @@ describe('DarkForestUpgrade', function () {
     const initialPopulationGrowth = planetBeforeUpgrade.populationGrowth;
 
     await expect(world.user1Core.upgradePlanet(upgradeablePlanetId, 0))
-      .to.emit(world.contracts.core, 'PlanetUpgraded')
+      .to.emit(world.contract, 'PlanetUpgraded')
       .withArgs(world.user1.address, upgradeablePlanetId, BN.from(0), BN.from(1));
 
-    const planetAfterUpgrade = await world.contracts.core.planets(upgradeablePlanetId);
+    const planetAfterUpgrade = await world.contract.planets(upgradeablePlanetId);
     const newPopulationCap = planetAfterUpgrade.populationCap;
     const newPopulationGrowth = planetAfterUpgrade.populationGrowth;
     const newSilver = planetAfterUpgrade.silver.toNumber();
@@ -106,6 +106,7 @@ describe('DarkForestUpgrade', function () {
   });
 
   it('should reject upgrade on silver mine, ruins, silver bank, and trading post', async function () {
+    this.timeout(0);
     await world.user1Core.initializePlayer(...makeInitArgs(SPAWN_PLANET_1));
 
     // conquer the special planets

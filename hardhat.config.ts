@@ -1,21 +1,31 @@
+// This file uses a `organize-imports-ignore` comment because we
+// need to control the ordering that Hardhat tasks are registered
+
+// organize-imports-ignore
+
 import '@nomiclabs/hardhat-ethers';
 import '@nomiclabs/hardhat-waffle';
-import '@openzeppelin/hardhat-upgrades';
+import 'hardhat-abi-exporter';
+import 'hardhat-diamond-abi';
+// Must be registered after hardhat-diamond-abi
 import '@typechain/hardhat';
 import 'hardhat-circom';
 import 'hardhat-contract-sizer';
+import '@solidstate/hardhat-4byte-uploader';
 import { extendEnvironment, HardhatUserConfig } from 'hardhat/config';
 import { lazyObject } from 'hardhat/plugins';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
+import * as diamondUtils from './utils/diamond';
 import * as path from 'path';
 import * as settings from './settings';
+import { decodeContracts, decodeInitializers, decodeAdminPlanets } from '@darkforest_eth/settings';
 import './tasks/artifact';
 import './tasks/circom';
 import './tasks/compile';
 import './tasks/debug';
 import './tasks/deploy';
 import './tasks/game';
-import './tasks/gpt-credits';
+import './tasks/lobby';
 import './tasks/subgraph';
 import './tasks/upgrades';
 import './tasks/utils';
@@ -41,28 +51,28 @@ extendEnvironment((env: HardhatRuntimeEnvironment) => {
 
   env.contracts = lazyObject(() => {
     const contracts = require('@darkforest_eth/contracts');
-    return settings.parse(settings.Contracts, contracts);
+    return settings.parse(decodeContracts, contracts);
   });
 
   env.initializers = lazyObject(() => {
     const { initializers = {} } = settings.load(env.network.name);
-    return settings.parse(settings.Initializers, initializers);
+    return settings.parse(decodeInitializers, initializers);
   });
 
   env.adminPlanets = lazyObject(() => {
     const { planets = [] } = settings.load(env.network.name);
-    return settings.parse(settings.AdminPlanets, planets);
+    return settings.parse(decodeAdminPlanets, planets);
   });
 });
 
 // The xdai config, but it isn't added to networks unless we have a DEPLOYER_MNEMONIC
 const xdai = {
-  // Using our archive node for admin task running
-  url: 'https://rpc-df.xdaichain.com/',
+  url: process.env.XDAI_RPC_URL ?? 'https://rpc-df.xdaichain.com/',
   accounts: {
     mnemonic: DEPLOYER_MNEMONIC,
   },
   chainId: 100,
+  gasMultiplier: 5,
 };
 
 // The mainnet config, but it isn't added to networks unless we have a DEPLOYER_MNEMONIC
@@ -105,20 +115,25 @@ const config: HardhatUserConfig = {
           balance: '100000000000000000000',
         },
         // user2 in tests
+        // admin account
         {
           privateKey: '0x67195c963ff445314e667112ab22f4a7404bad7f9746564eb409b9bb8c6aed32',
           balance: '100000000000000000000',
         },
       ],
       blockGasLimit: 16777215,
+      mining: {
+        auto: false,
+        interval: 1000,
+      },
     },
   },
   solidity: {
-    version: '0.7.6',
+    version: '0.8.10',
     settings: {
       optimizer: {
         enabled: true,
-        runs: 200,
+        runs: 1000,
       },
     },
   },
@@ -161,6 +176,27 @@ const config: HardhatUserConfig = {
   typechain: {
     outDir: path.join(packageDirs['@darkforest_eth/contracts'], 'typechain'),
     target: 'ethers-v5',
+  },
+  diamondAbi: {
+    // This plugin will combine all ABIs from any Smart Contract with `Facet` in the name or path and output it as `DarkForest.json`
+    name: 'DarkForest',
+    include: ['Facet'],
+    // We explicitly set `strict` to `true` because we want to validate our facets don't accidentally provide overlapping functions
+    strict: true,
+    // We use our diamond utils to filter some functions we ignore from the combined ABI
+    filter(abiElement: unknown, index: number, abi: unknown[], fullyQualifiedName: string) {
+      const signature = diamondUtils.toSignature(abiElement);
+      return diamondUtils.isIncluded(fullyQualifiedName, signature);
+    },
+  },
+  abiExporter: {
+    // This plugin will copy the ABI from the DarkForest artifact into our `@darkforest_eth/contracts` package as `abis/DarkForest.json`
+    path: path.join(packageDirs['@darkforest_eth/contracts'], 'abis'),
+    runOnCompile: true,
+    // We don't want additional directories created, so we explicitly set the `flat` option to `true`
+    flat: true,
+    // We **only** want to copy the DarkForest ABI (which is the Diamond ABI we generate) and the initializer ABI to this folder, so we limit the matched files with the `only` option
+    only: [':DarkForest$', ':DFInitialize$'],
   },
 };
 

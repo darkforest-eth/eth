@@ -1,4 +1,4 @@
-import { BigNumber, BigNumberish } from '@ethersproject/bignumber';
+import { BigNumber, BigNumberish } from 'ethers';
 
 interface TestLocationConstructorParam {
   hex: string;

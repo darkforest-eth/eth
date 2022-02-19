@@ -5,11 +5,11 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: DarkForestCore
+    name: DarkForest
     network: xdai
     source:
-      address: '{{{CORE_CONTRACT_ADDRESS}}}'
-      abi: DarkForestCore
+      address: '{{{CONTRACT_ADDRESS}}}'
+      abi: DarkForest
       startBlock: #{{{START_BLOCK}}}
     mapping:
       kind: ethereum/events
@@ -24,11 +24,11 @@ dataSources:
         - ArrivalQueue
         - DepartureQueue
         - Meta
+        - Artifact
+        - Spaceship
       abis:
-        - name: DarkForestCore
-          file: '{{{CORE_ABI_PATH}}}'
-        - name: DarkForestGetters
-          file: '{{{GETTERS_ABI_PATH}}}'
+        - name: DarkForest
+          file: '{{{DARKFOREST_ABI_PATH}}}'
       eventHandlers:
         - event: ArtifactDeposited(address,uint256,uint256)
           handler: handleArtifactDeposited
@@ -50,7 +50,7 @@ dataSources:
           handler: handlePlanetUpgraded
         - event: PlanetHatBought(address,uint256,uint256)
           handler: handlePlanetHatBought
-        - event: ArrivalQueued(address,uint256,uint256,uint256,uint256)
+        - event: ArrivalQueued(address,uint256,uint256,uint256,uint256,uint256)
           handler: handleArrivalQueued
         - event: PlayerInitialized(address,uint256)
           handler: handlePlayerInitialized
@@ -58,28 +58,16 @@ dataSources:
           handler: handlePlanetSilverWithdrawn
         - event: LocationRevealed(address,uint256,uint256,uint256)
           handler: handleLocationRevealed
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+        - event: PauseStateChanged(bool)
+          handler: handlePauseStateChanged
+        - event: LobbyCreated(address,address)
+          handler: handleLobbyCreated
+        - event: PlanetInvaded(address,uint256)
+          handler: handlePlanetInvaded
+        - event: PlanetCaptured(address,uint256)
+          handler: handlePlanetCaptured
       blockHandlers:
         - handler: handleBlock
       file: ./src/mapping.ts
-  - kind: ethereum/contract
-    name: DarkForestTokens
-    network: xdai
-    source:
-      address: '{{{TOKENS_CONTRACT_ADDRESS}}}'
-      abi: DarkForestTokens
-      startBlock: #{{{START_BLOCK}}}
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.5
-      language: wasm/assemblyscript
-      entities:
-        - Artifact
-      abis:
-        - name: DarkForestTokens
-          file: '{{{TOKENS_ABI_PATH}}}'
-        - name: DarkForestGetters
-          file: '{{{GETTERS_ABI_PATH}}}'
-      eventHandlers:
-        - event: Transfer(indexed address,indexed address,indexed uint256)
-          handler: handleTransfer
-      file: ./src/mappingTokens.ts

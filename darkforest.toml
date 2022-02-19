@@ -2,41 +2,92 @@
 # Defined in TOML as per https://toml.io/en/v0.5.0
 
 [initializers]
+START_PAUSED = true
 ADMIN_CAN_ADD_PLANETS = true
+TOKEN_MINT_END_TIMESTAMP = 2022-03-01T05:00:00.000Z
 WORLD_RADIUS_LOCKED = false
-TOKEN_MINT_END_TIMESTAMP = 2021-10-05T04:00:00.000Z # Mon Oct 04 2021 21:00:00 GMT-0700 (Pacific Daylight Time)
-TARGET4_RADIUS = 1600
-INITIAL_WORLD_RADIUS = 8000
-ROUND_NAME = "0.6.6 round 4"
-ROUND_END = 2021-10-05T04:00:00.000Z # Mon Oct 04 2021 21:00:00 GMT-0700 (Pacific Daylight Time)
+WORLD_RADIUS_MIN = 12_000
 
 ##################################
 # SNARK keys & Perlin parameters #
 ##################################
 DISABLE_ZK_CHECKS = false
-PLANETHASH_KEY = 6278
-SPACETYPE_KEY = 6279
-BIOMEBASE_KEY = 6270
+PLANETHASH_KEY = 115
+SPACETYPE_KEY = 116
+BIOMEBASE_KEY = 117
 PERLIN_MIRROR_X = false
 PERLIN_MIRROR_Y = false
 PERLIN_LENGTH_SCALE = 16384 # must be a power of two no greater than 16384
 
+##############
+# Space junk #
+##############
+SPACE_JUNK_ENABLED = true
+# Total amount of space junk a player can take on. This can be overridden at runtime by updating this value for a specific player in storage.
+SPACE_JUNK_LIMIT = 2000
+# The amount of junk that each level of planet gives the player when moving to it for the first time.
+PLANET_LEVEL_JUNK = [20, 25, 30, 35, 40, 45, 50, 55, 60, 65]
+# The speed boost a movement receives when abandoning a planet.
+ABANDON_SPEED_CHANGE_PERCENT = 150
+# The range boost a movement receives when abandoning a planet.
+ABANDON_RANGE_CHANGE_PERCENT = 150
+
+##############
+# Capture zones #
+##############
+CAPTURE_ZONES_ENABLED = true
+# How often zones change location. Max 255.
+CAPTURE_ZONE_CHANGE_BLOCK_INTERVAL = 255
+# How big the capture zones are
+CAPTURE_ZONE_RADIUS = 1000
+# The amount of score each planet level gives for capturing
+CAPTURE_ZONE_PLANET_LEVEL_SCORE = [
+  0,
+  0,
+  250_000,
+  500_000,
+  750_000,
+  1_000_000,
+  10_000_000,
+  20_000_000,
+  50_000_000,
+  100_000_000
+]
+# After invading, the number of blocks you need to hold a planet for before capturing
+CAPTURE_ZONE_HOLD_BLOCKS_REQUIRED = 2048
+# Number of capture zones that spawn each time they generate
+CAPTURE_ZONES_PER_5000_WORLD_RADIUS = 3
+
 ######################
 # Game configuration #
 ######################
-MAX_NATURAL_PLANET_LEVEL = 256
-TIME_FACTOR_HUNDREDTHS = 600 # speedup/slowdown game
+ARTIFACT_POINT_VALUES = [0, 100_000, 200_000, 500_000, 20_000_000, 50_000_000]
+MAX_NATURAL_PLANET_LEVEL = 9
+TIME_FACTOR_HUNDREDTHS = 100 # speedup/slowdown game
 PERLIN_THRESHOLD_1 = 14
 PERLIN_THRESHOLD_2 = 15
 PERLIN_THRESHOLD_3 = 19
 INIT_PERLIN_MIN = 13
 INIT_PERLIN_MAX = 14
 SPAWN_RIM_AREA = 0
-BIOME_THRESHOLD_1 = 15
+BIOME_THRESHOLD_1 = 14
 BIOME_THRESHOLD_2 = 17
-PLANET_RARITY = 16384
-PHOTOID_ACTIVATION_DELAY = 14400 # seconds
-LOCATION_REVEAL_COOLDOWN = 86400 # seconds
+SILVER_SCORE_VALUE = 10
+# PLANET_LEVEL_THRESHOLDS = [
+#   16_777_216,
+#   4_194_292,
+#   1_048_561,
+#   262_128,
+#   65_520,
+#   16_368,
+#   4_080,
+#   1_008,
+#   240,
+#   48
+# ]
+PLANET_RARITY = 12000
+PHOTOID_ACTIVATION_DELAY = 10800 # seconds
+LOCATION_REVEAL_COOLDOWN = 10800 # seconds
 CLAIM_PLANET_COOLDOWN = 10800 # seconds
 PLANET_TYPE_WEIGHTS = [
   [

@@ -25,12 +25,12 @@ describe('DarkForestReveal', function () {
     const x = 10;
     const y = 20;
     await world.user1Core.revealLocation(...makeRevealArgs(SPAWN_PLANET_2, x, y));
-    const revealedCoords = await world.contracts.core.revealedCoords(SPAWN_PLANET_2.id);
+    const revealedCoords = await world.contract.revealedCoords(SPAWN_PLANET_2.id);
     expect(revealedCoords.x.toNumber()).to.equal(x);
     expect(revealedCoords.y.toNumber()).to.equal(y);
     expect(revealedCoords.revealer).to.equal(world.user1.address);
-    await expect((await world.contracts.core.getNRevealedPlanets()).toNumber()).to.equal(1);
-    await expect(await world.contracts.core.revealedPlanetIds(0)).to.be.equal(SPAWN_PLANET_2.id);
+    await expect((await world.contract.getNRevealedPlanets()).toNumber()).to.equal(1);
+    await expect(await world.contract.revealedPlanetIds(0)).to.be.equal(SPAWN_PLANET_2.id);
   });
 
   it('allows player to reveal location of planet owned by another player', async function () {
@@ -40,26 +40,26 @@ describe('DarkForestReveal', function () {
     const x = 10;
     const y = 20;
     await world.user1Core.revealLocation(...makeRevealArgs(SPAWN_PLANET_2, x, y));
-    const revealedCoords = await world.contracts.core.revealedCoords(SPAWN_PLANET_2.id);
+    const revealedCoords = await world.contract.revealedCoords(SPAWN_PLANET_2.id);
     expect(revealedCoords.x.toNumber()).to.equal(x);
     expect(revealedCoords.y.toNumber()).to.equal(y);
-    await expect((await world.contracts.core.getNRevealedPlanets()).toNumber()).to.equal(1);
-    await expect(await world.contracts.core.revealedPlanetIds(0)).to.be.equal(SPAWN_PLANET_2.id);
+    await expect((await world.contract.getNRevealedPlanets()).toNumber()).to.equal(1);
+    await expect(await world.contract.revealedPlanetIds(0)).to.be.equal(SPAWN_PLANET_2.id);
   });
 
   it('allows player to reveal location of planet owned by self', async function () {
     const x = 10;
     const y = 20;
     await world.user1Core.revealLocation(...makeRevealArgs(SPAWN_PLANET_1, x, y));
-    const revealedCoords = await world.contracts.core.revealedCoords(SPAWN_PLANET_1.id);
+    const revealedCoords = await world.contract.revealedCoords(SPAWN_PLANET_1.id);
     expect(revealedCoords.x.toNumber()).to.equal(x);
     expect(revealedCoords.y.toNumber()).to.equal(y);
-    await expect((await world.contracts.core.getNRevealedPlanets()).toNumber()).to.equal(1);
-    await expect(await world.contracts.core.revealedPlanetIds(0)).to.be.equal(SPAWN_PLANET_1.id);
+    await expect((await world.contract.getNRevealedPlanets()).toNumber()).to.equal(1);
+    await expect(await world.contract.revealedPlanetIds(0)).to.be.equal(SPAWN_PLANET_1.id);
   });
 
   it("player can't reveal location of second planet without waiting for cooldown", async function () {
-    await world.contracts.core.changeLocationRevealCooldown(60);
+    await world.contract.changeLocationRevealCooldown(60);
 
     const x1 = 30;
     const y1 = 40;
@@ -72,7 +72,7 @@ describe('DarkForestReveal', function () {
 
     await increaseBlockchainTime();
     await world.user1Core.revealLocation(...makeRevealArgs(SPAWN_PLANET_1, x1, y1));
-    await expect((await world.contracts.core.getNRevealedPlanets()).toNumber()).to.equal(2);
+    await expect((await world.contract.getNRevealedPlanets()).toNumber()).to.equal(2);
   });
 
   it("player can't reveal invalid location that doesn't already exist in contract", async function () {
@@ -84,7 +84,7 @@ describe('DarkForestReveal', function () {
   });
 
   it("can't reveal same location twice", async function () {
-    await world.contracts.core.changeLocationRevealCooldown(60);
+    await world.contract.changeLocationRevealCooldown(60);
 
     const x = 30;
     const y = 40;
@@ -94,7 +94,7 @@ describe('DarkForestReveal', function () {
       world.user1Core.revealLocation(...makeRevealArgs(SPAWN_PLANET_1, x, y))
     ).to.be.revertedWith('Location already revealed');
 
-    await expect((await world.contracts.core.getNRevealedPlanets()).toNumber()).to.equal(1);
+    await expect((await world.contract.getNRevealedPlanets()).toNumber()).to.equal(1);
   });
 
   it('player must pass in valid perlin flags for zk checks', async function () {

@@ -2,8 +2,12 @@
 import { BigDecimal, BigInt } from '@graphprotocol/graph-ts';
 import { Arrival, Planet } from '../../generated/schema';
 
+function isZeroAddress(address: string): boolean {
+  return '0x0000000000000000000000000000000000000000' == address;
+}
+
 function hasOwner(planet: Planet): boolean {
-  return planet.owner !== '0x0000000000000000000000000000000000000000';
+  return !isZeroAddress(planet.owner);
 }
 
 function getSilverOverTime(planet: Planet, startTimeS: i32, endTimeS: i32): BigInt {
@@ -77,9 +81,12 @@ function getEnergyAtTime(planet: Planet, atTimeS: i32): BigInt {
 }
 
 function updatePlanetToTime(planet: Planet, atTimeS: i32): Planet {
-  planet.milliSilverLazy = getSilverOverTime(planet, planet.lastUpdated, atTimeS);
-  planet.milliEnergyLazy = getEnergyAtTime(planet, atTimeS);
-  planet.lastUpdated = atTimeS;
+  if (planet.pausers <= 0) {
+    planet.milliSilverLazy = getSilverOverTime(planet, planet.lastUpdated, atTimeS);
+    planet.milliEnergyLazy = getEnergyAtTime(planet, atTimeS);
+    planet.lastUpdated = atTimeS;
+  }
+
   return planet;
 }
 
@@ -109,7 +116,7 @@ export function arrive(toPlanet: Planet, arrival: Arrival): Planet {
       toPlanet.milliEnergyLazy = toPlanet.milliEnergyLazy.minus(effectiveEnergy);
     } else {
       // conquers planet
-      toPlanet.owner = arrival.player;
+      toPlanet.owner = isZeroAddress(arrival.player) ? toPlanet.owner : arrival.player;
       const effectiveDefendingEnergy = toPlanet.milliEnergyLazy
         .times(BigInt.fromI32(toPlanet.defense))
         .div(BigInt.fromI32(100));

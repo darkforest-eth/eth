@@ -1,5 +1,5 @@
 /* eslint-disable eqeqeq */
-import { CORE_CONTRACT_ADDRESS, GETTERS_CONTRACT_ADDRESS } from '@darkforest_eth/contracts';
+import { CONTRACT_ADDRESS } from '@darkforest_eth/contracts';
 import { Address, BigInt, ethereum, log } from '@graphprotocol/graph-ts';
 import {
   AdminPlanetCreated,
@@ -9,35 +9,43 @@ import {
   ArtifactDeposited,
   ArtifactFound,
   ArtifactWithdrawn,
+  DarkForest,
+  DarkForest__bulkGetArtifactsByIdsResultRetStruct,
+  LobbyCreated,
   LocationRevealed,
+  PlanetCaptured,
   PlanetHatBought,
+  PlanetInvaded,
   PlanetProspected,
   PlanetSilverWithdrawn,
   PlanetTransferred,
   PlanetUpgraded,
   PlayerInitialized,
-} from '../generated/DarkForestCore/DarkForestCore';
-import { DarkForestGetters } from '../generated/DarkForestCore/DarkForestGetters';
+  Transfer,
+} from '../generated/DarkForest/DarkForest';
 import {
   Arrival,
   ArrivalQueue,
   Artifact,
   Hat,
+  Lobby,
   Meta,
   Planet,
   Player,
   RevealedCoordinate,
+  Spaceship,
 } from '../generated/schema';
 import { arrive } from './helpers/arrivalHelpers';
 import {
-  artifactRarityToPoints,
   bjjFieldElementToSignedInt,
   hexStringToPaddedUnprefixed,
+  isSpaceship,
   toLowercase,
 } from './helpers/converters';
 import {
   refreshArtifactFromContractData,
   refreshPlanetFromContractData,
+  refreshSpaceshipFromContractData,
   refreshVoyageFromContractData,
 } from './helpers/decoders';
 
@@ -56,6 +64,18 @@ import {
 // handlers even though that can be costly, but so those other handlers can
 // planet.load successfully
 
+export function handlePlanetInvaded(event: PlanetInvaded): void {
+  const meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
+  addToPlanetRefreshQueue(meta, event.params.loc);
+  meta.save();
+}
+
+export function handlePlanetCaptured(event: PlanetCaptured): void {
+  const meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
+  addToPlanetRefreshQueue(meta, event.params.loc);
+  meta.save();
+}
+
 export function handleArtifactFound(event: ArtifactFound): void {
   const meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
   addToPlanetRefreshQueue(meta, event.params.loc);
@@ -64,23 +84,11 @@ export function handleArtifactFound(event: ArtifactFound): void {
   // instead of adding to artifact refresh queue, which is processed at end of block
   // make a contract call to save the artifact immediately, in case we need to grab
   // it from store in any additional handler in this block
-  const getters = DarkForestGetters.bind(Address.fromString(GETTERS_CONTRACT_ADDRESS));
-  const rawArtifact = getters.bulkGetArtifactsByIds([event.params.artifactId]);
+  const contract = DarkForest.bind(Address.fromString(CONTRACT_ADDRESS));
+  const rawArtifact = contract.bulkGetArtifactsByIds([event.params.artifactId]);
 
-  const artifact = refreshArtifactFromContractData(event.params.artifactId, rawArtifact[0]);
-  artifact.save();
-
-  // also update player's score
-  const playerId = event.params.player.toHexString();
-  const player = Player.load(playerId);
-  if (player) {
-    const scoreToAdd = BigInt.fromI32(artifactRarityToPoints(artifact.rarity));
-    player.score = player.score.plus(scoreToAdd);
-    player.save();
-  } else {
-    log.error('tried to process artifact score update for unknown player: {}', [playerId]);
-    throw new Error();
-  }
+  refreshArtifactOrSpaceship(event.params.artifactId, rawArtifact[0]);
+  addPlayerToRefreshQueue(meta, event.params.player.toHexString());
 }
 
 export function handleArtifactDeposited(event: ArtifactDeposited): void {
@@ -166,15 +174,26 @@ export function handlePlayerInitialized(event: PlayerInitialized): void {
   player.homeWorld = locationId;
   player.score = BigInt.fromI32(0);
   player.lastRevealTimestamp = 0;
+  player.spaceJunk = 0;
+  player.spaceJunkLimit = 0;
   player.save();
 
   // expensive to create planet in handler, but needs to exist in case say a hat
   // bought in same block
-  const getters = DarkForestGetters.bind(Address.fromString(GETTERS_CONTRACT_ADDRESS));
-  const planetDatas = getters.bulkGetPlanetsDataByIds([event.params.loc]);
+  const contract = DarkForest.bind(Address.fromString(CONTRACT_ADDRESS));
+  const planetDatas = contract.bulkGetPlanetsDataByIds([event.params.loc]);
   const rawData = planetDatas[0];
-  const planet = refreshPlanetFromContractData(event.params.loc, rawData.planet, rawData.info);
+  const planet = refreshPlanetFromContractData(
+    event.params.loc,
+    rawData.planet,
+    rawData.info,
+    rawData.info2
+  );
   planet.save();
+
+  const meta = getMeta(event.block.timestamp.toI32(), event.block.number.toI32());
+  addPlayerToRefreshQueue(meta, event.params.player.toHexString());
+  meta.save();
 }
 
 export function handleBlock(block: ethereum.Block): void {
@@ -185,6 +204,7 @@ export function handleBlock(block: ethereum.Block): void {
   refreshTouchedPlanets(meta);
   refreshTouchedArtifacts(meta);
   addNewDepartures(meta);
+  refreshPlayers(meta);
 
   meta.lastProcessed = current;
   meta.blockNumber = block.number.toI32();
@@ -303,10 +323,15 @@ export function handleLocationRevealed(event: LocationRevealed): void {
     // Expensive action for a handler but might not exist if never interacted
     // with before, or if it was an admin created planet that was scheduled but
     // refreshed yet
-    const getters = DarkForestGetters.bind(Address.fromString(GETTERS_CONTRACT_ADDRESS));
-    const planetDatas = getters.bulkGetPlanetsDataByIds([event.params.loc]);
+    const contract = DarkForest.bind(Address.fromString(CONTRACT_ADDRESS));
+    const planetDatas = contract.bulkGetPlanetsDataByIds([event.params.loc]);
     const rawData = planetDatas[0];
-    planet = refreshPlanetFromContractData(event.params.loc, rawData.planet, rawData.info);
+    planet = refreshPlanetFromContractData(
+      event.params.loc,
+      rawData.planet,
+      rawData.info,
+      rawData.info2
+    );
     planet.save();
   }
 
@@ -319,6 +344,29 @@ export function handleLocationRevealed(event: LocationRevealed): void {
   planet.revealedCoordinate = planet.id;
   planet.isRevealed = true;
   planet.save();
+}
+
+export function handleTransfer(event: Transfer): void {
+  let artifact = Artifact.load(event.params.tokenId.toHexString());
+  let spaceship = Spaceship.load(event.params.tokenId.toHexString());
+  if (artifact !== null) {
+    artifact.ownerAddress = event.params.to.toHexString();
+    artifact.save();
+  } else {
+    // artifact was just minted, so it's not in store yet
+    // note that a _mint does emit a Transfer ERC721 event
+    const contract = DarkForest.bind(Address.fromString(CONTRACT_ADDRESS));
+    const rawArtifact = contract.bulkGetArtifactsByIds([event.params.tokenId]);
+
+    refreshArtifactOrSpaceship(event.params.tokenId, rawArtifact[0]);
+  }
+}
+
+export function handleLobbyCreated(event: LobbyCreated): void {
+  const lobby = new Lobby(event.params.lobbyAddress.toHexString());
+  lobby.ownerAddress = event.params.ownerAddress.toHexString();
+  lobby.lobbyAddress = event.params.lobbyAddress.toHexString();
+  lobby.save();
 }
 
 function processScheduledArrivalsSinceLastBlock(meta: Meta, current: i32): void {
@@ -354,7 +402,12 @@ function processScheduledArrivalsSinceLastBlock(meta: Meta, current: i32): void 
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           const carriedArtifact = arrival.carriedArtifact!;
           const artifact = Artifact.load(carriedArtifact);
-          if (artifact) {
+          const spaceship = Spaceship.load(carriedArtifact);
+          if (spaceship) {
+            spaceship.onVoyage = null;
+            spaceship.onPlanet = toPlanet.id;
+            spaceship.save();
+          } else if (artifact) {
             artifact.onVoyage = null;
             artifact.onPlanet = toPlanet.id;
             artifact.save();
@@ -366,6 +419,12 @@ function processScheduledArrivalsSinceLastBlock(meta: Meta, current: i32): void 
       }
     }
   }
+}
+
+function addPlayerToRefreshQueue(meta: Meta, playerAddress: string): void {
+  const players = meta._currentlyRefreshingPlayers;
+  players.push(playerAddress);
+  meta._currentlyRefreshingPlayers = players;
 }
 
 function addToPlanetRefreshQueue(meta: Meta, planetId: BigInt): void {
@@ -414,21 +473,48 @@ function addToVoyageAddQueue(meta: Meta, voyageId: BigInt): void {
   meta._currentlyAddingVoyages = _currentlyAddingVoyages; // need to change ref otherwise won't save
 }
 
+function refreshPlayers(meta: Meta): void {
+  const players = meta._currentlyRefreshingPlayers.map<string>((x) => x);
+  const contract = DarkForest.bind(Address.fromString(CONTRACT_ADDRESS));
+
+  for (let i = 0; i < players.length; i++) {
+    const player = Player.load(players[i]);
+
+    if (player) {
+      const address = Address.fromString(players[i]);
+      const contractPlayer = contract.players(address);
+
+      player.score = contractPlayer.score;
+      player.spaceJunk = contractPlayer.spaceJunk.toI32();
+      player.spaceJunkLimit = contractPlayer.spaceJunkLimit.toI32();
+      player.save();
+    }
+  }
+
+  meta._currentlyRefreshingPlayers = [];
+  meta.save();
+}
+
 function refreshTouchedPlanets(meta: Meta): void {
   if (meta._currentlyRefreshingPlanets.length === 0) {
     // save a contract call by just returning
     return;
   }
 
-  const getters = DarkForestGetters.bind(Address.fromString(GETTERS_CONTRACT_ADDRESS));
-  const planetDatas = getters.bulkGetPlanetsDataByIds(meta._currentlyRefreshingPlanets);
+  const contract = DarkForest.bind(Address.fromString(CONTRACT_ADDRESS));
+  const planetDatas = contract.bulkGetPlanetsDataByIds(meta._currentlyRefreshingPlanets);
   // in AS we can't index into meta._currentlyRefreshingPlanets within a for loop
   // (see https://github.com/AssemblyScript/assemblyscript/issues/222)
   // so we copy into memory array and index into that
   const planetDecIds = meta._currentlyRefreshingPlanets.map<BigInt>((x) => x);
   for (let i = 0; i < meta._currentlyRefreshingPlanets.length; i++) {
     const rawData = planetDatas[i];
-    const planet = refreshPlanetFromContractData(planetDecIds[i], rawData.planet, rawData.info);
+    const planet = refreshPlanetFromContractData(
+      planetDecIds[i],
+      rawData.planet,
+      rawData.info,
+      rawData.info2
+    );
     planet.save();
   }
 
@@ -442,20 +528,45 @@ function refreshTouchedArtifacts(meta: Meta): void {
     return;
   }
 
-  const getters = DarkForestGetters.bind(Address.fromString(GETTERS_CONTRACT_ADDRESS));
-  const rawArtifacts = getters.bulkGetArtifactsByIds(meta._currentlyRefreshingArtifacts);
+  const contract = DarkForest.bind(Address.fromString(CONTRACT_ADDRESS));
+  const rawArtifacts = contract.bulkGetArtifactsByIds(meta._currentlyRefreshingArtifacts);
   // in AS we can't index into meta._currentlyRefreshingArtifacts within a for loop
   // (see https://github.com/AssemblyScript/assemblyscript/issues/222)
   // so we copy into memory array and index into that
   const artifactDecIds = meta._currentlyRefreshingArtifacts.map<BigInt>((x) => x);
   for (let i = 0; i < meta._currentlyRefreshingArtifacts.length; i++) {
-    const rawData = rawArtifacts[i];
-    const artifact = refreshArtifactFromContractData(artifactDecIds[i], rawData);
-    artifact.save();
+    refreshArtifactOrSpaceship(artifactDecIds[i], rawArtifacts[i]);
   }
 
   meta._currentlyRefreshingArtifacts = [];
   meta.save();
+}
+
+export class RefreshArtifactOrSpaceshipResult {
+  artifact: Artifact | null;
+  spaceship: Spaceship | null;
+
+  public constructor(artifact: Artifact | null, spaceship: Spaceship | null) {
+    this.artifact = artifact;
+    this.spaceship = spaceship;
+  }
+}
+
+function refreshArtifactOrSpaceship(
+  idDec: BigInt,
+  rawData: DarkForest__bulkGetArtifactsByIdsResultRetStruct
+): RefreshArtifactOrSpaceshipResult {
+  const type = rawData.artifact.artifactType;
+
+  if (isSpaceship(type)) {
+    const spaceship = refreshSpaceshipFromContractData(idDec, rawData);
+    spaceship.save();
+    return new RefreshArtifactOrSpaceshipResult(null, spaceship);
+  } else {
+    const artifact = refreshArtifactFromContractData(idDec, rawData);
+    artifact.save();
+    return new RefreshArtifactOrSpaceshipResult(artifact, null);
+  }
 }
 
 function addNewDepartures(meta: Meta): void {
@@ -464,8 +575,8 @@ function addNewDepartures(meta: Meta): void {
     return;
   }
 
-  const getters = DarkForestGetters.bind(Address.fromString(GETTERS_CONTRACT_ADDRESS));
-  const voyageDatas = getters.bulkGetVoyagesByIds(meta._currentlyAddingVoyages);
+  const contract = DarkForest.bind(Address.fromString(CONTRACT_ADDRESS));
+  const voyageDatas = contract.bulkGetVoyagesByIds(meta._currentlyAddingVoyages);
   // in AS we can't index into meta._currentlyAddingVoyages within a for loop
   // (see https://github.com/AssemblyScript/assemblyscript/issues/222)
   // so we copy into memory array and index into that
@@ -488,6 +599,8 @@ function addNewDepartures(meta: Meta): void {
     pendingArrivals.push(voyage.id);
     pending.arrivals = pendingArrivals; // need to change ref otherwise won't save
     pending.save();
+
+    addPlayerToRefreshQueue(meta, voyage.player);
   }
 
   meta._currentlyAddingVoyages = [];
@@ -511,14 +624,19 @@ function getMeta(timestamp: i32, blockNumber: i32): Meta {
     nullPlayer.initTimestamp = timestamp;
     nullPlayer.score = BigInt.fromI32(0);
     nullPlayer.lastRevealTimestamp = 0;
+    nullPlayer.spaceJunk = 0;
+    nullPlayer.spaceJunkLimit = 0;
     nullPlayer.save();
 
     // add the core contract into Player store, because it can own artifacts
-    const coreContract = new Player(toLowercase(CORE_CONTRACT_ADDRESS));
+    const coreContract = new Player(toLowercase(CONTRACT_ADDRESS));
     coreContract.initTimestamp = timestamp;
     coreContract.score = BigInt.fromI32(0);
     coreContract.lastRevealTimestamp = 0;
+    coreContract.spaceJunk = 0;
+    coreContract.spaceJunkLimit = 0;
     coreContract.save();
   }
+
   return meta as Meta;
 }

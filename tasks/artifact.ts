@@ -1,23 +1,15 @@
 import { task } from 'hardhat/config';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
-import { DarkForestTokens } from '../task-types';
 
 task('artifact:read', 'Read Artifact data from Tokens contract').setAction(artifactsRead);
 
 async function artifactsRead({}, hre: HardhatRuntimeEnvironment) {
-  const tokens: DarkForestTokens = await hre.run('utils:getTokens');
+  const contract = await hre.ethers.getContractAt('DarkForest', hre.contracts.CONTRACT_ADDRESS);
 
-  const id = await tokens.tokenByIndex(0);
+  const id = await contract.tokenByIndex(0);
   console.log(id.toString());
-  const token = await tokens.getArtifact(id);
+  const token = await contract.getArtifact(id);
   console.log(token);
-  const URI = await tokens.tokenURI(id);
+  const URI = await contract.tokenURI(id);
   console.log(URI);
-}
-
-task('artifact:set-base-uri', 'set token base URI').setAction(setBaseURI);
-
-async function setBaseURI({}, hre: HardhatRuntimeEnvironment) {
-  const tokens: DarkForestTokens = await hre.run('utils:getTokens');
-  tokens.setBaseUriForStaging();
 }

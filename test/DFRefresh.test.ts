@@ -37,17 +37,17 @@ describe('DarkForestRefresh', function () {
   it('should increase population over time', async function () {
     const planetId = SPAWN_PLANET_1.id;
 
-    const startPlanet = await world.contracts.core.planets(planetId);
-    const startPlanetExtendedInfo = await world.contracts.core.planetsExtendedInfo(planetId);
+    const startPlanet = await world.contract.planets(planetId);
+    const startPlanetExtendedInfo = await world.contract.planetsExtendedInfo(planetId);
     expect(startPlanetExtendedInfo.lastUpdated).to.equal(
       (await ethers.provider.getBlock('latest')).timestamp
     );
 
     await increaseBlockchainTime(SMALL_INTERVAL);
 
-    await world.contracts.core.refreshPlanet(planetId);
-    const midPlanet = await world.contracts.core.planets(planetId);
-    const midPlanetExtendedInfo = await world.contracts.core.planetsExtendedInfo(planetId);
+    await world.contract.refreshPlanet(planetId);
+    const midPlanet = await world.contract.planets(planetId);
+    const midPlanetExtendedInfo = await world.contract.planetsExtendedInfo(planetId);
     expect(midPlanetExtendedInfo.lastUpdated).to.equal(
       (await ethers.provider.getBlock('latest')).timestamp
     );
@@ -55,10 +55,10 @@ describe('DarkForestRefresh', function () {
 
     await increaseBlockchainTime(LARGE_INTERVAL);
 
-    await world.contracts.core.refreshPlanet(planetId);
+    await world.contract.refreshPlanet(planetId);
 
-    const endPlanet = await world.contracts.core.planets(planetId);
-    const endPlanetExtendedInfo = await world.contracts.core.planetsExtendedInfo(planetId);
+    const endPlanet = await world.contract.planets(planetId);
+    const endPlanetExtendedInfo = await world.contract.planetsExtendedInfo(planetId);
     expect(endPlanet.population).to.be.above(midPlanet.population);
     expect(endPlanet.population).to.not.be.above(endPlanet.populationCap);
     expect(endPlanet.population).to.be.above(endPlanet.populationCap.sub(BN.from(1)));
@@ -78,22 +78,22 @@ describe('DarkForestRefresh', function () {
 
     await world.user1Core.move(...makeMoveArgs(SPAWN_PLANET_2, SPAWN_PLANET_1, 0, 99000, 0));
 
-    await world.contracts.core.refreshPlanet(planetId1);
+    await world.contract.refreshPlanet(planetId1);
 
-    const startPlanet1 = await world.contracts.core.planets(planetId1);
+    const startPlanet1 = await world.contract.planets(planetId1);
     expect(startPlanet1.population).to.be.above(startPlanet1.populationCap);
 
     await increaseBlockchainTime(SMALL_INTERVAL);
-    await world.contracts.core.refreshPlanet(planetId1);
+    await world.contract.refreshPlanet(planetId1);
 
-    const midPlanet1 = await world.contracts.core.planets(planetId1);
+    const midPlanet1 = await world.contract.planets(planetId1);
     expect(midPlanet1.population).to.be.above(midPlanet1.populationCap);
     expect(midPlanet1.population).to.be.below(startPlanet1.population);
 
     await increaseBlockchainTime();
 
-    await world.contracts.core.refreshPlanet(planetId1);
-    const endPlanet1 = await world.contracts.core.planets(planetId1);
+    await world.contract.refreshPlanet(planetId1);
+    const endPlanet1 = await world.contract.planets(planetId1);
     expect(endPlanet1.population).to.not.be.below(endPlanet1.populationCap);
     expect(endPlanet1.population).to.be.below(endPlanet1.populationCap.add(BN.from(1)));
   });
@@ -111,7 +111,7 @@ describe('DarkForestRefresh', function () {
     // reduce it to 50% pop and 0% silver
     await increaseBlockchainTime();
 
-    let silverStarPlanet = await world.contracts.core.planets(silverStarId);
+    let silverStarPlanet = await world.contract.planets(silverStarId);
     const silverStarPopCap = silverStarPlanet.populationCap;
     const silverStarResCap = silverStarPlanet.silverCap;
     await world.user1Core.move(
@@ -127,9 +127,9 @@ describe('DarkForestRefresh', function () {
     // test that over SMALL_INTERVAL seconds it produces the correct amt of silver
     // i.e. after SMALL_INTERVAL seconds it has ~silverGrowth * SMALL_INTERVAL silver
     await increaseBlockchainTime(SMALL_INTERVAL);
-    await world.contracts.core.refreshPlanet(silverStarId);
+    await world.contract.refreshPlanet(silverStarId);
 
-    silverStarPlanet = await world.contracts.core.planets(silverStarId);
+    silverStarPlanet = await world.contract.planets(silverStarId);
     expect(silverStarPlanet.silver).to.not.be.below(
       silverStarPlanet.silverGrowth.mul(SMALL_INTERVAL)
     );
@@ -142,8 +142,8 @@ describe('DarkForestRefresh', function () {
   it('should not increase silver of non-silver-producing planet', async function () {
     const planetId = SPAWN_PLANET_1.id;
     await increaseBlockchainTime(SMALL_INTERVAL);
-    await world.contracts.core.refreshPlanet(planetId);
-    const planet = await world.contracts.core.planets(planetId);
+    await world.contract.refreshPlanet(planetId);
+    const planet = await world.contract.planets(planetId);
     expect(planet.silver).to.be.equal(BN.from(0));
   });
 
@@ -162,16 +162,16 @@ describe('DarkForestRefresh', function () {
     // make planet 2's silver > cap
     await world.user1Core.move(...makeMoveArgs(LVL1_ASTEROID_1, LVL1_ASTEROID_2, 0, 90000, 1000));
 
-    await world.contracts.core.refreshPlanet(silverStarId2);
-    let silverStarPlanet2 = await world.contracts.core.planets(silverStarId2);
+    await world.contract.refreshPlanet(silverStarId2);
+    let silverStarPlanet2 = await world.contract.planets(silverStarId2);
     const silverCap = silverStarPlanet2.silverCap;
     const oldSilver = silverStarPlanet2.silver;
     expect(oldSilver).to.not.be.below(silverCap);
 
     // after time has passed, planet 2 silver should not have increased
     await increaseBlockchainTime(SMALL_INTERVAL);
-    await world.contracts.core.refreshPlanet(silverStarId2);
-    silverStarPlanet2 = await world.contracts.core.planets(silverStarId2);
+    await world.contract.refreshPlanet(silverStarId2);
+    silverStarPlanet2 = await world.contract.planets(silverStarId2);
     const newSilver = silverStarPlanet2.silver;
     expect(newSilver).to.not.be.below(oldSilver);
   });
@@ -182,8 +182,8 @@ describe('DarkForestRefresh', function () {
     await world.user1Core.move(...makeMoveArgs(SPAWN_PLANET_1, LVL1_PLANET_NEBULA, 0, 20000, 0));
     await increaseBlockchainTime();
 
-    await world.contracts.core.refreshPlanet(star2Id);
-    let star2Data = await world.contracts.core.planets(star2Id);
+    await world.contract.refreshPlanet(star2Id);
+    let star2Data = await world.contract.planets(star2Id);
     const oldPop = star2Data.population;
     const oldSilver = star2Data.silver;
     expect(star2Data.owner).to.be.equal(ZERO_ADDRESS);
@@ -191,8 +191,8 @@ describe('DarkForestRefresh', function () {
     expect(star2Data.silver).to.be.equal(BN.from(0));
 
     increaseBlockchainTime(SMALL_INTERVAL);
-    await world.contracts.core.refreshPlanet(star2Id);
-    star2Data = await world.contracts.core.planets(star2Id);
+    await world.contract.refreshPlanet(star2Id);
+    star2Data = await world.contract.planets(star2Id);
     const newPop = star2Data.population;
     const newSilver = star2Data.silver;
     expect(newPop).to.be.equal(oldPop);

@@ -1,294 +1,98 @@
-import { SCORING_CONTRACT_ADDRESS } from '@darkforest_eth/contracts';
-import { DeployOptions } from '@openzeppelin/hardhat-upgrades/dist/deploy-proxy';
-import { getImplementationAddress, TransactionMinedTimeout } from '@openzeppelin/upgrades-core';
-import { Contract, Signer } from 'ethers';
 import { task } from 'hardhat/config';
-import { FactoryOptions, HardhatRuntimeEnvironment } from 'hardhat/types';
-import type {
-  DarkForestCore,
-  DarkForestGetters,
-  DarkForestGPTCredit,
-  DarkForestTokens,
-  LibraryContracts,
-  Whitelist,
-} from '../task-types';
+import { HardhatRuntimeEnvironment } from 'hardhat/types';
+import { DiamondChanges } from '../utils/diamond';
+import {
+  deployAdminFacet,
+  deployArtifactFacet,
+  deployCaptureFacet,
+  deployCoreFacet,
+  deployGetterFacet,
+  deployLibraries,
+  deployLobbyFacet,
+  deployMoveFacet,
+  deployWhitelistFacet,
+} from './deploy';
 
-// libraries (utils, in specific), is shared by DarkForestGetters and
-// DarkForestCore, so can't be upgraded individually
-task(
-  'upgrade:multi',
-  'upgrade libraries, DarkForestGetters, and DarkForestCore contract'
-).setAction(upgradeMulti);
+task('upgrade', 'upgrade contracts and replace in the diamond').setAction(upgrade);
 
-async function upgradeMulti({}, hre: HardhatRuntimeEnvironment) {
+async function upgrade({}, hre: HardhatRuntimeEnvironment) {
   await hre.run('utils:assertChainId');
+
+  const isDev = hre.network.name === 'localhost' || hre.network.name === 'hardhat';
 
   // need to force a compile for tasks
   await hre.run('compile');
 
-  const {
-    CORE_CONTRACT_ADDRESS,
-    TOKENS_CONTRACT_ADDRESS,
-    GETTERS_CONTRACT_ADDRESS,
-    GPT_CREDIT_CONTRACT_ADDRESS,
-    WHITELIST_CONTRACT_ADDRESS,
-    START_BLOCK,
-  } = hre.contracts;
+  const diamond = await hre.ethers.getContractAt('DarkForest', hre.contracts.CONTRACT_ADDRESS);
 
-  await upgradeProxyWithRetry<DarkForestGPTCredit>({
-    contractName: 'DarkForestGPTCredit',
-    contractAddress: GPT_CREDIT_CONTRACT_ADDRESS,
-    signerOrOptions: {},
-    deployOptions: {},
-    retries: 5,
-    hre,
-  });
+  const previousFacets = await diamond.facets();
 
-  console.log('upgraded DarkForestGPTCredit');
+  const changes = new DiamondChanges(previousFacets);
 
-  await upgradeProxyWithRetry<Whitelist>({
-    contractName: 'Whitelist',
-    contractAddress: WHITELIST_CONTRACT_ADDRESS,
-    signerOrOptions: {},
-    deployOptions: {},
-    retries: 5,
-    hre,
-  });
+  const libraries = await deployLibraries({}, hre);
 
-  console.log('upgraded Whitelist');
+  // Dark Forest facets
+  const coreFacet = await deployCoreFacet({}, libraries, hre);
+  const moveFacet = await deployMoveFacet({}, libraries, hre);
+  const artifactFacet = await deployArtifactFacet(
+    { diamondAddress: diamond.address },
+    libraries,
+    hre
+  );
+  const getterFacet = await deployGetterFacet({}, libraries, hre);
+  const whitelistFacet = await deployWhitelistFacet({}, libraries, hre);
+  const adminFacet = await deployAdminFacet({}, libraries, hre);
+  const lobbyFacet = await deployLobbyFacet({}, libraries, hre);
+  const captureFacet = await deployCaptureFacet({}, libraries, hre);
 
-  const libraries: LibraryContracts = await hre.run('deploy:libraries');
+  // The `cuts` to perform for Dark Forest facets
+  const darkForestCuts = [
+    ...changes.getFacetCuts('DFCoreFacet', coreFacet),
+    ...changes.getFacetCuts('DFMoveFacet', moveFacet),
+    ...changes.getFacetCuts('DFArtifactFacet', artifactFacet),
+    ...changes.getFacetCuts('DFGetterFacet', getterFacet),
+    ...changes.getFacetCuts('DFWhitelistFacet', whitelistFacet),
+    ...changes.getFacetCuts('DFAdminFacet', adminFacet),
+    ...changes.getFacetCuts('DFLobbyFacet', lobbyFacet),
+    ...changes.getFacetCuts('DFCaptureFacet', captureFacet),
+  ];
 
-  console.log('deployed new libraries');
-  for (const [key, value] of Object.entries(libraries)) {
-    console.log(`${key}:${value.address}`);
+  // The `cuts` to remove any old, unused functions
+  const removeCuts = changes.getRemoveCuts(darkForestCuts);
+
+  const shouldUpgrade = await changes.verify();
+  if (!shouldUpgrade) {
+    console.log('Upgrade aborted');
+    return;
   }
 
-  await upgradeProxyWithRetry<DarkForestGetters>({
-    contractName: 'DarkForestGetters',
-    contractAddress: GETTERS_CONTRACT_ADDRESS,
-    signerOrOptions: {
-      libraries: {
-        DarkForestUtils: libraries.utils.address,
-      },
-    },
-    // Linking external libraries like `DarkForestUtils` is not yet supported, or
-    // skip this check with the `unsafeAllowLinkedLibraries` flag
-    deployOptions: { unsafeAllowLinkedLibraries: true },
-    retries: 5,
-    hre,
-  });
+  const toCut = [...darkForestCuts, ...removeCuts];
 
-  // if we got a successful deploy based on new libraries save new addresses
-  await hre.run('deploy:save', {
-    coreBlockNumber: START_BLOCK,
-    libraries,
-    coreAddress: CORE_CONTRACT_ADDRESS,
-    tokensAddress: TOKENS_CONTRACT_ADDRESS,
-    gettersAddress: GETTERS_CONTRACT_ADDRESS,
-    whitelistAddress: WHITELIST_CONTRACT_ADDRESS,
-    gptCreditAddress: GPT_CREDIT_CONTRACT_ADDRESS,
-    scoringAddress: SCORING_CONTRACT_ADDRESS,
-  });
+  // As mentioned in the `deploy` task, EIP-2535 specifies that the `diamondCut`
+  // function takes two optional arguments: address _init and bytes calldata _calldata
+  // However, in a standard upgrade, no state modifications are done, so the 0x0 address
+  // and empty calldata are specified for those `diamondCut` parameters.
+  // If the Diamond storage needs to be changed on an upgrade, a contract would need to be
+  // deployed and these variables would need to be adjusted similar to the `deploy` task.
+  const initAddress = hre.ethers.constants.AddressZero;
+  const initFunctionCall = '0x';
 
-  console.log('upgraded DarkForestGetters');
+  const upgradeTx = await diamond.diamondCut(toCut, initAddress, initFunctionCall);
+  const upgradeReceipt = await upgradeTx.wait();
+  if (!upgradeReceipt.status) {
+    throw Error(`Diamond cut failed: ${upgradeTx.hash}`);
+  }
+  console.log('Completed diamond cut');
 
-  await upgradeProxyWithRetry<DarkForestCore>({
-    contractName: 'DarkForestCore',
-    contractAddress: CORE_CONTRACT_ADDRESS,
-    signerOrOptions: {
-      libraries: {
-        DarkForestInitialize: libraries.initialize.address,
-        DarkForestPlanet: libraries.planet.address,
-        DarkForestUtils: libraries.utils.address,
-        Verifier: libraries.verifier.address,
-        DarkForestArtifactUtils: libraries.artifactUtils.address,
-      },
-    },
-    // Linking external libraries like `DarkForestUtils` is not yet supported, or
-    // skip this check with the `unsafeAllowLinkedLibraries` flag
-    deployOptions: { unsafeAllowLinkedLibraries: true },
-    retries: 5,
-    hre,
-  });
-
-  console.log('upgraded DarkForestCore');
-}
-
-task('upgrade:core', 'upgrade DarkForestCore contract (only)').setAction(upgradeCore);
-
-async function upgradeCore({}, hre: HardhatRuntimeEnvironment) {
-  await hre.run('utils:assertChainId');
-
-  // need to force a compile for tasks
-  await hre.run('compile');
-
-  const {
-    CORE_CONTRACT_ADDRESS,
-    UTILS_LIBRARY_ADDRESS,
-    PLANET_LIBRARY_ADDRESS,
-    INITIALIZE_LIBRARY_ADDRESS,
-    VERIFIER_LIBRARY_ADDRESS,
-    ARTIFACT_UTILS_LIBRARY_ADDRESS,
-  } = hre.contracts;
-
-  await upgradeProxyWithRetry<DarkForestCore>({
-    contractName: 'DarkForestCore',
-    contractAddress: CORE_CONTRACT_ADDRESS,
-    signerOrOptions: {
-      libraries: {
-        DarkForestInitialize: INITIALIZE_LIBRARY_ADDRESS,
-        DarkForestPlanet: PLANET_LIBRARY_ADDRESS,
-        DarkForestArtifactUtils: ARTIFACT_UTILS_LIBRARY_ADDRESS,
-        DarkForestUtils: UTILS_LIBRARY_ADDRESS,
-        Verifier: VERIFIER_LIBRARY_ADDRESS,
-      },
-    },
-    // Linking external libraries like `DarkForestUtils` is not yet supported, or
-    // skip this check with the `unsafeAllowLinkedLibraries` flag
-    deployOptions: { unsafeAllowLinkedLibraries: true },
-    retries: 5,
-    hre,
-  });
-}
-
-task('upgrade:getters', 'upgrade DarkForestGetters contract (only)').setAction(upgradeGetters);
-
-async function upgradeGetters({}, hre: HardhatRuntimeEnvironment) {
-  await hre.run('utils:assertChainId');
-
-  // need to force a compile for tasks
-  await hre.run('compile');
-
-  const { UTILS_LIBRARY_ADDRESS, GETTERS_CONTRACT_ADDRESS } = hre.contracts;
-
-  await upgradeProxyWithRetry<DarkForestGetters>({
-    contractName: 'DarkForestGetters',
-    contractAddress: GETTERS_CONTRACT_ADDRESS,
-    signerOrOptions: {
-      libraries: {
-        DarkForestUtils: UTILS_LIBRARY_ADDRESS,
-      },
-    },
-    // Linking external libraries like `DarkForestUtils` is not yet supported, or
-    // skip this check with the `unsafeAllowLinkedLibraries` flag
-    deployOptions: { unsafeAllowLinkedLibraries: true },
-    retries: 5,
-    hre,
-  });
-}
-
-task('upgrade:tokens', 'upgrade DarkForestTokens contract').setAction(upgradeTokens);
-
-async function upgradeTokens({}, hre: HardhatRuntimeEnvironment) {
-  await hre.run('utils:assertChainId');
-
-  // need to force a compile for tasks
-  await hre.run('compile');
-
-  const { TOKENS_CONTRACT_ADDRESS } = hre.contracts;
-
-  await upgradeProxyWithRetry<DarkForestTokens>({
-    contractName: 'DarkForestTokens',
-    contractAddress: TOKENS_CONTRACT_ADDRESS,
-    signerOrOptions: {},
-    deployOptions: {},
-    retries: 5,
-    hre,
-  });
-}
-
-task('upgrade:gpt', 'upgrade DarkForestGPTCredit contract (only)').setAction(upgradeGpt);
-
-async function upgradeGpt({}, hre: HardhatRuntimeEnvironment) {
-  await hre.run('utils:assertChainId');
-
-  // need to force a compile for tasks
-  await hre.run('compile');
-
-  const { GPT_CREDIT_CONTRACT_ADDRESS } = hre.contracts;
-
-  await upgradeProxyWithRetry<DarkForestGPTCredit>({
-    contractName: 'DarkForestGPTCredit',
-    contractAddress: GPT_CREDIT_CONTRACT_ADDRESS,
-    signerOrOptions: {},
-    deployOptions: {},
-    retries: 5,
-    hre,
-  });
-}
-
-task('getImplementationAddress', 'gets the implementation address of the given proxy contrat')
-  .addPositionalParam('contractAddress')
-  .setAction(getImplementationAddressTask);
-
-async function getImplementationAddressTask(
-  { contractAddress }: { contractAddress: string },
-  hre: HardhatRuntimeEnvironment
-) {
-  const implementationAddress = await getImplementationAddress(
-    hre.ethers.provider,
-    contractAddress
-  );
-
-  console.log(`implementation address: ` + implementationAddress);
-
-  return implementationAddress;
-}
-
-task('upgrade:whitelist', 'upgrade Whitelist contract (only)').setAction(upgradeWhitelist);
-
-async function upgradeWhitelist({}, hre: HardhatRuntimeEnvironment) {
-  await hre.run('utils:assertChainId');
-
-  // need to force a compile for tasks
-  await hre.run('compile');
-
-  const { WHITELIST_CONTRACT_ADDRESS } = hre.contracts;
-
-  await upgradeProxyWithRetry<Whitelist>({
-    contractName: 'Whitelist',
-    contractAddress: WHITELIST_CONTRACT_ADDRESS,
-    signerOrOptions: {},
-    deployOptions: {},
-    retries: 5,
-    hre,
-  });
-}
-
-async function upgradeProxyWithRetry<C extends Contract>({
-  contractName,
-  contractAddress,
-  signerOrOptions,
-  deployOptions,
-  hre,
-  retries,
-}: {
-  contractName: string;
-  contractAddress: string;
-  signerOrOptions: Signer | FactoryOptions | undefined;
-  deployOptions: DeployOptions;
-  hre: HardhatRuntimeEnvironment;
-  retries: number;
-}): Promise<C> {
-  try {
-    const factory = await hre.ethers.getContractFactory(contractName, signerOrOptions);
-    const contract = await hre.upgrades.upgradeProxy(contractAddress, factory, deployOptions);
-    await contract.deployTransaction.wait();
-    return contract as C;
-  } catch (e) {
-    if (e instanceof TransactionMinedTimeout && retries > 0) {
-      console.log(`timed out upgrading ${contractName}, retrying`);
-      return upgradeProxyWithRetry({
-        contractName,
-        contractAddress,
-        signerOrOptions,
-        deployOptions,
-        retries: --retries,
-        hre,
-      });
-    } else {
-      throw e;
+  // TODO: Upstream change to update task name from `hardhat-4byte-uploader`
+  if (!isDev) {
+    try {
+      await hre.run('upload-selectors', { noCompile: true });
+    } catch {
+      console.warn('WARNING: Unable to update 4byte database with our selectors');
+      console.warn('Please run the `upload-selectors` task manually so selectors can be reversed');
     }
   }
+
+  console.log('Upgraded successfully. Godspeed cadet.');
 }
