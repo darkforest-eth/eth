@@ -49,7 +49,7 @@ Private Key: 0x67195c963ff445314e667112ab22f4a7404bad7f9746564eb409b9bb8c6aed32
 
 ## subgraph
 
-Assuming you already have your contracts deployed be it on a local node or on a mainnet, you'll have the `abi/DarkForest.json` file, the `CONTRACT_ADDRESS` address, and the block the diamond contract was initialized at (so you dont waste time syncing from the genesis block) inside the `@darkforest_eth/contracts` packag. In development, the start block will be set at 0.
+Assuming you already have your contracts deployed be it on a local node or on a mainnet, you'll have the `abi/DarkForest.json` file, the `CONTRACT_ADDRESS` address, and the block the diamond contract was initialized at (so you dont waste time syncing from the genesis block) inside the `@darkforest_eth/contracts` package. In development, the start block will be set at 0.
 
 ## TheGraph hosted solution
 
