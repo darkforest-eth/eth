@@ -11,7 +11,13 @@ import {LibArtifactUtils} from "../libraries/LibArtifactUtils.sol";
 import {WithStorage} from "../libraries/LibStorage.sol";
 
 // Type imports
-import {SpaceType, DFPInitPlanetArgs, AdminCreatePlanetArgs, ArtifactType} from "../DFTypes.sol";
+import {
+    SpaceType,
+    DFPInitPlanetArgs,
+    AdminCreatePlanetArgs,
+    ArtifactType,
+    Player
+} from "../DFTypes.sol";
 
 contract DFAdminFacet is WithStorage {
     event AdminOwnershipChanged(uint256 loc, address newOwner);
@@ -45,6 +51,23 @@ contract DFAdminFacet is WithStorage {
     function setOwner(uint256 planetId, address newOwner) public onlyAdmin {
         gs().planets[planetId].owner = newOwner;
         emit AdminOwnershipChanged(planetId, newOwner);
+    }
+
+    function deductScore(address playerAddress, uint256 amount) public onlyAdmin {
+        Player storage player = gs().players[playerAddress];
+
+        require(player.isInitialized, "player does not exist");
+        require(amount <= player.score, "tried to deduct much score");
+
+        player.score -= amount;
+    }
+
+    function addScore(address playerAddress, uint256 amount) public onlyAdmin {
+        Player storage player = gs().players[playerAddress];
+
+        require(player.isInitialized, "player does not exist");
+
+        player.score += amount;
     }
 
     /**
@@ -123,5 +146,9 @@ contract DFAdminFacet is WithStorage {
         require(LibArtifactUtils.isSpaceship(artifactType), "artifact type must be a space ship");
 
         LibArtifactUtils.createAndPlaceSpaceship(locationId, owner, artifactType);
+    }
+
+    function setPlanetTransferEnabled(bool enabled) public onlyAdmin {
+        gameConstants().PLANET_TRANSFER_ENABLED = enabled;
     }
 }

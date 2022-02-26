@@ -38,6 +38,12 @@ contract DFWhitelistFacet is WithStorage {
         }
     }
 
+    function disableKeys(bytes32[] memory keys) public onlyAdmin {
+        for (uint256 i = 0; i < keys.length; i++) {
+            ws().allowedKeyHashes[keys[i]] = false;
+        }
+    }
+
     function useKey(string memory key, address owner) public onlyAdmin {
         // This is a no-op instead of a revert
         // because when the webserver restarts

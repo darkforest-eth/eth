@@ -18,6 +18,31 @@ async function changeDrip(args: { value: number }, hre: HardhatRuntimeEnvironmen
   console.log(`changed drip to ${args.value}`);
 }
 
+task('whitelist:disableKeys', 'disables keys stored in the given file path')
+  .addPositionalParam(
+    'filePath',
+    'the path to the file containing keys to disable',
+    undefined,
+    types.string
+  )
+  .setAction(whitelistDisable);
+
+async function whitelistDisable(args: { filePath: string }, hre: HardhatRuntimeEnvironment) {
+  await hre.run('utils:assertChainId');
+  const keyFileContents = fs.readFileSync(args.filePath).toString();
+  const keys = keyFileContents.split('\n').filter((k) => k.length > 0);
+
+  const contract = await hre.ethers.getContractAt('DarkForest', hre.contracts.CONTRACT_ADDRESS);
+
+  while (keys.length > 0) {
+    const subset = keys.splice(0, Math.min(keys.length, 400));
+    console.log(`clearing ${subset.length} keys`);
+    const hashes: string[] = subset.map((x) => hre.ethers.utils.id(x));
+    const akReceipt = await contract.disableKeys(hashes, { gasPrice: '5000000000' }); // 5gwei
+    await akReceipt.wait();
+  }
+}
+
 task('whitelist:generate', 'create n keys and add to whitelist contract')
   .addPositionalParam('number', 'number of keys', undefined, types.int)
   .setAction(whitelistGenerate);

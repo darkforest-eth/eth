@@ -86,6 +86,7 @@ contract DFCaptureFacet is WithStorage {
         PlanetExtendedInfo memory planetExtendedInfo = gs().planetsExtendedInfo[locationId];
         PlanetExtendedInfo2 storage planetExtendedInfo2 = gs().planetsExtendedInfo2[locationId];
 
+        require(planetExtendedInfo2.capturer == address(0), "planets can only be captured once");
         require(!planetExtendedInfo.destroyed, "planet is destroyed");
         require(planet.owner == msg.sender, "you can only capture planets you own");
         require(

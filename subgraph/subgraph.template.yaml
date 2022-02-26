@@ -60,8 +60,6 @@ dataSources:
           handler: handleLocationRevealed
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
-        - event: PauseStateChanged(bool)
-          handler: handlePauseStateChanged
         - event: LobbyCreated(address,address)
           handler: handleLobbyCreated
         - event: PlanetInvaded(address,uint256)

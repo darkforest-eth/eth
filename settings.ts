@@ -7,7 +7,7 @@ import * as decoders from 'decoders';
 import 'hardhat/types/runtime';
 import * as path from 'path';
 import resolvePackage from 'resolve-package-path';
-import dedent from 'ts-dedent';
+import { dedent } from 'ts-dedent';
 
 declare module 'hardhat/types/runtime' {
   interface HardhatRuntimeEnvironment {
