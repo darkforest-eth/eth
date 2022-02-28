@@ -65,6 +65,13 @@ contract DFWhitelistFacet is WithStorage {
         payable(owner).transfer(ws().drip);
     }
 
+    function addToWhitelist(address toAdd) public onlyAdmin {
+        require(!ws().allowedAccounts[toAdd], "player is already allowed");
+
+        ws().allowedAccounts[toAdd] = true;
+        ws().allowedAccountsArray.push(toAdd);
+    }
+
     function removeFromWhitelist(address toRemove) public onlyAdmin {
         require(ws().allowedAccounts[toRemove], "player was not whitelisted to begin with");
         ws().allowedAccounts[toRemove] = false;
