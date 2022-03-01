@@ -15,13 +15,18 @@ import {
     SpaceType,
     DFPInitPlanetArgs,
     AdminCreatePlanetArgs,
+    Artifact,
     ArtifactType,
-    Player
+    Player,
+    Planet,
+    PlanetExtendedInfo,
+    PlanetExtendedInfo2
 } from "../DFTypes.sol";
 
 contract DFAdminFacet is WithStorage {
     event AdminOwnershipChanged(uint256 loc, address newOwner);
     event AdminPlanetCreated(uint256 loc);
+    event AdminGiveSpaceship(uint256 loc, address owner, ArtifactType artifactType);
     event PauseStateChanged(bool paused);
 
     /////////////////////////////
@@ -143,9 +148,36 @@ contract DFAdminFacet is WithStorage {
         address owner,
         ArtifactType artifactType
     ) public onlyAdmin {
+        require(gs().planetsExtendedInfo2[locationId].isInitialized, "planet is not initialized");
         require(LibArtifactUtils.isSpaceship(artifactType), "artifact type must be a space ship");
 
-        LibArtifactUtils.createAndPlaceSpaceship(locationId, owner, artifactType);
+        uint256 shipId = LibArtifactUtils.createAndPlaceSpaceship(locationId, owner, artifactType);
+        Artifact memory artifact = gs().artifacts[shipId];
+        Planet memory planet = gs().planets[locationId];
+        PlanetExtendedInfo memory planetExtendedInfo = gs().planetsExtendedInfo[locationId];
+        PlanetExtendedInfo2 memory planetExtendedInfo2 = gs().planetsExtendedInfo2[locationId];
+
+        (planet, planetExtendedInfo, planetExtendedInfo2) = LibPlanet.applySpaceshipArrive(
+            artifact,
+            planet,
+            planetExtendedInfo,
+            planetExtendedInfo2
+        );
+
+        gs().planets[locationId] = planet;
+        gs().planetsExtendedInfo[locationId] = planetExtendedInfo;
+        gs().planetsExtendedInfo2[locationId] = planetExtendedInfo2;
+
+        emit AdminGiveSpaceship(locationId, owner, artifactType);
+    }
+
+    function adminInitializePlanet(uint256 locationId, uint256 perlin) public onlyAdmin {
+        require(
+            !gs().planetsExtendedInfo2[locationId].isInitialized,
+            "planet is already initialized"
+        );
+
+        LibPlanet.initializePlanetWithDefaults(locationId, perlin, false);
     }
 
     function setPlanetTransferEnabled(bool enabled) public onlyAdmin {

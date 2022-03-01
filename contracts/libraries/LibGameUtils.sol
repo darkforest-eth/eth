@@ -534,7 +534,7 @@ library LibGameUtils {
     // the owner can send a maximum of 5 arrivals to this planet
     // separately, everyone other than the owner can also send a maximum
     // of 5 arrivals in aggregate
-    function checkPlanetDOS(uint256 locationId) public view {
+    function checkPlanetDOS(uint256 locationId, address sender) public view {
         uint8 arrivalsFromOwner = 0;
         uint8 arrivalsFromOthers = 0;
 
@@ -550,11 +550,13 @@ library LibGameUtils {
                 }
             }
         }
-        if (msg.sender == gs().planets[locationId].owner) {
+        if (sender == gs().planets[locationId].owner) {
             require(arrivalsFromOwner < 6, "Planet is rate-limited");
         } else {
             require(arrivalsFromOthers < 6, "Planet is rate-limited");
         }
+
+        require(arrivalsFromOwner + arrivalsFromOthers < 12, "Planet is rate-limited");
     }
 
     function updateWorldRadius() public {

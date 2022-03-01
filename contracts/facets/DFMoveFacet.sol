@@ -53,23 +53,35 @@ contract DFMoveFacet is WithStorage {
             false
         );
 
-        uint256 oldLoc = _input[0];
-        uint256 newLoc = _input[1];
+        DFPMoveArgs memory args =
+            DFPMoveArgs({
+                oldLoc: _input[0],
+                newLoc: _input[1],
+                maxDist: _input[4],
+                popMoved: _input[10],
+                silverMoved: _input[11],
+                movedArtifactId: _input[12],
+                abandoning: _input[13],
+                sender: msg.sender
+            });
+
+        if (_isSpaceshipMove(args)) {
+            // If spaceships moves are not address(0)
+            // they can conquer planets with 0 energy
+            args.sender = address(0);
+        }
+
         uint256 newPerlin = _input[2];
         uint256 newRadius = _input[3];
-        uint256 maxDist = _input[4];
-        uint256 popMoved = _input[10];
-        uint256 silverMoved = _input[11];
-        uint256 movedArtifactId = _input[12];
 
         if (!snarkConstants().DISABLE_ZK_CHECKS) {
             uint256[10] memory _proofInput =
                 [
-                    oldLoc,
-                    newLoc,
+                    args.oldLoc,
+                    args.newLoc,
                     newPerlin,
                     newRadius,
-                    maxDist,
+                    args.maxDist,
                     _input[5],
                     _input[6],
                     _input[7],
@@ -82,35 +94,30 @@ contract DFMoveFacet is WithStorage {
         // check radius
         require(newRadius <= gs().worldRadius, "Attempting to move out of bounds");
 
-        // Only perform if the toPlanet have never initialized previously
-        if (!gs().planetsExtendedInfo[newLoc].isInitialized) {
-            LibPlanet.initializePlanetWithDefaults(newLoc, newPerlin, false);
-        } else {
-            // need to do this so people can't deny service to planets with gas limit
-            LibPlanet.refreshPlanet(newLoc);
-            LibGameUtils.checkPlanetDOS(newLoc);
-        }
-
         // Refresh fromPlanet first before doing any action on it
-        LibPlanet.refreshPlanet(oldLoc);
+        LibPlanet.refreshPlanet(args.oldLoc);
 
         gs().planetEventsCount++;
 
-        // _input[13] is the abandoning flag
-        // We've reached the maximum amount of local variables, so it has to be referenced directly
-        _executeMove(
-            DFPMoveArgs(oldLoc, newLoc, maxDist, popMoved, silverMoved, movedArtifactId, _input[13])
-        );
+        // Only perform if the toPlanet have never initialized previously
+        if (!gs().planetsExtendedInfo[args.newLoc].isInitialized) {
+            LibPlanet.initializePlanetWithDefaults(args.newLoc, newPerlin, false);
+        } else {
+            // need to do this so people can't deny service to planets with gas limit
+            LibPlanet.refreshPlanet(args.newLoc);
+            LibGameUtils.checkPlanetDOS(args.newLoc, args.sender);
+        }
+
+        _executeMove(args);
 
         LibGameUtils.updateWorldRadius();
         emit ArrivalQueued(
             msg.sender,
             gs().planetEventsCount,
-            oldLoc,
-            newLoc,
-            movedArtifactId,
-            // _input[13] is the abandoning flag
-            _input[13]
+            args.oldLoc,
+            args.newLoc,
+            args.movedArtifactId,
+            args.abandoning
         );
         return (gs().planetEventsCount);
     }
@@ -180,7 +187,7 @@ contract DFMoveFacet is WithStorage {
 
         _createArrival(
             DFPCreateArrivalArgs(
-                msg.sender,
+                args.sender,
                 args.oldLoc,
                 args.newLoc,
                 args.maxDist,
@@ -449,11 +456,8 @@ contract DFMoveFacet is WithStorage {
         require(popArriving > 0 || isSpaceship, "Not enough forces to make move");
         require(isSpaceship ? args.popMoved == 0 : true, "spaceship moves must be 0 energy moves");
         gs().planetArrivals[gs().planetEventsCount] = ArrivalData({
-            id: gs().planetEventsCount, /**
-              This is the zero address so that ships moving to an unowned planet with
-              no barbarians don't cause the planet to be conquered by the ship's controller.
-             */
-            player: isSpaceship ? address(0) : args.player,
+            id: gs().planetEventsCount,
+            player: args.player, // player address or address(0) for ship moves
             fromPlanet: args.oldLoc,
             toPlanet: args.newLoc,
             popArriving: popArriving,

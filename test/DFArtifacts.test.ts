@@ -338,6 +338,11 @@ describe('DarkForestArtifacts', function () {
         distFromOrigin: 1998,
       });
 
+      await world.contract.adminInitializePlanet(
+        planetWithArtifactLoc.id,
+        planetWithArtifactLoc.perlin
+      );
+
       await world.contract.adminGiveSpaceShip(
         planetWithArtifactLoc.id,
         world.user1.address,

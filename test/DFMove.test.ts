@@ -1,3 +1,4 @@
+import { ArtifactType } from '@darkforest_eth/types';
 import { expect } from 'chai';
 import { BigNumber } from 'ethers';
 import { ethers } from 'hardhat';
@@ -889,5 +890,72 @@ describe('move rate limits', function () {
         )
       );
     }
+  });
+
+  it('should not allow more than 6 ship movements to uncontrolled planet', async function () {
+    for (let i = 0; i < 6; i++) {
+      await world.contract.adminGiveSpaceShip(
+        SPAWN_PLANET_1.id,
+        world.user1.address,
+        ArtifactType.ShipMothership
+      );
+
+      const ship = (await world.user1Core.getArtifactsOnPlanet(SPAWN_PLANET_1.id))[0].artifact;
+
+      await world.user1Core.move(
+        ...makeMoveArgs(SPAWN_PLANET_1, LVL2_PLANET_SPACE, 10, 0, 0, ship.id)
+      );
+    }
+
+    await world.contract.adminGiveSpaceShip(
+      SPAWN_PLANET_1.id,
+      world.user1.address,
+      ArtifactType.ShipMothership
+    );
+
+    const ship = (await world.user1Core.getArtifactsOnPlanet(SPAWN_PLANET_1.id))[0].artifact;
+
+    await expect(
+      world.user1Core.move(...makeMoveArgs(SPAWN_PLANET_1, LVL2_PLANET_SPACE, 1000, 0, 0, ship.id))
+    ).to.be.revertedWith('Planet is rate-limited');
+
+    await increaseBlockchainTime();
+    await world.user1Core.refreshPlanet(LVL2_PLANET_SPACE.id);
+
+    const numShipsOnPlanet = (await world.user1Core.getArtifactsOnPlanet(LVL2_PLANET_SPACE.id))
+      .length;
+
+    expect(numShipsOnPlanet).to.be.eq(6);
+  });
+
+  it('when moving 6 ships to planet, should not allow an enemy attack', async function () {
+    await conquerUnownedPlanet(world, world.user1Core, SPAWN_PLANET_1, LVL2_PLANET_SPACE);
+    await increaseBlockchainTime();
+
+    for (let i = 0; i < 6; i++) {
+      await world.contract.adminGiveSpaceShip(
+        SPAWN_PLANET_1.id,
+        world.user1.address,
+        ArtifactType.ShipMothership
+      );
+
+      const ship = (await world.user1Core.getArtifactsOnPlanet(SPAWN_PLANET_1.id))[0].artifact;
+
+      await world.user1Core.move(
+        ...makeMoveArgs(SPAWN_PLANET_1, LVL2_PLANET_SPACE, 10, 0, 0, ship.id)
+      );
+    }
+
+    await expect(
+      world.user2Core.move(...makeMoveArgs(SPAWN_PLANET_2, LVL2_PLANET_SPACE, 1, 10000, 0))
+    ).to.be.revertedWith('Planet is rate-limited');
+
+    await increaseBlockchainTime();
+    await world.user1Core.refreshPlanet(LVL2_PLANET_SPACE.id);
+
+    const numShipsOnPlanet = (await world.user1Core.getArtifactsOnPlanet(LVL2_PLANET_SPACE.id))
+      .length;
+
+    expect(numShipsOnPlanet).to.be.eq(6);
   });
 });
