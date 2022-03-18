@@ -92,8 +92,8 @@ contract DFAdminFacet is WithStorage {
             LibPlanet.initializePlanet(_a, _b, _c, _input, false);
         }
 
-        gs().planets[planetId].population = gs().planets[planetId].populationCap;
         gs().planets[planetId].silver = gs().planets[planetId].silverCap;
+        gs().planets[planetId].population = gs().planets[planetId].populationCap;
 
         setOwner(planetId, newOwner);
     }

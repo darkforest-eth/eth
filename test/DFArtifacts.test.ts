@@ -1,10 +1,11 @@
-import { ArtifactType } from '@darkforest_eth/types';
+import { ArtifactRarity, ArtifactType, Biome } from '@darkforest_eth/types';
 import { expect } from 'chai';
 import { BigNumberish } from 'ethers';
 import hre from 'hardhat';
 import { TestLocation } from './utils/TestLocation';
 import {
   conquerUnownedPlanet,
+  createArtifactOnPlanet,
   fixtureLoader,
   getArtifactsOwnedBy,
   getCurrentTime,
@@ -396,25 +397,17 @@ describe('DarkForestArtifacts', function () {
   });
 
   it('should not be able to move an activated artifact', async function () {
-    const newArtifactId = await user1MintArtifactPlanet(world.user1Core);
-    // after finding artifact, planet's popCap might get buffed
-    // so let it fill up again
-    await increaseBlockchainTime();
+    const artifactId = await createArtifactOnPlanet(
+      world.contract,
+      world.user1.address,
+      ARTIFACT_PLANET_1,
+      ArtifactType.Monolith
+    );
+    await world.user1Core.activateArtifact(ARTIFACT_PLANET_1.id, artifactId, 0);
 
-    // now activate the artifact
-    // admin-force-update the planet to be one of the basic artifacts;
-    // this prevents the artifact from being one that requires valid parameter
-    // in order to activate (like wormholes, which require wormholeTo)
-    const artifactsBefore = await getArtifactsOwnedBy(world.contract, world.contract.address);
-    const updatedArtifact = Object.assign({}, artifactsBefore[0]);
-    updatedArtifact.artifactType = 0;
-    await world.contract.updateArtifact(updatedArtifact);
-    await world.user1Core.activateArtifact(ARTIFACT_PLANET_1.id, newArtifactId, 0);
-
-    // attempt to move artifact; should fail
     await expect(
       world.user1Core.move(
-        ...makeMoveArgs(ARTIFACT_PLANET_1, SPAWN_PLANET_1, 10, 50000, 0, newArtifactId)
+        ...makeMoveArgs(ARTIFACT_PLANET_1, SPAWN_PLANET_1, 10, 50000, 0, artifactId)
       )
     ).to.be.revertedWith('you cannot take an activated artifact off a planet');
   });
@@ -592,30 +585,14 @@ describe('DarkForestArtifacts', function () {
       const wormholeSpeedups = [2, 4, 8, 16, 32];
 
       for (let i = 0; i < artifactRarities.length; i++) {
-        await increaseBlockchainTime();
-
-        const newTokenId = hexToBigNumber(i + 1 + ''); // artifact ids can't be 0
-        await world.contract.createArtifact({
-          tokenId: newTokenId,
-          discoverer: world.user1.address,
-          planetId: 1, // planet id
-          rarity: artifactRarities[i],
-          biome: 1, // biome
-          artifactType: 5, // wormhole
-          owner: world.user1.address,
-          controller: ZERO_ADDRESS,
-        });
-
-        const userArtifacts = await world.contract.getPlayerArtifactIds(world.user1.address);
-
-        expect(userArtifacts[userArtifacts.length - 1]).to.eq(newTokenId);
-
-        // deposit artifact at a trading post, move it to spawn planet, and active it
-        await world.user1Core.depositArtifact(LVL6_SPACETIME.id, newTokenId);
-        await world.user1Core.move(
-          ...makeMoveArgs(LVL6_SPACETIME, from, 0, 150000000, 0, newTokenId)
+        const artifactId = await createArtifactOnPlanet(
+          world.contract,
+          world.user1.address,
+          from,
+          ArtifactType.Wormhole,
+          { rarity: artifactRarities[i] as ArtifactRarity, biome: Biome.OCEAN }
         );
-        await world.user1Core.activateArtifact(from.id, newTokenId, to.id);
+        await world.user1Core.activateArtifact(from.id, artifactId, to.id);
 
         // move from planet with artifact to its wormhole destination
         await increaseBlockchainTime();
@@ -644,12 +621,7 @@ describe('DarkForestArtifacts', function () {
           expectedTimeInverted
         );
 
-        await increaseBlockchainTime();
         await world.user1Core.deactivateArtifact(from.id);
-        await world.user1Core.move(
-          ...makeMoveArgs(from, LVL6_SPACETIME, 0, shipsSent, 0, newTokenId)
-        );
-        await world.user1Core.withdrawArtifact(LVL6_SPACETIME.id, newTokenId);
       }
     });
 

@@ -1,5 +1,6 @@
 import type { DarkForest } from '@darkforest_eth/contracts/typechain';
 import { modPBigInt } from '@darkforest_eth/hashing';
+import { ArtifactRarity, ArtifactType, Biome } from '@darkforest_eth/types';
 import { BigNumber, BigNumberish } from 'ethers';
 import { ethers, waffle } from 'hardhat';
 import { TestLocation } from './TestLocation';
@@ -277,4 +278,30 @@ export async function getArtifactsOwnedBy(contract: DarkForest, addr: string) {
   return (await contract.bulkGetArtifactsByIds(artifactsIds)).map(
     (artifactWithMetadata) => artifactWithMetadata[0]
   );
+}
+
+export async function createArtifactOnPlanet(
+  contract: DarkForest,
+  owner: string,
+  planet: TestLocation,
+  type: ArtifactType,
+  { rarity, biome }: { rarity?: ArtifactRarity; biome?: Biome } = {}
+) {
+  rarity ||= ArtifactRarity.Common;
+  biome ||= Biome.FOREST;
+
+  const tokenId = hexToBigNumber(Math.floor(Math.random() * 10000000000).toString(16));
+
+  await contract.adminGiveArtifact({
+    tokenId,
+    discoverer: owner,
+    owner: owner,
+    planetId: planet.id,
+    rarity: rarity.toString(),
+    biome: biome.toString(),
+    artifactType: type.toString(),
+    controller: ZERO_ADDRESS,
+  });
+
+  return tokenId;
 }

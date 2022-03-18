@@ -6,6 +6,7 @@ import {
   deployArtifactFacet,
   deployCaptureFacet,
   deployCoreFacet,
+  deployDebugFacet,
   deployGetterFacet,
   deployLibraries,
   deployLobbyFacet,
@@ -56,6 +57,11 @@ async function upgrade({}, hre: HardhatRuntimeEnvironment) {
     ...changes.getFacetCuts('DFLobbyFacet', lobbyFacet),
     ...changes.getFacetCuts('DFCaptureFacet', captureFacet),
   ];
+
+  if (isDev) {
+    const debugFacet = await deployDebugFacet({}, libraries, hre);
+    darkForestCuts.push(...changes.getFacetCuts('DFDebugFacet', debugFacet));
+  }
 
   // The `cuts` to remove any old, unused functions
   const removeCuts = changes.getRemoveCuts(darkForestCuts);

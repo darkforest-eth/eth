@@ -4,6 +4,7 @@ import { BigNumber } from 'ethers';
 import { ethers } from 'hardhat';
 import {
   conquerUnownedPlanet,
+  createArtifactOnPlanet,
   fixtureLoader,
   increaseBlockchainTime,
   makeInitArgs,
@@ -95,6 +96,32 @@ describe('DarkForestMove', function () {
       await expect(
         world.user1Core.move(...makeMoveArgs(LVL2_PLANET_SPACE, SPAWN_PLANET_2, 1000, 0, 0, shipId))
       ).to.be.revertedWith('you can only move your own ships');
+    });
+
+    it('should not consume a photoid if moving a ship off a planet with one activated', async function () {
+      const artifactId = await createArtifactOnPlanet(
+        world.contract,
+        world.user1.address,
+        SPAWN_PLANET_1,
+        ArtifactType.PhotoidCannon
+      );
+
+      await world.user1Core.activateArtifact(SPAWN_PLANET_1.id, artifactId, 0);
+      await increaseBlockchainTime();
+
+      const ship = (await world.user1Core.getArtifactsOnPlanet(SPAWN_PLANET_1.id))[0].artifact;
+      const shipId = ship.id;
+
+      await world.user1Core.move(
+        ...makeMoveArgs(SPAWN_PLANET_1, LVL1_ASTEROID_1, 100, 0, 0, shipId)
+      );
+
+      await world.contract.refreshPlanet(SPAWN_PLANET_1.id);
+      const activePhotoid = (await world.contract.getArtifactsOnPlanet(SPAWN_PLANET_1.id)).filter(
+        (a) => a.artifact.artifactType === ArtifactType.PhotoidCannon
+      )[0];
+      // If the photoid is not there, it was used during ship move
+      expect(activePhotoid).to.not.eq(undefined);
     });
   });
 

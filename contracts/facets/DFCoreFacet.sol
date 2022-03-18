@@ -33,17 +33,10 @@ contract DFCoreFacet is WithStorage {
     using ABDKMath64x64 for *;
 
     event PlayerInitialized(address player, uint256 loc);
-    event PlanetUpgraded(address player, uint256 loc, uint256 branch, uint256 toBranchLevel); // emitted in DFPlanet library
+    event PlanetUpgraded(address player, uint256 loc, uint256 branch, uint256 toBranchLevel); // emitted in LibPlanet
     event PlanetHatBought(address player, uint256 loc, uint256 tohatLevel);
     event PlanetTransferred(address sender, uint256 loc, address receiver);
     event LocationRevealed(address revealer, uint256 loc, uint256 x, uint256 y);
-
-    event PlanetProspected(address player, uint256 loc);
-    event ArtifactFound(address player, uint256 artifactId, uint256 loc);
-    event ArtifactDeposited(address player, uint256 artifactId, uint256 loc);
-    event ArtifactWithdrawn(address player, uint256 artifactId, uint256 loc);
-    event ArtifactActivated(address player, uint256 artifactId, uint256 loc); // emitted in DFPlanet library
-    event ArtifactDeactivated(address player, uint256 artifactId, uint256 loc); // emitted in DFPlanet library
 
     event PlanetSilverWithdrawn(address player, uint256 loc, uint256 amount);
 
@@ -67,11 +60,6 @@ contract DFCoreFacet is WithStorage {
 
     modifier notPaused() {
         require(!gs().paused, "Game is paused");
-        _;
-    }
-
-    modifier notTokenEnded() {
-        require(block.timestamp < gs().TOKEN_MINT_END_TIMESTAMP, "Token mint period has ended");
         _;
     }
 
@@ -170,43 +158,6 @@ contract DFCoreFacet is WithStorage {
         return _location;
     }
 
-    /**
-      Gives players 5 spaceships on their home planet. Can only be called once
-      by a given player. This is a first pass at getting spaceships into the game.
-      Eventually ships will be able to spawn in the game naturally (construction, capturing, etc.)
-     */
-    function giveSpaceShips(uint256 locationId) public onlyWhitelisted {
-        require(!gs().players[msg.sender].claimedShips, "player already claimed ships");
-        require(
-            gs().planets[locationId].owner == msg.sender && gs().planets[locationId].isHomePlanet,
-            "you can only spawn ships on your home planet"
-        );
-
-        address owner = gs().planets[locationId].owner;
-        uint256 id1 =
-            LibArtifactUtils.createAndPlaceSpaceship(
-                locationId,
-                owner,
-                ArtifactType.ShipMothership
-            );
-        uint256 id2 =
-            LibArtifactUtils.createAndPlaceSpaceship(locationId, owner, ArtifactType.ShipCrescent);
-        uint256 id3 =
-            LibArtifactUtils.createAndPlaceSpaceship(locationId, owner, ArtifactType.ShipWhale);
-        uint256 id4 =
-            LibArtifactUtils.createAndPlaceSpaceship(locationId, owner, ArtifactType.ShipGear);
-        uint256 id5 =
-            LibArtifactUtils.createAndPlaceSpaceship(locationId, owner, ArtifactType.ShipTitan);
-
-        emit ArtifactFound(msg.sender, id1, locationId);
-        emit ArtifactFound(msg.sender, id2, locationId);
-        emit ArtifactFound(msg.sender, id3, locationId);
-        emit ArtifactFound(msg.sender, id4, locationId);
-        emit ArtifactFound(msg.sender, id5, locationId);
-
-        gs().players[msg.sender].claimedShips = true;
-    }
-
     function upgradePlanet(uint256 _location, uint256 _branch)
         public
         notPaused
@@ -271,94 +222,6 @@ contract DFCoreFacet is WithStorage {
 
         gs().planetsExtendedInfo[_location].hatLevel += 1;
         emit PlanetHatBought(msg.sender, _location, gs().planetsExtendedInfo[_location].hatLevel);
-    }
-
-    function findArtifact(
-        uint256[2] memory _a,
-        uint256[2][2] memory _b,
-        uint256[2] memory _c,
-        uint256[7] memory _input
-    ) public notPaused notTokenEnded {
-        uint256 planetId = _input[0];
-        uint256 biomebase = _input[1];
-
-        LibGameUtils.revertIfBadSnarkPerlinFlags(
-            [_input[2], _input[3], _input[4], _input[5], _input[6]],
-            true
-        );
-
-        refreshPlanet(planetId);
-
-        if (!snarkConstants().DISABLE_ZK_CHECKS) {
-            require(
-                Verifier.verifyBiomebaseProof(_a, _b, _c, _input),
-                "biome zkSNARK failed doesn't check out"
-            );
-        }
-
-        uint256 foundArtifactId =
-            LibArtifactUtils.findArtifact(DFPFindArtifactArgs(planetId, biomebase, address(this)));
-
-        emit ArtifactFound(msg.sender, foundArtifactId, planetId);
-    }
-
-    function depositArtifact(uint256 locationId, uint256 artifactId) public notPaused {
-        // should this be implemented as logic that is triggered when a player sends
-        // an artifact to the contract with locationId in the extra data?
-        // might be better use of the ERC721 standard - can use safeTransfer then
-        refreshPlanet(locationId);
-
-        LibArtifactUtils.depositArtifact(locationId, artifactId, address(this));
-
-        emit ArtifactDeposited(msg.sender, artifactId, locationId);
-    }
-
-    // withdraws the given artifact from the given planet. you must own the planet,
-    // the artifact must be on the given planet
-    function withdrawArtifact(uint256 locationId, uint256 artifactId) public notPaused {
-        refreshPlanet(locationId);
-
-        LibArtifactUtils.withdrawArtifact(locationId, artifactId);
-
-        emit ArtifactWithdrawn(msg.sender, artifactId, locationId);
-    }
-
-    // activates the given artifact on the given planet. the artifact must have
-    // been previously deposited on this planet. the artifact cannot be activated
-    // within a certain cooldown period, depending on the artifact type
-    function activateArtifact(
-        uint256 locationId,
-        uint256 artifactId,
-        uint256 wormholeTo
-    ) public notPaused {
-        refreshPlanet(locationId);
-
-        if (wormholeTo != 0) {
-            refreshPlanet(wormholeTo);
-        }
-
-        LibArtifactUtils.activateArtifact(locationId, artifactId, wormholeTo);
-        // event is emitted in the above library function
-    }
-
-    // if there's an activated artifact on this planet, deactivates it. otherwise reverts.
-    // deactivating an artifact this debuffs the planet, and also removes whatever special
-    // effect that the artifact bestowned upon this planet.
-    function deactivateArtifact(uint256 locationId) public notPaused {
-        refreshPlanet(locationId);
-
-        LibArtifactUtils.deactivateArtifact(locationId);
-        // event is emitted in the above library function
-    }
-
-    // in order to be able to find an artifact on a planet, the planet
-    // must first be 'prospected'. prospecting commits to a currently-unknown
-    // seed that is used to randomly generate the artifact that will be
-    // found on this planet.
-    function prospectPlanet(uint256 locationId) public notPaused {
-        refreshPlanet(locationId);
-        LibArtifactUtils.prospectPlanet(locationId);
-        emit PlanetProspected(msg.sender, locationId);
     }
 
     // withdraw silver

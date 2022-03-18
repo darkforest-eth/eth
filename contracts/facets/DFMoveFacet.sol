@@ -135,10 +135,12 @@ contract DFMoveFacet is WithStorage {
             arrivalType = ArrivalType.Wormhole;
         }
 
-        (bool photoidPresent, Upgrade memory newTempUpgrade) = _checkPhotoid(args);
-        if (photoidPresent) {
-            temporaryUpgrade = newTempUpgrade;
-            arrivalType = ArrivalType.Photoid;
+        if (!_isSpaceshipMove(args)) {
+            (bool photoidPresent, Upgrade memory newTempUpgrade) = _checkPhotoid(args);
+            if (photoidPresent) {
+                temporaryUpgrade = newTempUpgrade;
+                arrivalType = ArrivalType.Photoid;
+            }
         }
 
         _removeSpaceshipEffectsFromOriginPlanet(args);

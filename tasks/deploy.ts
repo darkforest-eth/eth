@@ -269,6 +269,11 @@ export async function deployAndCut(
     ...changes.getFacetCuts('DFLobbyFacet', lobbyFacet),
   ];
 
+  if (isDev) {
+    const debugFacet = await deployDebugFacet({}, libraries, hre);
+    darkForestFacetCuts.push(...changes.getFacetCuts('DFDebugFacet', debugFacet));
+  }
+
   const toCut = [...diamondSpecFacetCuts, ...darkForestFacetCuts];
 
   const diamondCut = await hre.ethers.getContractAt('DarkForest', diamond.address);
@@ -335,6 +340,14 @@ export async function deployAdminFacet(
   return contract;
 }
 
+export async function deployDebugFacet({}, {}: Libraries, hre: HardhatRuntimeEnvironment) {
+  const factory = await hre.ethers.getContractFactory('DFDebugFacet');
+  const contract = await factory.deploy();
+  await contract.deployTransaction.wait();
+  console.log(`DFDebugFacet deployed to: ${contract.address}`);
+  return contract;
+}
+
 export async function deployWhitelistFacet({}, {}: Libraries, hre: HardhatRuntimeEnvironment) {
   const factory = await hre.ethers.getContractFactory('DFWhitelistFacet');
   const contract = await factory.deploy();
@@ -343,8 +356,19 @@ export async function deployWhitelistFacet({}, {}: Libraries, hre: HardhatRuntim
   return contract;
 }
 
-export async function deployArtifactFacet({}, {}: Libraries, hre: HardhatRuntimeEnvironment) {
-  const factory = await hre.ethers.getContractFactory('DFArtifactFacet');
+export async function deployArtifactFacet(
+  {},
+  { LibGameUtils, LibPlanet, LibArtifactUtils, Verifier }: Libraries,
+  hre: HardhatRuntimeEnvironment
+) {
+  const factory = await hre.ethers.getContractFactory('DFArtifactFacet', {
+    libraries: {
+      Verifier,
+      LibArtifactUtils,
+      LibGameUtils,
+      LibPlanet,
+    },
+  });
   const contract = await factory.deploy();
   await contract.deployTransaction.wait();
   console.log(`DFArtifactFacet deployed to: ${contract.address}`);
@@ -393,14 +417,13 @@ export async function deployLibraries({}, hre: HardhatRuntimeEnvironment) {
 
 export async function deployCoreFacet(
   {},
-  { Verifier, LibGameUtils, LibArtifactUtils, LibPlanet }: Libraries,
+  { Verifier, LibGameUtils, LibPlanet }: Libraries,
   hre: HardhatRuntimeEnvironment
 ) {
   const factory = await hre.ethers.getContractFactory('DFCoreFacet', {
     libraries: {
       Verifier,
       LibGameUtils,
-      LibArtifactUtils,
       LibPlanet,
     },
   });

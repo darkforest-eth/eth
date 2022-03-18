@@ -206,26 +206,15 @@ describe('DarkForestUpgrade', function () {
   });
 
   it('should reject upgrade if total level already maxed (dead space)', async function () {
-    this.timeout(10000);
-
     const upgradeablePlanetId = LVL2_PLANET_DEAD_SPACE.id;
 
     await world.user1Core.initializePlayer(...makeInitArgs(SPAWN_PLANET_1));
-
-    // conquer upgradeable planet and silver planet
-    await conquerUnownedPlanet(world, world.user1Core, SPAWN_PLANET_1, LVL2_PLANET_DEAD_SPACE);
-    await conquerUnownedPlanet(world, world.user1Core, SPAWN_PLANET_1, LVL1_ASTEROID_2);
-
-    await increaseBlockchainTime();
+    await world.contract.safeSetOwner(world.user1.address, ...makeInitArgs(LVL2_PLANET_DEAD_SPACE));
 
     const branchOrder = [2, 2, 2, 1, 1];
     for (let i = 0; i < 5; i++) {
-      // fill up planet with silver
-      await feedSilverToCap(world, world.user1Core, LVL1_ASTEROID_2, LVL2_PLANET_DEAD_SPACE);
-
+      await world.contract.adminFillPlanet(upgradeablePlanetId);
       await world.user1Core.upgradePlanet(upgradeablePlanetId, branchOrder[i]);
-
-      await increaseBlockchainTime();
     }
 
     await expect(world.user1Core.upgradePlanet(upgradeablePlanetId, 1)).to.be.revertedWith(
