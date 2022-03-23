@@ -2,7 +2,9 @@ import * as ts from 'typescript';
 
 interface CompiledOuput {
   jsContents: string;
+  jsmapContents: string;
   dtsContents: string;
+  dtsmapContents: string;
 }
 
 // This provides a utility for turning a string of TypeScript into strings of JS and DTS
@@ -11,6 +13,9 @@ export function tscompile(input: string): CompiledOuput {
   const options = {
     ...ts.getDefaultCompilerOptions(),
     declaration: true,
+    declarationMap: true,
+    sourceMap: true,
+    inlineSources: true,
   };
   const inputFileName = 'index.ts';
   const sourceFile = ts.createSourceFile(inputFileName, input, ts.ScriptTarget.ES2020);
@@ -37,6 +42,8 @@ export function tscompile(input: string): CompiledOuput {
 
   return {
     jsContents: createdFiles['index.js'],
+    jsmapContents: createdFiles['index.js.map'],
     dtsContents: createdFiles['index.d.ts'],
+    dtsmapContents: createdFiles['index.d.ts.map'],
   };
 }

@@ -19,5 +19,7 @@ subgraph/generated/*
 subgraph/subgraph.yaml
 subgraph/packages/*
 
+tsconfig.ref.tsbuildinfo
+
 # Local development version of darkforest.toml
 darkforest.localhost.toml

@@ -1,5 +1,14 @@
 // Visit https://aka.ms/tsconfig.json for all config options
 {
+  "include": [
+    "./hardhat.config.ts",
+    "settings.ts",
+    "tasks/**/*.ts",
+    // test/**/*.ts is explicitly not included to avoid a chicken-egg problem with typechain
+    "utils/**/*.ts",
+    "utils/**/*.json",
+    "../packages/contracts/typechain"
+  ],
   "compilerOptions": {
     "target": "ES2020",
     "module": "commonjs",
@@ -7,8 +16,7 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
-  },
-  "include": ["./scripts", "./test", "../packages/contracts/typechain"],
-  "files": ["./hardhat.config.ts"]
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true
+  }
 }

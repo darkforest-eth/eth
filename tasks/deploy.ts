@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import { task, types } from 'hardhat/config';
 import type { HardhatRuntimeEnvironment, Libraries } from 'hardhat/types';
 import * as path from 'path';
-import * as prettier from 'prettier';
+import { dedent } from 'ts-dedent';
 import * as settings from '../settings';
 import { DiamondChanges } from '../utils/diamond';
 import { tscompile } from '../utils/tscompile';
@@ -122,7 +122,7 @@ async function saveDeploy(
   const isDev = hre.network.name === 'localhost' || hre.network.name === 'hardhat';
 
   // Save the addresses of the deployed contracts to the `@darkforest_eth/contracts` package
-  const tsContents = `
+  const tsContents = dedent`
   /**
    * This package contains deployed contract addresses, ABIs, and Typechain types
    * for the Dark Forest game.
@@ -178,26 +178,25 @@ async function saveDeploy(
   export const INIT_ADDRESS = '${args.initAddress}';
   `;
 
-  const { jsContents, dtsContents } = tscompile(tsContents);
+  const { jsContents, jsmapContents, dtsContents, dtsmapContents } = tscompile(tsContents);
 
   const contractsFileTS = path.join(hre.packageDirs['@darkforest_eth/contracts'], 'index.ts');
   const contractsFileJS = path.join(hre.packageDirs['@darkforest_eth/contracts'], 'index.js');
+  const contractsFileJSMap = path.join(
+    hre.packageDirs['@darkforest_eth/contracts'],
+    'index.js.map'
+  );
   const contractsFileDTS = path.join(hre.packageDirs['@darkforest_eth/contracts'], 'index.d.ts');
+  const contractsFileDTSMap = path.join(
+    hre.packageDirs['@darkforest_eth/contracts'],
+    'index.d.ts.map'
+  );
 
-  const options = prettier.resolveConfig.sync(contractsFileTS);
-
-  fs.writeFileSync(
-    contractsFileTS,
-    prettier.format(tsContents, { ...options, parser: 'babel-ts' })
-  );
-  fs.writeFileSync(
-    contractsFileJS,
-    prettier.format(jsContents, { ...options, parser: 'babel-ts' })
-  );
-  fs.writeFileSync(
-    contractsFileDTS,
-    prettier.format(dtsContents, { ...options, parser: 'babel-ts' })
-  );
+  fs.writeFileSync(contractsFileTS, tsContents);
+  fs.writeFileSync(contractsFileJS, jsContents);
+  fs.writeFileSync(contractsFileJSMap, jsmapContents);
+  fs.writeFileSync(contractsFileDTS, dtsContents);
+  fs.writeFileSync(contractsFileDTSMap, dtsmapContents);
 }
 
 export async function deployAndCut(
