@@ -114,15 +114,6 @@ struct GameConstants {
     uint256[10] CAPTURE_ZONE_PLANET_LEVEL_SCORE;
     uint256 CAPTURE_ZONE_HOLD_BLOCKS_REQUIRED;
     uint256 CAPTURE_ZONES_PER_5000_WORLD_RADIUS;
-    SpaceshipConstants SPACESHIPS;
-}
-
-struct SpaceshipConstants {
-    bool GEAR;
-    bool MOTHERSHIP;
-    bool TITAN;
-    bool CRESCENT;
-    bool WHALE;
 }
 
 // SNARK keys and perlin params

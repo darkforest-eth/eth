@@ -236,44 +236,26 @@ contract DFArtifactFacet is WithStorage, ERC721 {
         );
 
         address owner = gs().planets[locationId].owner;
-        if (gameConstants().SPACESHIPS.MOTHERSHIP) {
-            uint256 id1 =
-                LibArtifactUtils.createAndPlaceSpaceship(
-                    locationId,
-                    owner,
-                    ArtifactType.ShipMothership
-                );
-            emit ArtifactFound(msg.sender, id1, locationId);
-        }
+        uint256 id1 =
+            LibArtifactUtils.createAndPlaceSpaceship(
+                locationId,
+                owner,
+                ArtifactType.ShipMothership
+            );
+        uint256 id2 =
+            LibArtifactUtils.createAndPlaceSpaceship(locationId, owner, ArtifactType.ShipCrescent);
+        uint256 id3 =
+            LibArtifactUtils.createAndPlaceSpaceship(locationId, owner, ArtifactType.ShipWhale);
+        uint256 id4 =
+            LibArtifactUtils.createAndPlaceSpaceship(locationId, owner, ArtifactType.ShipGear);
+        uint256 id5 =
+            LibArtifactUtils.createAndPlaceSpaceship(locationId, owner, ArtifactType.ShipTitan);
 
-        if (gameConstants().SPACESHIPS.CRESCENT) {
-            uint256 id2 =
-                LibArtifactUtils.createAndPlaceSpaceship(
-                    locationId,
-                    owner,
-                    ArtifactType.ShipCrescent
-                );
-            emit ArtifactFound(msg.sender, id2, locationId);
-        }
-
-        if (gameConstants().SPACESHIPS.WHALE) {
-            uint256 id3 =
-                LibArtifactUtils.createAndPlaceSpaceship(locationId, owner, ArtifactType.ShipWhale);
-            emit ArtifactFound(msg.sender, id3, locationId);
-        }
-
-        if (gameConstants().SPACESHIPS.GEAR) {
-            uint256 id4 =
-                LibArtifactUtils.createAndPlaceSpaceship(locationId, owner, ArtifactType.ShipGear);
-            emit ArtifactFound(msg.sender, id4, locationId);
-        }
-
-        if (gameConstants().SPACESHIPS.TITAN) {
-            uint256 id5 =
-                LibArtifactUtils.createAndPlaceSpaceship(locationId, owner, ArtifactType.ShipTitan);
-
-            emit ArtifactFound(msg.sender, id5, locationId);
-        }
+        emit ArtifactFound(msg.sender, id1, locationId);
+        emit ArtifactFound(msg.sender, id2, locationId);
+        emit ArtifactFound(msg.sender, id3, locationId);
+        emit ArtifactFound(msg.sender, id4, locationId);
+        emit ArtifactFound(msg.sender, id5, locationId);
 
         gs().players[msg.sender].claimedShips = true;
     }

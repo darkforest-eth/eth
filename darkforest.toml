@@ -140,12 +140,6 @@ PLANET_TYPE_WEIGHTS = [
   ],
 ]
 
-[initializers.SPACESHIPS]
-GEAR = true
-MOTHERSHIP = true
-TITAN = true
-CRESCENT = true
-WHALE = true
 
 ##########################
 # Planets to add to game #
