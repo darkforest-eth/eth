@@ -36,7 +36,7 @@ import {
 
 // Library imports
 import {LibDiamond} from "./vendor/libraries/LibDiamond.sol";
-import {WithStorage, SpaceshipConstants} from "./libraries/LibStorage.sol";
+import {WithStorage} from "./libraries/LibStorage.sol";
 import {LibGameUtils} from "./libraries/LibGameUtils.sol";
 
 // Type imports
@@ -107,7 +107,6 @@ struct InitArgs {
     uint256[10] CAPTURE_ZONE_PLANET_LEVEL_SCORE;
     uint256 CAPTURE_ZONE_HOLD_BLOCKS_REQUIRED;
     uint256 CAPTURE_ZONES_PER_5000_WORLD_RADIUS;
-    SpaceshipConstants SPACESHIPS;
 }
 
 contract DFInitialize is WithStorage {
@@ -192,7 +191,6 @@ contract DFInitialize is WithStorage {
             .CAPTURE_ZONE_HOLD_BLOCKS_REQUIRED;
         gameConstants().CAPTURE_ZONES_PER_5000_WORLD_RADIUS = initArgs
             .CAPTURE_ZONES_PER_5000_WORLD_RADIUS;
-        gameConstants().SPACESHIPS = initArgs.SPACESHIPS;
 
         gs().nextChangeBlock = block.number + initArgs.CAPTURE_ZONE_CHANGE_BLOCK_INTERVAL;
 
