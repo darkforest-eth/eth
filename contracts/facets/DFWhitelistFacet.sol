@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 // Library imports
 import {LibDiamond} from "../vendor/libraries/LibDiamond.sol";
+import {Verifier} from "../Verifier.sol";
 
 // Storage imports
 import {WithStorage} from "../libraries/LibStorage.sol";
@@ -26,43 +27,56 @@ contract DFWhitelistFacet is WithStorage {
         return ws().allowedAccounts[_addr];
     }
 
-    function isKeyValid(string memory key) public view returns (bool) {
-        bytes32 hashed = keccak256(abi.encodePacked(key));
-        return ws().allowedKeyHashes[hashed];
+    function isKeyHashValid(uint256 hashed) public view returns (bool) {
+        return ws().newAllowedKeyHashes[hashed];
     }
 
     // modify whitelist
-    function addKeys(bytes32[] memory hashes) public onlyAdmin {
+    function addKeys(uint256[] memory hashes) public onlyAdmin {
         for (uint16 i = 0; i < hashes.length; i++) {
-            ws().allowedKeyHashes[hashes[i]] = true;
+            ws().newAllowedKeyHashes[hashes[i]] = true;
         }
     }
 
-    function disableKeys(bytes32[] memory keys) public onlyAdmin {
+    function disableKeys(uint256[] memory keys) public onlyAdmin {
         for (uint256 i = 0; i < keys.length; i++) {
-            ws().allowedKeyHashes[keys[i]] = false;
+            ws().newAllowedKeyHashes[keys[i]] = false;
         }
     }
 
-    function useKey(string memory key, address owner) public onlyAdmin {
-        // This is a no-op instead of a revert
-        // because when the webserver restarts
-        // we have no way to recover useKey txs
-        // that were sent but not confirmed.
-        // Repeating the request should be a
-        // success so the webserver can
-        // properly notify the client.
-        if (ws().allowedAccounts[owner]) {
-            return;
-        }
+    function useKey(
+        uint256[2] memory _a,
+        uint256[2][2] memory _b,
+        uint256[2] memory _c,
+        uint256[2] memory _input
+    ) public {
+        require(Verifier.verifyWhitelistProof(_a, _b, _c, _input), "Failed whitelist proof check");
 
-        bytes32 hashed = keccak256(abi.encodePacked(key));
-        require(ws().allowedKeyHashes[hashed], "invalid key");
-        ws().allowedAccounts[owner] = true;
-        ws().allowedAccountsArray.push(owner);
-        ws().allowedKeyHashes[hashed] = false;
+        uint256 hashedKey = _input[0];
+        address payable recipient = payable(address(uint160(_input[1])));
+
+        if (ws().allowedAccounts[recipient]) return;
+
+        _useKey(hashedKey, recipient);
+
+        if (ws().relayerRewardsEnabled && recipient != msg.sender) {
+            // Payment to encourage relaying whitelist
+            // transactions for new users with no funds
+            payable(msg.sender).transfer(ws().relayerReward);
+        }
+    }
+
+    function adminUseKey(uint256 keyHash, address payable recipient) public onlyAdmin {
+        _useKey(keyHash, recipient);
+    }
+
+    function _useKey(uint256 keyHash, address payable recipient) private {
+        require(ws().newAllowedKeyHashes[keyHash], "invalid key");
+        ws().allowedAccounts[recipient] = true;
+        ws().allowedAccountsArray.push(recipient);
+        ws().newAllowedKeyHashes[keyHash] = false;
         // xDAI ONLY
-        payable(owner).transfer(ws().drip);
+        payable(recipient).transfer(ws().drip);
     }
 
     function addToWhitelist(address toAdd) public onlyAdmin {
@@ -91,5 +105,17 @@ contract DFWhitelistFacet is WithStorage {
 
     function drip() public view returns (uint256) {
         return ws().drip;
+    }
+
+    function setRelayerRewardsEnabled(bool newRewardsEnabled) public onlyAdmin {
+        ws().relayerRewardsEnabled = newRewardsEnabled;
+    }
+
+    function changeRelayerReward(uint256 newReward) public onlyAdmin {
+        ws().relayerReward = newReward;
+    }
+
+    function relayerReward() public view returns (uint256) {
+        return ws().relayerReward;
     }
 }

@@ -347,8 +347,16 @@ export async function deployDebugFacet({}, {}: Libraries, hre: HardhatRuntimeEnv
   return contract;
 }
 
-export async function deployWhitelistFacet({}, {}: Libraries, hre: HardhatRuntimeEnvironment) {
-  const factory = await hre.ethers.getContractFactory('DFWhitelistFacet');
+export async function deployWhitelistFacet(
+  {},
+  { Verifier }: Libraries,
+  hre: HardhatRuntimeEnvironment
+) {
+  const factory = await hre.ethers.getContractFactory('DFWhitelistFacet', {
+    libraries: {
+      Verifier,
+    },
+  });
   const contract = await factory.deploy();
   await contract.deployTransaction.wait();
   console.log(`DFWhitelistFacet deployed to: ${contract.address}`);

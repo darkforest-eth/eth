@@ -13,6 +13,19 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types';
 // @ts-ignore
 import * as snarkjs from 'snarkjs';
 
+// use to run some code on the contract-side in case an upgrade to the contracts
+// requires it
+task('game:migrateContracts', 'migrate the game contracts').setAction(gameMigrateContracts);
+
+async function gameMigrateContracts({}, hre: HardhatRuntimeEnvironment) {
+  await hre.run('utils:assertChainId');
+
+  const contract = await hre.ethers.getContractAt('DarkForest', hre.contracts.CONTRACT_ADDRESS);
+
+  const unpauseReceipt = await contract.migrate();
+  await unpauseReceipt.wait();
+}
+
 task('game:pause', 'pause the game').setAction(gamePause);
 
 async function gamePause({}, hre: HardhatRuntimeEnvironment) {

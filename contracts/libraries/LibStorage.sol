@@ -19,8 +19,16 @@ struct WhitelistStorage {
     bool enabled;
     uint256 drip;
     mapping(address => bool) allowedAccounts;
+    // TODO Delete this when we re-deploy a fresh contract
     mapping(bytes32 => bool) allowedKeyHashes;
     address[] allowedAccountsArray;
+    bool relayerRewardsEnabled;
+    uint256 relayerReward;
+    // This is needed to be upgrade-safe because we can't
+    // change the data type of the existing allowedKeyHashes
+    // TODO When we delete the old one, this becomes the only
+    // mapping.
+    mapping(uint256 => bool) newAllowedKeyHashes;
 }
 
 struct GameStorage {
@@ -114,6 +122,15 @@ struct GameConstants {
     uint256[10] CAPTURE_ZONE_PLANET_LEVEL_SCORE;
     uint256 CAPTURE_ZONE_HOLD_BLOCKS_REQUIRED;
     uint256 CAPTURE_ZONES_PER_5000_WORLD_RADIUS;
+    SpaceshipConstants SPACESHIPS;
+}
+
+struct SpaceshipConstants {
+    bool GEAR;
+    bool MOTHERSHIP;
+    bool TITAN;
+    bool CRESCENT;
+    bool WHALE;
 }
 
 // SNARK keys and perlin params

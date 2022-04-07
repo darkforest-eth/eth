@@ -55,7 +55,7 @@ async function subgraphCodegen(_args: HardhatArguments, hre: HardhatRuntimeEnvir
 
   await fs.writeFile(path.join(subgraphPath, 'subgraph.yaml'), '# ' + warning + yaml);
 
-  await exec(`npx graph codegen`, {
+  await exec(`npx graph codegen subgraph/subgraph.yaml`, {
     cwd: subgraphPath,
     env: { ...process.env },
     stdio: 'inherit',

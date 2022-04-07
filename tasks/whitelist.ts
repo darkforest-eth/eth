@@ -1,7 +1,7 @@
+import { generateKeys, keyHash, keysPerTx } from '@darkforest_eth/whitelist';
 import * as fs from 'fs';
 import { subtask, task, types } from 'hardhat/config';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
-import { generateKey, generateKeys, keysPerTx } from './whitelist-helpers';
 
 task('whitelist:changeDrip', 'change the faucet amount for whitelisted players')
   .addPositionalParam('value', 'drip value (in ether or xDAI)', undefined, types.float)
@@ -60,11 +60,11 @@ async function whitelistGenerate(args: { number: number }, hre: HardhatRuntimeEn
     const keysToGenerate = Math.min(nKeys - keysGenerated, keysPerTx);
     console.log(`Keyset ${i}: registering ${keysToGenerate} keys`);
 
-    const keys: string[] = generateKeys(keysToGenerate);
-    const hashes: string[] = keys.map((x) => hre.ethers.utils.id(x));
+    const keys = generateKeys(keysToGenerate);
+    const keyHashes = keys.map(keyHash);
 
     try {
-      const akReceipt = await contract.addKeys(hashes, { gasPrice: '5000000000' }); // 5gwei
+      const akReceipt = await contract.addKeys(keyHashes, { gasPrice: '5000000000' }); // 5gwei
       await akReceipt.wait();
 
       allKeys = allKeys.concat(keys);
@@ -101,7 +101,7 @@ async function whitelistExists(
   if (address !== undefined) {
     return await hre.run('whitelist:existsAddress', { address });
   } else if (key !== undefined) {
-    return await hre.run('whitelist:existsKey', { key });
+    return await hre.run('whitelist:existsKeyHash', { key });
   }
 }
 
@@ -127,16 +127,17 @@ async function whitelistExistsAddress(args: { address: string }, hre: HardhatRun
   console.log(`Player ${args.address} is${isWhitelisted ? '' : ' NOT'} whitelisted.`);
 }
 
-subtask('whitelist:existsKey', 'determine if a whitelist key is valid')
+subtask('whitelist:existsKeyHash', 'determine if a whitelist key is valid')
   .addParam('key', 'whitelist key', undefined, types.string)
-  .setAction(whitelistExistsKey);
+  .setAction(whitelistExistsKeyHash);
 
-async function whitelistExistsKey(args: { key: string }, hre: HardhatRuntimeEnvironment) {
+async function whitelistExistsKeyHash(args: { key: string }, hre: HardhatRuntimeEnvironment) {
   await hre.run('utils:assertChainId');
 
   const contract = await hre.ethers.getContractAt('DarkForest', hre.contracts.CONTRACT_ADDRESS);
 
-  const isValid = await contract.isKeyValid(args.key);
+  const hash = keyHash(args.key);
+  const isValid = await contract.isKeyHashValid(hash);
 
   const balance = await hre.ethers.provider.getBalance(contract.address);
   console.log('whitelist balance:', hre.ethers.utils.formatEther(balance));
@@ -144,11 +145,7 @@ async function whitelistExistsKey(args: { key: string }, hre: HardhatRuntimeEnvi
   console.log(`Key ${args.key} is${isValid ? '' : ' NOT'} valid.`);
 }
 
-task(
-  'whitelist:register',
-  'add address to whitelist contract with given key if provided, or on-the-fly-generated key if not provided'
-)
-  .addOptionalParam('key', 'whitelist key', undefined, types.string)
+task('whitelist:register', 'add address(es) to whitelist')
   .addParam(
     'address',
     'network address (or comma seperated list of addresses)',
@@ -157,27 +154,7 @@ task(
   )
   .setAction(whitelistRegister);
 
-async function whitelistRegister(
-  { address, key }: { address: string; key?: string },
-  hre: HardhatRuntimeEnvironment
-) {
-  if (key === undefined) {
-    return await hre.run('whitelist:registerAddress', { address });
-  } else {
-    return await hre.run('whitelist:registerKey', { address, key });
-  }
-}
-
-subtask('whitelist:registerAddress', 'add address to whitelist with on-the-fly-generated key')
-  .addParam(
-    'address',
-    'network address (or comma seperated list of addresses)',
-    undefined,
-    types.string
-  )
-  .setAction(whitelistRegisterAddress);
-
-async function whitelistRegisterAddress(args: { address: string }, hre: HardhatRuntimeEnvironment) {
+async function whitelistRegister(args: { address: string }, hre: HardhatRuntimeEnvironment) {
   await hre.run('utils:assertChainId');
 
   const contract = await hre.ethers.getContractAt('DarkForest', hre.contracts.CONTRACT_ADDRESS);
@@ -193,48 +170,12 @@ async function whitelistRegisterAddress(args: { address: string }, hre: HardhatR
       throw new Error(`Address ${address} is already whitelisted.`);
     }
 
-    const apiKey: string = generateKey();
-    const akReceipt = await contract.addKeys([hre.ethers.utils.id(apiKey)]);
-    await akReceipt.wait();
-
-    const ukReceipt = await contract.useKey(apiKey, address);
-    await ukReceipt.wait();
+    const whitelistTx = await contract.addToWhitelist(address);
+    await whitelistTx.wait();
 
     const balance = await hre.ethers.provider.getBalance(contract.address);
     console.log('whitelist balance:', hre.ethers.utils.formatEther(balance));
 
-    console.log(`[${new Date()}] Registered player ${address} with key ${apiKey}.`);
+    console.log(`[${new Date()}] Registered player ${address}.`);
   }
-}
-
-subtask('whitelist:registerKey', 'add address to whitelist with pregenerated key')
-  .addParam('key', 'whitelist key', undefined, types.string)
-  .addParam('address', 'network address', undefined, types.string)
-  .setAction(whitelistRegisterKey);
-
-async function whitelistRegisterKey(
-  args: { address: string; key: string },
-  hre: HardhatRuntimeEnvironment
-) {
-  await hre.run('utils:assertChainId');
-
-  const contract = await hre.ethers.getContractAt('DarkForest', hre.contracts.CONTRACT_ADDRESS);
-
-  const isValid = await contract.isKeyValid(args.key);
-  if (!isValid) {
-    throw new Error(`Key ${args.key} is${isValid ? '' : ' NOT'} valid.`);
-  }
-
-  const isWhitelisted = await contract.isWhitelisted(args.address);
-  if (isWhitelisted) {
-    throw new Error(`Player ${args.address} is already whitelisted.`);
-  }
-
-  const ukReceipt = await contract.useKey(args.key, args.address);
-  await ukReceipt.wait();
-
-  const balance = await hre.ethers.provider.getBalance(contract.address);
-  console.log('whitelist balance:', hre.ethers.utils.formatEther(balance));
-
-  console.log(`[${new Date()}] Registered player ${args.address} with key ${args.key}.`);
 }

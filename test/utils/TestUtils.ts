@@ -1,8 +1,20 @@
 import type { DarkForest } from '@darkforest_eth/contracts/typechain';
 import { modPBigInt } from '@darkforest_eth/hashing';
+import {
+  buildContractCallArgs,
+  SnarkJSProofAndSignals,
+  WhitelistSnarkContractCallArgs,
+  WhitelistSnarkInput,
+  whitelistSnarkWasmPath,
+  whitelistSnarkZkeyPath,
+} from '@darkforest_eth/snarks';
 import { ArtifactRarity, ArtifactType, Biome } from '@darkforest_eth/types';
+import { bigIntFromKey } from '@darkforest_eth/whitelist';
+import bigInt from 'big-integer';
 import { BigNumber, BigNumberish } from 'ethers';
 import { ethers, waffle } from 'hardhat';
+// @ts-ignore
+import * as snarkjs from 'snarkjs';
 import { TestLocation } from './TestLocation';
 import { World } from './TestWorld';
 import { ARTIFACT_PLANET_1, initializers, LARGE_INTERVAL } from './WorldConstants';
@@ -66,6 +78,21 @@ export function makeRevealArgs(
       PERLIN_MIRROR_Y ? '1' : '0',
     ],
   ];
+}
+
+export async function makeWhitelistArgs(key: string, recipient: string) {
+  const input: WhitelistSnarkInput = {
+    key: bigIntFromKey(key).toString(),
+    recipient: bigInt(recipient.substring(2), 16).toString(),
+  };
+
+  const fullProveResponse = await snarkjs.groth16.fullProve(
+    input,
+    whitelistSnarkWasmPath,
+    whitelistSnarkZkeyPath
+  );
+  const { proof, publicSignals }: SnarkJSProofAndSignals = fullProveResponse;
+  return buildContractCallArgs(proof, publicSignals) as WhitelistSnarkContractCallArgs;
 }
 
 export function makeInitArgs(

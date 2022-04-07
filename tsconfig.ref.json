@@ -5,6 +5,9 @@
       "path": "../packages/contracts/tsconfig.ref.json"
     },
     {
+      "path": "../packages/whitelist/tsconfig.ref.json"
+    },
+    {
       "path": "../packages/hashing/tsconfig.ref.json"
     },
     {
