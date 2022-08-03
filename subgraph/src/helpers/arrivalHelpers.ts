@@ -1,6 +1,6 @@
 /* eslint-disable eqeqeq */
 import { BigDecimal, BigInt } from '@graphprotocol/graph-ts';
-import { Arrival, Planet } from '../../generated/schema';
+import { Arrival, Planet } from '../../../generated/schema';
 
 function isZeroAddress(address: string): boolean {
   return '0x0000000000000000000000000000000000000000' == address;

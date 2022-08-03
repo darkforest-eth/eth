@@ -6,8 +6,8 @@ import {
   DarkForest__bulkGetPlanetsDataByIdsResultRetInfoStruct,
   DarkForest__bulkGetPlanetsDataByIdsResultRetPlanetStruct,
   DarkForest__bulkGetVoyagesByIdsResultRetStruct,
-} from '../../generated/DarkForest/DarkForest';
-import { Arrival, Artifact, Planet, Spaceship } from '../../generated/schema';
+} from '../../../generated/DarkForest/DarkForest';
+import { Arrival, Artifact, Planet, Spaceship } from '../../../generated/schema';
 import {
   hexStringToPaddedUnprefixed,
   isDefenseBoosted,

@@ -91,7 +91,7 @@ async function subgraphDeploy(args: { name: string }, hre: HardhatRuntimeEnviron
   });
 
   await exec(
-    `npx graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 -l df ${args.name} `,
+    `npx graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 -l df ${args.name} subgraph/subgraph.yaml`,
     {
       cwd: subgraphPath,
       env: { ...process.env },

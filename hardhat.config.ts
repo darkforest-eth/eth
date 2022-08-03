@@ -106,17 +106,20 @@ const config: HardhatUserConfig = {
       accounts: [
         // from/deployer is default the first address in accounts
         {
+          // Account #1: 0x1c0f0af3262a7213e59be7f1440282279d788335
           privateKey: '0x044C7963E9A89D4F8B64AB23E02E97B2E00DD57FCB60F316AC69B77135003AEF',
           balance: '100000000000000000000',
         },
         // user1 in tests
         {
+          // Account #2: 0xe8170282c5bc6e7c5b2d984cd5d897a05e0afafb
           privateKey: '0x523170AAE57904F24FFE1F61B7E4FF9E9A0CE7557987C2FC034EACB1C267B4AE',
           balance: '100000000000000000000',
         },
         // user2 in tests
         // admin account
         {
+          // Account #3: 0x3097403b64fe672467345bf159f4c9c5464bd89e
           privateKey: '0x67195c963ff445314e667112ab22f4a7404bad7f9746564eb409b9bb8c6aed32',
           balance: '100000000000000000000',
         },
