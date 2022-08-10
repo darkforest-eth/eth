@@ -31,6 +31,7 @@ import './tasks/upgrades';
 import './tasks/utils';
 import './tasks/wallet';
 import './tasks/whitelist';
+import './tasks/alt-whitelist';
 
 require('dotenv').config();
 
@@ -85,6 +86,14 @@ const mainnet = {
   chainId: 1,
 };
 
+const acadia2 = {
+  url: 'https://acadia2-alt-producer-archive-rpc.altresearch.xyz/',
+  accounts: {
+    mnemonic: DEPLOYER_MNEMONIC,
+  },
+  chainId: 9990,
+}
+
 const config: HardhatUserConfig = {
   defaultNetwork: 'hardhat',
   networks: {
@@ -93,6 +102,7 @@ const config: HardhatUserConfig = {
     // > Error HH100: Network xdai doesn't exist
     ...(DEPLOYER_MNEMONIC ? { xdai } : undefined),
     ...(DEPLOYER_MNEMONIC ? { mainnet } : undefined),
+    ...(DEPLOYER_MNEMONIC ? { acadia2 } : undefined),
     localhost: {
       url: 'http://localhost:8545/',
       accounts: {

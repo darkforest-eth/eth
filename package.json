@@ -73,6 +73,7 @@
     "hardhat:dev": "hardhat --network localhost",
     "hardhat:prod": "hardhat --network xdai",
     "hardhat:mainnet": "hardhat --network mainnet",
+    "hardhat:acadia2": "hardhat --network acadia2",
     "prepare": "yarn compile",
     "compile": "hardhat compile",
     "circom:prod": "hardhat circom --verbose",
