@@ -22,7 +22,8 @@ async function walletInfo({}, hre: HardhatRuntimeEnvironment) {
 }
 
 task('wallet:send', 'send the native currency of this chain (ETH on mainnet, xDAI on xDAI chain)')
-  .addParam('from', 'sender address', undefined, types.string)
+  .addParam('fromPrivateKey', 'sender private key', "", types.string)
+  .addParam('from', 'sender address', "", types.string)
   .addParam('to', 'receiver address', undefined, types.string)
   .addParam('value', 'value to send (in units of ETH/xDAI)', undefined, types.float)
   .addParam(
@@ -37,6 +38,7 @@ task('wallet:send', 'send the native currency of this chain (ETH on mainnet, xDA
 
 async function sendValue(
   args: {
+    fromPrivateKey: string;
     from: string;
     to: string;
     value: number;
@@ -50,18 +52,28 @@ async function sendValue(
   if (!toIsAddress) {
     throw new Error(`TO address ${args.to} is NOT a valid address.`);
   }
-  const fromIsAddress = hre.ethers.utils.isAddress(args.from);
-  if (!fromIsAddress) {
-    throw new Error(`FROM address ${args.from} is NOT a valid address.`);
+
+  if (!args.fromPrivateKey && !args.from || args.fromPrivateKey && args.from) {
+    throw new Error(
+      'Need to specify either from or fromPrivateKey argument, but cannot be both at the same time.'
+    );
+  }
+
+  if (args.from) {
+    const fromIsAddress = hre.ethers.utils.isAddress(args.from);
+    if (!fromIsAddress) {
+      throw new Error(`FROM address ${args.from} is NOT a valid address.`);
+    }
   }
 
   const accounts = await hre.ethers.getSigners();
-  const sender = accounts.filter(
-    (account) => account.address.toLowerCase() === args.from.toLowerCase()
-  )[0];
+  const sender = args.fromPrivateKey
+    ? new hre.ethers.Wallet(args.fromPrivateKey, hre.ethers.provider)
+    : accounts.filter((acct) => acct.address.toLowerCase() === args.from.toLowerCase())[0];
+
   if (!sender) {
     throw new Error(
-      `FROM address ${args.from} not found in local wallet! Check your hardhat.config file`
+      `FROM address ${args.from} not found in local wallet or cannot initialize from private key.`
     );
   }
 

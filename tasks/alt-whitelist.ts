@@ -2,11 +2,13 @@ import { subtask, task, types } from 'hardhat/config';
 import * as fs from 'fs';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 
-const faucetAddr = process.env['FAUCET_ADDR']
+require('dotenv').config();
+
+const { ALT_FAUCET_PRIV_KEY } = process.env
+const DRIP_AMT = 0.3
 
 task('alt-whitelist:generate', 'create the account and register to the game')
   .addPositionalParam('number', 'number of keys', undefined, types.int)
-  .addPositionalParam('dripAmt', 'drip value (in ether)', undefined, types.float)
   .setAction(whitelistGenerate);
 
 async function whitelistGenerate(
@@ -30,10 +32,17 @@ async function whitelistGenerate(
   await hre.run('whitelist:register', { address: addresses })
 
   // drip amount
-  if (!faucetAddr) {
-    console.log('No dripping as faucet address is not set.');
+  if (ALT_FAUCET_PRIV_KEY) {
+    for (const wallet of wallets) {
+      await hre.run('wallet:send', {
+        fromPrivateKey: ALT_FAUCET_PRIV_KEY,
+        to: wallet.address,
+        value: DRIP_AMT,
+        dry: false,
+      })
+    }
   } else {
-
+    console.log('No dripping as faucet address is not set.');
   }
 
   // Write the public/private key to a csv file
