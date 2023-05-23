@@ -73,7 +73,7 @@ export async function initializeWorld({
     hre
   );
 
-  const contract = await hre.ethers.getContractAt('DarkForest', diamond.address);
+  const contract = await hre.ethers.getContractAt('DarkForest', diamond.address) as DarkForest;
 
   await deployer.sendTransaction({
     to: contract.address,
