@@ -5,7 +5,6 @@ pragma solidity ^0.8.0;
 import {DFWhitelistFacet} from "./DFWhitelistFacet.sol";
 
 // Library imports
-import {Verifier} from "../Verifier.sol";
 import {ABDKMath64x64} from "../vendor/libraries/ABDKMath64x64.sol";
 import {LibDiamond} from "../vendor/libraries/LibDiamond.sol";
 import {LibGameUtils} from "../libraries/LibGameUtils.sol";
@@ -13,7 +12,7 @@ import {LibArtifactUtils} from "../libraries/LibArtifactUtils.sol";
 import {LibPlanet} from "../libraries/LibPlanet.sol";
 
 // Storage imports
-import {WithStorage} from "../libraries/LibStorage.sol";
+import {WithStorage, ProofType} from "../libraries/LibStorage.sol";
 
 // Type imports
 import {
@@ -86,14 +85,10 @@ contract DFCoreFacet is WithStorage {
     }
 
     function checkRevealProof(
-        uint256[2] memory _a,
-        uint256[2][2] memory _b,
-        uint256[2] memory _c,
-        uint256[9] memory _input
+        uint256[9] memory _input,
+        bytes memory _proof
     ) public view returns (bool) {
-        if (!snarkConstants().DISABLE_ZK_CHECKS) {
-            require(Verifier.verifyRevealProof(_a, _b, _c, _input), "Failed reveal pf check");
-        }
+        verifyProof(ProofType.Reveal, _proof, _input);
 
         LibGameUtils.revertIfBadSnarkPerlinFlags(
             [_input[4], _input[5], _input[6], _input[7], _input[8]],
@@ -104,12 +99,10 @@ contract DFCoreFacet is WithStorage {
     }
 
     function revealLocation(
-        uint256[2] memory _a,
-        uint256[2][2] memory _b,
-        uint256[2] memory _c,
-        uint256[9] memory _input
+        uint256[9] memory _input,
+        bytes memory _proof
     ) public onlyWhitelisted returns (uint256) {
-        require(checkRevealProof(_a, _b, _c, _input), "Failed reveal pf check");
+        require(checkRevealProof(_input, _proof), "Failed reveal pf check");
 
         if (!gs().planetsExtendedInfo[_input[0]].isInitialized) {
             LibPlanet.initializePlanetWithDefaults(_input[0], _input[1], false);

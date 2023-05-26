@@ -7,7 +7,7 @@ import {LibLazyUpdate} from "./LibLazyUpdate.sol";
 import {Verifier} from "../Verifier.sol";
 
 // Storage imports
-import {LibStorage, GameStorage, GameConstants, SnarkConstants} from "./LibStorage.sol";
+import {LibStorage, GameStorage, GameConstants, SnarkConstants, ProofType} from "./LibStorage.sol";
 
 // Type imports
 import {
@@ -97,14 +97,12 @@ library LibPlanet {
      * Same SNARK args as `initializePlayer`. Adds a planet to the smart contract without setting an owner.
      */
     function initializePlanet(
-        uint256[2] memory _a,
-        uint256[2][2] memory _b,
-        uint256[2] memory _c,
         uint256[8] memory _input,
+        bytes memory _proof,
         bool isHomePlanet
     ) public {
         if (!snarkConstants().DISABLE_ZK_CHECKS) {
-            require(Verifier.verifyInitProof(_a, _b, _c, _input), "Failed init proof check");
+            verifyProof(ProofType.Init, _proof, _input);
         }
 
         uint256 _location = _input[0];

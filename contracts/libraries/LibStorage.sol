@@ -15,6 +15,8 @@ import {
     Artifact
 } from "../DFTypes.sol";
 
+import { INargoUltraVerifier } from "../Verifier.sol";
+
 enum ProofType {
     Init,
     Move,
@@ -273,5 +275,9 @@ contract WithStorage {
 
     function upgrades() internal pure returns (Upgrade[4][3] storage) {
         return LibStorage.upgrades();
+    }
+
+    function verifyProof(ProofType pType, bytes memory proof, bytes32[] memory inputs) internal view returns (bool) {
+        return INargoUltraVerifier(snarkConstants().verifiers[pType]).verify(proof, inputs);
     }
 }

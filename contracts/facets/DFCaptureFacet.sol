@@ -49,16 +49,14 @@ contract DFCaptureFacet is WithStorage {
      * the need to generate all the zones on every transaction.
      */
     function invadePlanet(
-        uint256[2] memory _a,
-        uint256[2][2] memory _b,
-        uint256[2] memory _c,
-        uint256[9] memory _input
+        uint256[9] memory _input,
+        bytes memory _proof
     ) public onlyWhitelisted notPaused {
         require(gameConstants().CAPTURE_ZONES_ENABLED, "capture zones are disabled");
 
         uint256 locationId = _input[0];
 
-        DFCoreFacet(address(this)).checkRevealProof(_a, _b, _c, _input);
+        DFCoreFacet(address(this)).checkRevealProof(_input, _proof);
 
         require(planetInCaptureZone(_input[2], _input[3]), "planet is not in capture zone");
 
