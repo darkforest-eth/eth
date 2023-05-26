@@ -15,7 +15,9 @@ import {
     Artifact
 } from "../DFTypes.sol";
 
-import { INargoUltraVerifier } from "../Verifier.sol";
+interface INargoUltraVerifier {
+    function verify(bytes calldata _proof, bytes32[] calldata _publicInputs) external view returns (bool);
+}
 
 enum ProofType {
     Init,
@@ -277,7 +279,11 @@ contract WithStorage {
         return LibStorage.upgrades();
     }
 
-    function verifyProof(ProofType pType, bytes memory proof, bytes32[] memory inputs) internal view returns (bool) {
-        return INargoUltraVerifier(snarkConstants().verifiers[pType]).verify(proof, inputs);
+    function verifyProof(ProofType pType, bytes memory proof, uint256[] memory inputs) internal view returns (bool) {
+        bytes32[] memory inputBytes = new bytes32[](inputs.length);
+        for (uint256 i = 0; i < inputs.length; i++) {
+            inputBytes[i] = bytes32(inputs[i]);
+        }
+        return INargoUltraVerifier(snarkConstants().verifiers[pType]).verify(proof, inputBytes);
     }
 }

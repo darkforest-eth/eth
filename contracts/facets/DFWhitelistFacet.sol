@@ -3,10 +3,9 @@ pragma solidity ^0.8.0;
 
 // Library imports
 import {LibDiamond} from "../vendor/libraries/LibDiamond.sol";
-import {Verifier} from "../Verifier.sol";
 
 // Storage imports
-import {WithStorage} from "../libraries/LibStorage.sol";
+import {WithStorage, ProofType} from "../libraries/LibStorage.sol";
 
 contract DFWhitelistFacet is WithStorage {
     // administrative
@@ -45,12 +44,12 @@ contract DFWhitelistFacet is WithStorage {
     }
 
     function useKey(
-        uint256[2] memory _a,
-        uint256[2][2] memory _b,
-        uint256[2] memory _c,
-        uint256[2] memory _input
+        uint256[2] memory _input,
+        bytes memory _proof
     ) public {
-        require(Verifier.verifyWhitelistProof(_a, _b, _c, _input), "Failed whitelist proof check");
+        uint256[] memory ins = new uint256[](2);
+        ins[0] = _input[0]; ins[1] = _input[1];
+        require(verifyProof(ProofType.Whitelist, _proof, ins), "Failed whitelist proof check");
 
         uint256 hashedKey = _input[0];
         address payable recipient = payable(address(uint160(_input[1])));

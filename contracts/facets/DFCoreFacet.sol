@@ -88,7 +88,13 @@ contract DFCoreFacet is WithStorage {
         uint256[9] memory _input,
         bytes memory _proof
     ) public view returns (bool) {
-        verifyProof(ProofType.Reveal, _proof, _input);
+        uint256[] memory ins = new uint256[](9);
+        ins[0] = _input[0]; ins[1] = _input[1];
+        ins[2] = _input[2]; ins[3] = _input[3];
+        ins[4] = _input[4]; ins[5] = _input[5];
+        ins[6] = _input[6]; ins[7] = _input[7];
+        ins[8] = _input[8];
+        verifyProof(ProofType.Reveal, _proof, ins);
 
         LibGameUtils.revertIfBadSnarkPerlinFlags(
             [_input[4], _input[5], _input[6], _input[7], _input[8]],
@@ -119,12 +125,10 @@ contract DFCoreFacet is WithStorage {
     }
 
     function initializePlayer(
-        uint256[2] memory _a,
-        uint256[2][2] memory _b,
-        uint256[2] memory _c,
-        uint256[8] memory _input
+        uint256[8] memory _input,
+        bytes memory _proof
     ) public onlyWhitelisted returns (uint256) {
-        LibPlanet.initializePlanet(_a, _b, _c, _input, true);
+        LibPlanet.initializePlanet(_input, _proof, true);
 
         uint256 _location = _input[0];
         uint256 _perlin = _input[1];

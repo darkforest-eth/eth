@@ -46,9 +46,11 @@ contract DFGetterFacet is WithStorage {
         return gs().TOKEN_MINT_END_TIMESTAMP;
     }
 
+    /*
     function getSnarkConstants() public pure returns (SnarkConstants memory) {
         return snarkConstants();
     }
+    */
 
     function getGameConstants() public pure returns (GameConstants memory) {
         return gameConstants();

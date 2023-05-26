@@ -4,10 +4,9 @@ pragma solidity ^0.8.0;
 // Library imports
 import {LibGameUtils} from "./LibGameUtils.sol";
 import {LibLazyUpdate} from "./LibLazyUpdate.sol";
-import {Verifier} from "../Verifier.sol";
 
 // Storage imports
-import {LibStorage, GameStorage, GameConstants, SnarkConstants, ProofType} from "./LibStorage.sol";
+import {LibStorage, GameStorage, GameConstants, SnarkConstants, ProofType, INargoUltraVerifier} from "./LibStorage.sol";
 
 // Type imports
 import {
@@ -102,7 +101,12 @@ library LibPlanet {
         bool isHomePlanet
     ) public {
         if (!snarkConstants().DISABLE_ZK_CHECKS) {
-            verifyProof(ProofType.Init, _proof, _input);
+            bytes32[] memory inputBytes = new bytes32[](_input.length);
+            for (uint256 i = 0; i < _input.length; i++) {
+                inputBytes[i] = bytes32(_input[i]);
+            }
+
+            INargoUltraVerifier(snarkConstants().verifiers[ProofType.Init]).verify(_proof, inputBytes);
         }
 
         uint256 _location = _input[0];

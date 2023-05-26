@@ -4,7 +4,6 @@ pragma solidity ^0.8.0;
 // Contract imports
 import {ERC721} from "@solidstate/contracts/token/ERC721/ERC721.sol";
 import {ERC721BaseStorage} from "@solidstate/contracts/token/ERC721/base/ERC721BaseStorage.sol";
-import {Verifier} from "../Verifier.sol";
 import {DFWhitelistFacet} from "./DFWhitelistFacet.sol";
 
 // Library Imports
@@ -14,7 +13,7 @@ import {LibArtifactUtils} from "../libraries/LibArtifactUtils.sol";
 import {LibPlanet} from "../libraries/LibPlanet.sol";
 
 // Storage imports
-import {WithStorage} from "../libraries/LibStorage.sol";
+import {WithStorage, ProofType} from "../libraries/LibStorage.sol";
 
 // Type imports
 import {Artifact, ArtifactType, DFTCreateArtifactArgs, DFPFindArtifactArgs} from "../DFTypes.sol";
@@ -136,10 +135,8 @@ contract DFArtifactFacet is WithStorage, ERC721 {
     }
 
     function findArtifact(
-        uint256[2] memory _a,
-        uint256[2][2] memory _b,
-        uint256[2] memory _c,
-        uint256[7] memory _input
+        uint256[7] memory _input,
+        bytes memory _proof
     ) public notPaused notTokenEnded {
         uint256 planetId = _input[0];
         uint256 biomebase = _input[1];
@@ -152,9 +149,13 @@ contract DFArtifactFacet is WithStorage, ERC721 {
         LibPlanet.refreshPlanet(planetId);
 
         if (!snarkConstants().DISABLE_ZK_CHECKS) {
+            uint256[] memory ins = new uint256[](7);
+            ins[0] = _input[0]; ins[1] = _input[1];
+            ins[2] = _input[2]; ins[3] = _input[3];
+            ins[4] = _input[4]; ins[5] = _input[5];
+            ins[6] = _input[6];
             require(
-                Verifier.verifyBiomebaseProof(_a, _b, _c, _input),
-                "biome zkSNARK failed doesn't check out"
+                verifyProof(ProofType.Biomebase, _proof, ins)
             );
         }
 

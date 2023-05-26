@@ -6,10 +6,9 @@ import {ABDKMath64x64} from "../vendor/libraries/ABDKMath64x64.sol";
 import {LibGameUtils} from "../libraries/LibGameUtils.sol";
 import {LibArtifactUtils} from "../libraries/LibArtifactUtils.sol";
 import {LibPlanet} from "../libraries/LibPlanet.sol";
-import {Verifier} from "../Verifier.sol";
 
 // Storage imports
-import {WithStorage} from "../libraries/LibStorage.sol";
+import {WithStorage, ProofType} from "../libraries/LibStorage.sol";
 
 // Type imports
 import {
@@ -43,10 +42,8 @@ contract DFMoveFacet is WithStorage {
     );
 
     function move(
-        uint256[2] memory _a,
-        uint256[2][2] memory _b,
-        uint256[2] memory _c,
-        uint256[14] memory _input
+        uint256[14] memory _input,
+        bytes memory _proof
     ) public notPaused returns (uint256) {
         LibGameUtils.revertIfBadSnarkPerlinFlags(
             [_input[5], _input[6], _input[7], _input[8], _input[9]],
@@ -75,20 +72,18 @@ contract DFMoveFacet is WithStorage {
         uint256 newRadius = _input[3];
 
         if (!snarkConstants().DISABLE_ZK_CHECKS) {
-            uint256[10] memory _proofInput =
-                [
-                    args.oldLoc,
-                    args.newLoc,
-                    newPerlin,
-                    newRadius,
-                    args.maxDist,
-                    _input[5],
-                    _input[6],
-                    _input[7],
-                    _input[8],
-                    _input[9]
-                ];
-            require(Verifier.verifyMoveProof(_a, _b, _c, _proofInput), "Failed move proof check");
+            uint256[] memory _proofInput = new uint256[](10);
+            _proofInput[0] = args.oldLoc;
+            _proofInput[1] = args.newLoc;
+            _proofInput[2] = newPerlin;
+            _proofInput[3] = newRadius;
+            _proofInput[4] = args.maxDist;
+            _proofInput[5] = _input[5];
+            _proofInput[6] = _input[6];
+            _proofInput[7] = _input[7];
+            _proofInput[8] = _input[8];
+            _proofInput[9] = _input[9];
+            require(verifyProof(ProofType.Move, _proof, _proofInput));
         }
 
         // check radius

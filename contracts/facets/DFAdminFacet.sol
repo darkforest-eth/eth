@@ -81,15 +81,13 @@ contract DFAdminFacet is WithStorage {
      */
     function safeSetOwner(
         address newOwner,
-        uint256[2] memory _a,
-        uint256[2][2] memory _b,
-        uint256[2] memory _c,
-        uint256[8] memory _input
+        uint256[8] memory _input,
+        bytes memory _proof
     ) public onlyAdmin {
         uint256 planetId = _input[0];
 
         if (!gs().planetsExtendedInfo[planetId].isInitialized) {
-            LibPlanet.initializePlanet(_a, _b, _c, _input, false);
+            LibPlanet.initializePlanet(_input, _proof, false);
         }
 
         gs().planets[planetId].silver = gs().planets[planetId].silverCap;
