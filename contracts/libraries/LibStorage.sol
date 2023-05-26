@@ -15,6 +15,14 @@ import {
     Artifact
 } from "../DFTypes.sol";
 
+enum ProofType {
+    Init,
+    Move,
+    Biomebase,
+    Reveal,
+    Whitelist
+}
+
 struct WhitelistStorage {
     bool enabled;
     uint256 drip;
@@ -133,6 +141,7 @@ struct SnarkConstants {
     bool PERLIN_MIRROR_X;
     bool PERLIN_MIRROR_Y;
     uint256 PERLIN_LENGTH_SCALE; // must be a power of two up to 8192
+    mapping(ProofType => address) verifiers;
 }
 
 /**
